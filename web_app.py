@@ -244,7 +244,8 @@ async def get_correlation_matrix():
         "Peer_Pressure_Spend", "Stress_Spend", "Financial_Confidence",
         "Lifestyle_Upgrade_Spend", "Wealth_Plan_Readiness", "Research_Freq_Num"
     ]
-    corr_matrix = df_calc[corr_cols].corr(method="spearman").round(3)
+    # Pure Pandas/NumPy Spearman correlation (rank Pearson correlation) without scipy dependency
+    corr_matrix = df_calc[corr_cols].rank().corr().round(3)
     fig = viz.plot_spearman_heatmap(corr_matrix)
 
     return JSONResponse({

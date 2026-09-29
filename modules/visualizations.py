@@ -173,8 +173,8 @@ def plot_peer_vs_stress_correlation(df: pd.DataFrame) -> go.Figure:
     melted = ct.melt(id_vars="Peer_Pressure_Spend", var_name="Stress_Spend", value_name="Count")
     melted = melted[melted["Count"] > 0]
 
-    # Calculate Spearman correlation
-    rho = df["Peer_Pressure_Spend"].corr(df["Stress_Spend"], method="spearman")
+    # Calculate Spearman correlation via ranks (pure Pandas/NumPy, no external scipy needed)
+    rho = float(df["Peer_Pressure_Spend"].rank().corr(df["Stress_Spend"].rank()))
 
     fig = go.Figure(go.Scatter(
         x=melted["Stress_Spend"],
