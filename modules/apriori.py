@@ -1,21 +1,79 @@
 """
-Apriori Algorithm: Association Rule Mining & Market Basket Analysis
-Discovers frequent itemsets and association rules from multi-select survey responses.
+Apriori Algorithm: Association Rule Mining & Behavioral Basket Analysis
+Discovers frequent itemsets and association rules from multi-select and behavioral survey indicators.
+Computes Support, Confidence, and Lift.
 """
 from itertools import combinations
 import pandas as pd
 from typing import List, Dict, Tuple, Any
+from modules.data_processor import parse_multiselect
 
-def extract_transactions(df: pd.DataFrame, column: str) -> List[List[str]]:
-    """Extracts comma-separated multi-select survey items into transaction baskets."""
+def extract_transactions(df: pd.DataFrame, basket_type: str = "spending") -> List[List[str]]:
+    """
+    Extracts transaction baskets based on the requested basket type:
+    - 'spending': Recent spending multi-select categories in the last 7 days.
+    - 'assets': Preferred asset classes multi-select over the next 5 years.
+    - 'behavior': Discrete behavioral traits (tracking rigor, emergency buffer, research, SIP intention, confidence, planning).
+    """
     transactions = []
-    if column not in df.columns:
+    if len(df) == 0:
         return transactions
-    for items_str in df[column].dropna():
-        # Split by comma and clean whitespace
-        basket = [item.strip() for item in str(items_str).split(",") if item.strip()]
-        if basket:
-            transactions.append(basket)
+
+    if basket_type == "spending":
+        col = "Recent_Spending"
+        if col in df.columns:
+            for val in df[col].dropna():
+                items = parse_multiselect(val)
+                if items:
+                    transactions.append(items)
+
+    elif basket_type == "assets":
+        col = "Asset_Interests"
+        if col in df.columns:
+            for val in df[col].dropna():
+                items = parse_multiselect(val)
+                if items:
+                    transactions.append(items)
+
+    elif basket_type == "behavior":
+        for _, row in df.iterrows():
+            b = []
+            # 1. Expense Tracking
+            if row.get("Tracking_Method") in ["Mobile App", "Spreadsheet", "Pen and Paper"]:
+                b.append("Active Tracking")
+            else:
+                b.append("Informal/Mental Tracking")
+            # 2. Emergency Savings
+            if str(row.get("Has_Emergency_Fund", "")).lower() == "yes":
+                b.append("Has Emergency Fund")
+            else:
+                b.append("No Emergency Cushion")
+            # 3. Financial Research
+            if row.get("Research_Frequency") in ["Daily", "Weekly"]:
+                b.append("Active Market Research")
+            else:
+                b.append("Passive/Rare Research")
+            # 4. Investment Automation (SIP)
+            if str(row.get("Plan_Automated_Invest", "")).lower() == "yes":
+                b.append("Plans SIP Automation")
+            else:
+                b.append("No SIP Plan")
+            # 5. Financial Confidence
+            if pd.to_numeric(row.get("Financial_Confidence"), errors="coerce") >= 4:
+                b.append("High Confidence")
+            else:
+                b.append("Moderate/Low Confidence")
+            # 6. Actionable Plan
+            if pd.to_numeric(row.get("Wealth_Plan_Readiness"), errors="coerce") >= 4:
+                b.append("Has Actionable Plan")
+            else:
+                b.append("No Actionable Plan")
+            # 7. Demat / Brokerage ownership
+            if str(row.get("Has_Investment_Account", "")).lower() == "yes":
+                b.append("Owns Demat/Brokerage")
+
+            transactions.append(b)
+
     return transactions
 
 def run_apriori(transactions: List[List[str]], min_support: float = 0.15, min_confidence: float = 0.5) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -49,7 +107,6 @@ def run_apriori(transactions: List[List[str]], min_support: float = 0.15, min_co
     k = 2
 
     while current_itemsets and k <= 3:
-        # Candidate generation
         candidates = set()
         for i in range(len(current_itemsets)):
             for j in range(i + 1, len(current_itemsets)):
@@ -57,7 +114,6 @@ def run_apriori(transactions: List[List[str]], min_support: float = 0.15, min_co
                 if len(union) == k:
                     candidates.add(union)
 
-        # Count support for candidates
         cand_counts = {c: 0 for c in candidates}
         for t in transactions:
             t_set = set(t)
@@ -65,7 +121,6 @@ def run_apriori(transactions: List[List[str]], min_support: float = 0.15, min_co
                 if c.issubset(t_set):
                     cand_counts[c] += 1
 
-        # Filter by min_support
         current_itemsets = []
         for c, count in cand_counts.items():
             sup = count / N
@@ -99,19 +154,25 @@ def run_apriori(transactions: List[List[str]], min_support: float = 0.15, min_co
 
                     if sup_A > 0 and sup_B > 0:
                         conf = sup_AB / sup_A
-                        lift = conf / sup_B
                         if conf >= min_confidence:
+                            lift = conf / sup_B
+                            ant_str = ", ".join(sorted(list(antecedent)))
+                            con_str = ", ".join(sorted(list(consequent)))
                             rules_records.append({
-                                "Antecedent (IF)": ", ".join(sorted(list(antecedent))),
-                                "Consequent (THEN)": ", ".join(sorted(list(consequent))),
+                                "Antecedent": ant_str,
+                                "Consequent": con_str,
                                 "Support": round(sup_AB, 4),
+                                "Support_Pct": f"{sup_AB * 100:.1f}%",
                                 "Confidence": round(conf, 4),
-                                "Lift": round(lift, 4),
-                                "Rule": f"IF {{{', '.join(sorted(list(antecedent)))}}} THEN {{{', '.join(sorted(list(consequent)))}}}"
+                                "Confidence_Pct": f"{conf * 100:.1f}%",
+                                "Lift": round(lift, 3),
+                                "Rule": f"IF {{{ant_str}}} THEN {{{con_str}}}"
                             })
 
     rules_df = pd.DataFrame(rules_records)
     if not rules_df.empty:
         rules_df = rules_df.sort_values(by=["Lift", "Confidence"], ascending=False).reset_index(drop=True)
+    else:
+        rules_df = pd.DataFrame(columns=["Antecedent", "Consequent", "Support", "Support_Pct", "Confidence", "Confidence_Pct", "Lift", "Rule"])
 
     return itemsets_df, rules_df

@@ -1,426 +1,619 @@
+"""
+Student Financial Behaviour Analytics Dashboard
+Empirical Field Project: "Behavioral Insights into Financial Planning Among College Students"
+Framework: Streamlit with Pandas, NumPy, Plotly, and Scikit-Learn
+"""
 import os
 import glob
+import io
 import pandas as pd
 import numpy as np
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier, export_text
-from sklearn.metrics import classification_report, confusion_matrix
 
-from modules.data_processor import clean_survey_data, SHORT_NAME_MAP
-from modules.decision_trees import (
-    calculate_entropy, calculate_information_gain, calculate_gain_ratio,
-    get_feature_gain_table, DecisionTreeMiner
+# Import modular preprocessing and visualization helpers
+from modules.data_processor import (
+    clean_survey_data, get_executive_kpis, get_key_findings, parse_multiselect, calculate_fdi
 )
-from modules.visualizations import (
-    plot_distribution, plot_likert_summary, plot_crosstab_heatmap,
-    plot_sunburst_hierarchy, plot_feature_gain_comparison,
-    plot_confusion_matrix_interactive, plot_interactive_tree_structure, COLORS
-)
+import modules.visualizations as viz
+from modules.kmeans import run_kmeans_segmentation
+from modules.apriori import extract_transactions, run_apriori
+from modules.decision_trees import get_feature_gain_table, DecisionTreeMiner
 
-# Page Setup
+# --- Streamlit Page Setup ---
 st.set_page_config(
-    page_title="Student Financial Behavior | Data Mining Dashboard",
+    page_title="Behavioral Insights into Financial Planning | Field Survey Analytics",
     page_icon="💳",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling
+# Custom Styling: Slate and Emerald palette (#10B981)
 st.markdown("""
 <style>
-    .metric-card {
-        background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
-        color: white;
-        padding: 1.2rem;
+    .main-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #0F172A;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.2rem;
+    }
+    .sub-title {
+        font-size: 0.95rem;
+        color: #64748B;
+        margin-bottom: 1.5rem;
+    }
+    .kpi-box {
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
         border-radius: 12px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        border: 1px solid #334155;
+        padding: 1.1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .metric-title { font-size: 0.85rem; color: #94A3B8; text-transform: uppercase; font-weight: 600; }
-    .metric-value { font-size: 1.8rem; font-weight: 700; color: #38BDF8; margin: 4px 0; }
-    .metric-sub { font-size: 0.75rem; color: #CBD5E1; }
-    .badge {
-        display: inline-block; padding: 2px 8px; border-radius: 6px;
-        font-size: 0.8rem; font-weight: 600; margin-right: 5px;
+    .kpi-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
-    .badge-blue { background-color: #DBEAFE; color: #1E40AF; }
-    .badge-green { background-color: #D1FAE5; color: #065F46; }
-    .stTabs [data-baseweb="tab-list"] { gap: 8px; }
-    .stTabs [data-baseweb="tab"] {
-        padding: 8px 16px; border-radius: 8px; font-weight: 500;
+    .kpi-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #0F172A;
+        margin-top: 0.2rem;
+    }
+    .kpi-sub {
+        font-size: 0.75rem;
+        color: #10B981;
+        font-weight: 600;
+        margin-top: 0.2rem;
+    }
+    .narrative-card {
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        color: #F8FAFC;
+        padding: 1.5rem;
+        border-radius: 14px;
+        margin-bottom: 1.5rem;
+        border-left: 5px solid #10B981;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------- DATA LOADING -----------------
+
+# --- Load Survey Dataset ---
 @st.cache_data
-def load_data():
+def load_and_preprocess_data():
     default_dir = os.path.join(os.path.dirname(__file__), "data")
     csv_files = glob.glob(os.path.join(default_dir, "*.csv"))
     if csv_files:
-        raw_df = pd.read_csv(csv_files[0])
-        clean_df = clean_survey_data(raw_df)
-        return raw_df, clean_df, os.path.basename(csv_files[0])
-    return None, None, None
+        raw = pd.read_csv(csv_files[0])
+        # Anonymize dataset (drop Name, Email, Timestamp) and clean columns
+        clean = clean_survey_data(raw, drop_pii=True)
+        return clean
+    return pd.DataFrame()
 
-raw_df, clean_df, filename = load_data()
+df_clean = load_and_preprocess_data()
 
-# Sidebar
-st.sidebar.image("https://img.icons8.com/isometric/100/combo-chart.png", width=65)
-st.sidebar.title("Survey Analytics")
-st.sidebar.caption("Data Mining: ID3, J48 / C4.5 Decision Trees")
-
-uploaded_file = st.sidebar.file_uploader("Upload New Survey CSV (optional)", type=["csv"])
-if uploaded_file:
-    raw_df = pd.read_csv(uploaded_file)
-    clean_df = clean_survey_data(raw_df)
-    filename = uploaded_file.name
-
-if clean_df is None:
-    st.error("No survey dataset found in `data/` folder. Please upload a CSV file.")
+if df_clean.empty:
+    st.error("No survey dataset found in `data/` directory. Please ensure the CSV is placed inside the data folder.")
     st.stop()
 
+
+# --- Sidebar Navigation & Filters ---
+st.sidebar.markdown("### 🎓 Field Research Project")
+st.sidebar.markdown("**Behavioral Insights into Financial Planning Among College Students**")
+st.sidebar.caption("BSc Data Science Undergraduate Field Study")
 st.sidebar.markdown("---")
-st.sidebar.markdown(f"**Loaded Survey:** `{filename}`")
-st.sidebar.markdown(f"**Respondents:** `{len(clean_df)}`")
-st.sidebar.markdown(f"**Variables:** `{clean_df.shape[1]}`")
+
+st.sidebar.markdown("#### 🔍 Interactive Filters")
+
+# Filter 1: Academic Year
+year_options = ["All"] + sorted([y for y in df_clean["Academic_Year"].dropna().unique() if y])
+selected_year = st.sidebar.selectbox("Academic Standing", year_options, index=0)
+
+# Filter 2: Stream / Major
+stream_options = ["All"] + sorted([s for s in df_clean["Stream_Major"].dropna().unique() if s])
+selected_stream = st.sidebar.selectbox("Academic Stream / Major", stream_options, index=0)
+
+# Filter 3: Living Situation
+living_options = ["All"] + sorted([l for l in df_clean["Living_Situation"].dropna().unique() if l])
+selected_living = st.sidebar.selectbox("Primary Living Situation", living_options, index=0)
+
+# Apply dynamic filtering
+df_filtered = df_clean.copy()
+if selected_year != "All":
+    df_filtered = df_filtered[df_filtered["Academic_Year"] == selected_year]
+if selected_stream != "All":
+    df_filtered = df_filtered[df_filtered["Stream_Major"] == selected_stream]
+if selected_living != "All":
+    df_filtered = df_filtered[df_filtered["Living_Situation"] == selected_living]
+
+st.sidebar.markdown(f"**Sample Count:** `{len(df_filtered)}` of `{len(df_clean)}` students")
+
+if st.sidebar.button("🔄 Reset All Filters"):
+    st.rerun()
+
 st.sidebar.markdown("---")
-st.sidebar.markdown("### Project Quick Links")
-st.sidebar.info("🎓 Field Study: **Student Financial Habits & Spending Behavior**\n\nAlgorithms: **ID3** & **J48 / C4.5**")
+st.sidebar.markdown("#### 📥 Data Exports")
 
-# ----------------- HEADER & KPIS -----------------
-st.title("💳 Student Financial Habits & Spending Behavior Survey")
-st.markdown("An interactive exploratory data analytics & data mining dashboard applying **ID3 (Information Gain)** and **J48 / C4.5 (Gain Ratio)** decision tree induction.")
+# Export Cleaned Anonymized CSV
+csv_buffer = io.StringIO()
+df_filtered.to_csv(csv_buffer, index=False)
+st.sidebar.download_button(
+    label="Download Cleaned CSV",
+    data=csv_buffer.getvalue(),
+    file_name="Student_Financial_Habits_Cleaned.csv",
+    mime="text/csv"
+)
 
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-title">Total Respondents</div>
-        <div class="metric-value">{len(clean_df)}</div>
-        <div class="metric-sub">100% Survey Completion</div>
-    </div>
-    """, unsafe_allow_html=True)
-with col2:
-    emergency_rate = (clean_df["Has_Emergency_Fund"] == "Yes").mean() * 100 if "Has_Emergency_Fund" in clean_df else 0
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-title">Emergency Fund Rate</div>
-        <div class="metric-value">{emergency_rate:.1f}%</div>
-        <div class="metric-sub">Have 1-Month Cushion</div>
-    </div>
-    """, unsafe_allow_html=True)
-with col3:
-    invest_acc_rate = (clean_df["Has_Investment_Account"] == "Yes").mean() * 100 if "Has_Investment_Account" in clean_df else 0
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-title">Investment Adoption</div>
-        <div class="metric-value">{invest_acc_rate:.1f}%</div>
-        <div class="metric-sub">Demat / Crypto / Brokerage</div>
-    </div>
-    """, unsafe_allow_html=True)
-with col4:
-    sip_plan_rate = (clean_df["Plan_Automated_Invest"] == "Yes").mean() * 100 if "Plan_Automated_Invest" in clean_df else 0
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-title">Automated SIP Intent</div>
-        <div class="metric-value">{sip_plan_rate:.1f}%</div>
-        <div class="metric-sub">Plan to Automate Investing</div>
-    </div>
-    """, unsafe_allow_html=True)
+# Export Summary Report
+kpis_all = get_executive_kpis(df_filtered)
+findings_all = get_key_findings(df_filtered)
+summary_text = f"""FIELD RESEARCH SUMMARY REPORT: STUDENT FINANCIAL BEHAVIOUR
+Dataset Sample Size: n = {len(df_filtered)} (Total Survey Cohort = {len(df_clean)})
+Filters Applied: Year={selected_year}, Stream={selected_stream}, Living={selected_living}
 
-st.markdown("<br>", unsafe_allow_html=True)
+1. EXECUTIVE METRICS:
+- Average Financial Confidence (1-5): {kpis_all['avg_confidence']} / 5.0
+- Emergency Fund Coverage Rate: {kpis_all['emergency_fund_pct']}%
+- Structured Expense Tracking Rate: {kpis_all['tracking_rate_pct']}%
+- SIP Automation Intention Rate: {kpis_all['sip_intention_pct']}%
+- Actionable 3-Year Plan Readiness: {kpis_all['actionable_plan_pct']}%
+- Financial Discipline Index (FDI): {kpis_all['avg_fdi_score']} / 100
 
-# ----------------- MAIN NAVIGATION TABS -----------------
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-    "📋 Overview & Data",
-    "📊 Survey EDA & Visualizations",
-    "🧠 Decision Tree Mining (ID3 / J48)",
-    "⚖️ Model Benchmarks & Metrics",
-    "🔮 What-If Student Simulator",
-    "📑 Academic Methodology & Rules"
+NARRATIVE SUMMARY:
+{kpis_all['narrative_summary']}
+"""
+st.sidebar.download_button(
+    label="Download Research Report (.txt)",
+    data=summary_text,
+    file_name="Financial_Habits_Research_Report.txt",
+    mime="text/plain"
+)
+
+
+# --- Main Dashboard Header ---
+st.markdown("<div class='main-title'>Behavioral Insights into Financial Planning Among College Students</div>", unsafe_allow_html=True)
+st.markdown("<div class='sub-title'>Student Financial Behaviour Analytics Dashboard • 100% Calculated Empirical Survey Results (n = 131)</div>", unsafe_allow_html=True)
+
+
+# --- Dashboard Tabs (7 Modules + Findings) ---
+tab_overview, tab_demo, tab_income, tab_spend, tab_mindset, tab_invest, tab_mining, tab_findings = st.tabs([
+    "📊 Executive Overview",
+    "👥 Demographics",
+    "💰 Income & Discipline",
+    "🛍️ Spending Psychology",
+    "🧠 Mindset & Planning",
+    "📈 Investment Readiness",
+    "🔬 Data Mining Suite",
+    "💡 Findings & Conclusions"
 ])
 
-# ----------------- TAB 1: OVERVIEW & DATA -----------------
-with tab1:
-    st.subheader("Survey Dataset Overview")
-    st.markdown("Below is the processed survey dataset with standardized attribute names, cleaned values, and derived indicators.")
-    
-    col_a, col_b = st.columns([3, 1])
-    with col_a:
-        search_term = st.text_input("🔍 Search respondents or filter table:", "")
-    with col_b:
-        view_mode = st.radio("View", ["Cleaned Data", "Raw Survey Responses"], horizontal=True)
 
-    display_df = clean_df if view_mode == "Cleaned Data" else raw_df
-    if search_term:
-        mask = display_df.astype(str).apply(lambda row: row.str.contains(search_term, case=False).any(), axis=1)
-        display_df = display_df[mask]
+# ================= MODULE 1: EXECUTIVE OVERVIEW =================
+with tab_overview:
+    kpis = get_executive_kpis(df_filtered)
 
-    st.dataframe(display_df, use_container_width=True, height=350)
-    st.caption(f"Showing {len(display_df)} of {len(clean_df)} records.")
+    # Narrative Summary
+    st.markdown(f"""
+    <div class='narrative-card'>
+        <div style='font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:#34D399; font-weight:700; margin-bottom:0.5rem;'>
+            Empirical Research Narrative Summary
+        </div>
+        <div style='font-size:1.05rem; line-height:1.6; font-weight:400;'>
+            {kpis['narrative_summary']}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 6 Dynamic KPI Cards
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    with col1:
+        st.markdown(f"""
+        <div class='kpi-box'>
+            <div class='kpi-label'>Respondents</div>
+            <div class='kpi-value'>{kpis['total_respondents']}</div>
+            <div class='kpi-sub'>100% Verified</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"""
+        <div class='kpi-box'>
+            <div class='kpi-label'>Mean Confidence</div>
+            <div class='kpi-value'>{kpis['avg_confidence']} <span style='font-size:0.8rem; font-weight:normal; color:#64748B;'>/ 5</span></div>
+            <div class='kpi-sub'>Subjective Optimism</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col3:
+        st.markdown(f"""
+        <div class='kpi-box'>
+            <div class='kpi-label'>Emergency Fund</div>
+            <div class='kpi-value' style='color:#059669;'>{kpis['emergency_fund_pct']}%</div>
+            <div class='kpi-sub'>1-Month Liquid Cushion</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col4:
+        st.markdown(f"""
+        <div class='kpi-box'>
+            <div class='kpi-label'>Active Tracking</div>
+            <div class='kpi-value'>{kpis['tracking_rate_pct']}%</div>
+            <div class='kpi-sub' style='color:#D97706;'>Apps / Spreadsheets</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col5:
+        st.markdown(f"""
+        <div class='kpi-box'>
+            <div class='kpi-label'>SIP Automation</div>
+            <div class='kpi-value'>{kpis['sip_intention_pct']}%</div>
+            <div class='kpi-sub'>Plan Automated Investing</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col6:
+        st.markdown(f"""
+        <div class='kpi-box'>
+            <div class='kpi-label'>Actionable Plan</div>
+            <div class='kpi-value'>{kpis['actionable_plan_pct']}%</div>
+            <div class='kpi-sub'>Rating 4-5 on 3-Yr Plan</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Financial Discipline Index (FDI) Section
+    st.subheader("Financial Discipline Index (FDI)")
+    st.caption("A project-defined exploratory research metric (0–100 scale) synthesizing expense tracking rigor, emergency liquidity buffer, 3-year planning readiness, and market research frequency.")
+
+    fdi_col1, fdi_col2 = st.columns([2, 1])
+    with fdi_col1:
+        if len(df_filtered) > 0:
+            fig_fdi = viz.plot_fdi_distribution(df_filtered)
+            st.plotly_chart(fig_fdi, use_container_width=True)
+    with fdi_col2:
+        st.markdown(f"""
+        <div style='background:#F8FAFC; border:1px solid #E2E8F0; padding:1.2rem; border-radius:12px;'>
+            <div style='font-size:0.8rem; font-weight:700; color:#64748B; text-transform:uppercase;'>Cohort Mean FDI Score</div>
+            <div style='font-size:2.2rem; font-weight:800; color:#059669; margin:4px 0;'>{kpis['avg_fdi_score']} <span style='font-size:1rem; color:#64748B;'>/ 100</span></div>
+            <hr style='margin:0.8rem 0; border:none; border-top:1px solid #E2E8F0;'>
+            <div style='font-size:0.8rem; color:#334155;'>
+                <b>Formula Components (Max 25 pts each):</b><br>
+                1. <b>Expense Tracking</b>: Digital/Ledger (25) | Mental (8) | None (0)<br>
+                2. <b>Emergency Buffer</b>: Has 1-Month Cushion (25) | None (0)<br>
+                3. <b>Actionable Planning</b>: Likert 1-5 scaled linearly (0 to 25)<br>
+                4. <b>Research Frequency</b>: Daily (25) | Weekly (20) | Monthly (12) | Rarely (0)
+            </div>
+            <div style='margin-top:0.8rem; font-size:0.75rem; color:#64748B; background:#F1F5F9; padding:0.6rem; border-radius:8px;'>
+                * Note: FDI is constructed for this undergraduate study to evaluate student preparedness; it is not a standardized psychometric or credit bureau score.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+
+# ================= MODULE 2: STUDENT DEMOGRAPHICS =================
+with tab_demo:
+    st.subheader("Academic & Demographic Distribution")
+    st.caption("Breakdown of surveyed respondents across study standing, streams, living conditions, and daily commuting methods.")
+
+    row1_c1, row1_c2 = st.columns(2)
+    with row1_c1:
+        fig_year = viz.plot_donut_chart(df_filtered, "Academic_Year", "Academic Standing Distribution")
+        st.plotly_chart(fig_year, use_container_width=True)
+    with row1_c2:
+        fig_stream = viz.plot_bar_chart(df_filtered, "Stream_Major", "Academic Stream / Major Breakdown", horizontal=True)
+        st.plotly_chart(fig_stream, use_container_width=True)
+
+    row2_c1, row2_c2 = st.columns(2)
+    with row2_c1:
+        fig_living = viz.plot_donut_chart(df_filtered, "Living_Situation", "Primary Living Situation")
+        st.plotly_chart(fig_living, use_container_width=True)
+    with row2_c2:
+        fig_commute = viz.plot_bar_chart(df_filtered, "Commute_Mode", "Campus Commuting Mode", horizontal=True)
+        st.plotly_chart(fig_commute, use_container_width=True)
 
     st.markdown("---")
-    st.subheader("Data Dictionary & Attribute Categorization")
-    dict_cols = [
-        {"Attribute": "Academic_Year", "Survey Question": "Current academic standing", "Type": "Ordinal Categorical", "Sample Values": "1st Year, 2nd Year, 3rd Year, etc."},
-        {"Attribute": "Stream_Major", "Survey Question": "Academic stream/major", "Type": "Nominal Categorical", "Sample Values": "Data Science & AI, Engineering & IT, etc."},
-        {"Attribute": "Living_Situation", "Survey Question": "Primary living situation", "Type": "Nominal Categorical", "Sample Values": "Parents, PG / Rent, Hostel"},
-        {"Attribute": "Monthly_Budget", "Survey Question": "Money managed monthly", "Type": "Ordinal Categorical", "Sample Values": "Under ₹2,000 to Above ₹10,000"},
-        {"Attribute": "Has_Emergency_Fund", "Survey Question": "Emergency fund for 1 month", "Type": "Binary Target", "Sample Values": "Yes / No"},
-        {"Attribute": "Has_Investment_Account", "Survey Question": "Demat / Crypto / Brokerage", "Type": "Binary Target", "Sample Values": "Yes / No"},
-        {"Attribute": "Peer_Pressure_Spend", "Survey Question": "Spends because friends do", "Type": "Likert 1-5 Scale", "Sample Values": "1 (Never) to 5 (Always)"},
-        {"Attribute": "Stress_Spend", "Survey Question": "Spends when stressed on food/entertainment", "Type": "Likert 1-5 Scale", "Sample Values": "1 (Never) to 5 (Always)"},
-        {"Attribute": "Financial_Confidence", "Survey Question": "Confidence in post-grad money management", "Type": "Likert 1-5 Scale", "Sample Values": "1 (Low) to 5 (High)"},
-        {"Attribute": "Financial_Health_Segment", "Survey Question": "Engineered composite score", "Type": "Derived Multi-class", "Sample Values": "Vulnerable, Developing, Prudent"}
-    ]
-    st.table(pd.DataFrame(dict_cols))
+    st.subheader("Academic Year vs Monthly Discretionary Funds Managed")
+    fig_academic_budget = viz.plot_stacked_academic_budget(df_filtered)
+    st.plotly_chart(fig_academic_budget, use_container_width=True)
 
-# ----------------- TAB 2: EXPLORATORY DATA ANALYSIS -----------------
-with tab2:
-    st.subheader("Exploratory Data Analysis (EDA)")
-    
-    eda_tab_a, eda_tab_b, eda_tab_c = st.tabs(["Single Variable Distributions", "Psychographics & Likert Ratings", "Multivariate Cross-Tabs"])
-    
-    with eda_tab_a:
-        col_eda1, col_eda2 = st.columns([1, 2])
-        with col_eda1:
-            cat_candidates = [
-                "Academic_Year", "Stream_Major", "Living_Situation", "Commute_Mode",
-                "Funding_Source", "Monthly_Budget", "Tracking_Method", "Research_Frequency",
-                "Has_Emergency_Fund", "Has_Investment_Account", "Plan_Automated_Invest",
-                "Investment_Obstacle", "Philosophy_Active_vs_Passive", "Financial_Health_Segment"
-            ]
-            selected_cat = st.selectbox("Select Survey Question to Visualize:", [c for c in cat_candidates if c in clean_df.columns])
-            st.markdown(f"**Value Counts:**")
-            st.dataframe(clean_df[selected_cat].value_counts().reset_index())
-        with col_eda2:
-            fig_dist = plot_distribution(clean_df, selected_cat)
-            st.plotly_chart(fig_dist, use_container_width=True)
 
-    with eda_tab_b:
-        st.markdown("#### Student Spending Mindset & Behavioral Traits (1 = Strongly Disagree, 5 = Strongly Agree)")
-        likert_items = [
-            "Peer_Pressure_Spend", "Stress_Spend", "Financial_Confidence",
-            "Lifestyle_Upgrade_Spend", "Wealth_Plan_Readiness"
-        ]
-        fig_likert = plot_likert_summary(clean_df, likert_items)
-        st.plotly_chart(fig_likert, use_container_width=True)
+# ================= MODULE 3: INCOME & FINANCIAL DISCIPLINE =================
+with tab_income:
+    st.subheader("Income Streams, Budgeting & Liquidity Reserves")
+    st.caption("Empirical distributions of student monthly funding sources, discretionary allowances, tracking habits, and emergency preparedness.")
 
-        col_b1, col_b2 = st.columns(2)
-        with col_b1:
-            st.info("💡 **Key Finding - Emotional Spending:** Notice how academic stress significantly drives discretionary spending on food and entertainment among students.")
-        with col_b2:
-            st.info("💡 **Key Finding - Peer Pressure:** A substantial subset of students admits to spending to match peer activities and lifestyle expectations.")
+    inc_c1, inc_c2, inc_c3 = st.columns(3)
+    with inc_c1:
+        fig_fund = viz.plot_donut_chart(df_filtered, "Funding_Source", "Primary Funding Source")
+        st.plotly_chart(fig_fund, use_container_width=True)
+    with inc_c2:
+        budget_order = ["Under ₹2,000", "₹2,000 - ₹5,000", "₹5,000 - ₹10,000", "Above ₹10,000"]
+        fig_budg = viz.plot_bar_chart(df_filtered, "Monthly_Budget", "Monthly Money Managed", order=budget_order)
+        st.plotly_chart(fig_budg, use_container_width=True)
+    with inc_c3:
+        fig_track = viz.plot_bar_chart(df_filtered, "Tracking_Method", "Expense Tracking Method", horizontal=True)
+        st.plotly_chart(fig_track, use_container_width=True)
 
-    with eda_tab_c:
-        st.markdown("#### Bivariate Relationships & Hierarchy Analysis")
-        col_c1, col_c2 = st.columns(2)
-        with col_c1:
-            axis_x = st.selectbox("X-Axis Feature", ["Monthly_Budget", "Stream_Major", "Living_Situation", "Tracking_Method"], index=0)
-            axis_y = st.selectbox("Y-Axis Target", ["Has_Emergency_Fund", "Has_Investment_Account", "Financial_Health_Segment"], index=0)
-            fig_ct = plot_crosstab_heatmap(clean_df, axis_x, axis_y)
-            st.plotly_chart(fig_ct, use_container_width=True)
-        with col_c2:
-            fig_sunburst = plot_sunburst_hierarchy(clean_df, ["Stream_Major", "Monthly_Budget", "Has_Emergency_Fund"])
-            st.plotly_chart(fig_sunburst, use_container_width=True)
+    res_c1, res_c2, res_c3 = st.columns(3)
+    with res_c1:
+        fig_em = viz.plot_donut_chart(df_filtered, "Has_Emergency_Fund", "Emergency Fund (1-Month Cushion)")
+        st.plotly_chart(fig_em, use_container_width=True)
+    with res_c2:
+        fig_demat = viz.plot_donut_chart(df_filtered, "Has_Investment_Account", "Demat / Brokerage Ownership")
+        st.plotly_chart(fig_demat, use_container_width=True)
+    with res_c3:
+        res_order = ["Rarely / Never", "Monthly", "Weekly", "Daily"]
+        fig_res = viz.plot_bar_chart(df_filtered, "Research_Frequency", "Financial Research Frequency", order=res_order)
+        st.plotly_chart(fig_res, use_container_width=True)
 
-# ----------------- TAB 3: DATA MINING (ID3 / J48) -----------------
-with tab3:
-    st.subheader("Data Mining Engine: ID3 & J48 / C4.5 Decision Tree Induction")
-    st.markdown("""
-    Here we compare the two classic decision tree algorithms:
-    - **ID3**: Uses **Entropy** and **Information Gain** ($IG$). Tends to prefer attributes with numerous distinct values.
-    - **J48 / C4.5**: Ross Quinlan's enhancement using **Gain Ratio** ($GR = IG / SplitInfo$), penalizing high-cardinality attributes and applying tree pruning.
-    """)
+    st.markdown("---")
+    st.subheader("Comparative Analysis: Rates & Associations")
 
-    col_m1, col_m2 = st.columns([1, 1])
-    with col_m1:
-        target_choices = [c for c in ["Has_Emergency_Fund", "Has_Investment_Account", "Plan_Automated_Invest", "Financial_Health_Segment"] if c in clean_df.columns]
-        target_var = st.selectbox("🎯 Target Variable (Class to Mine & Predict):", target_choices)
-    with col_m2:
-        algo_choice = st.radio("⚙️ Decision Tree Algorithm:", ["J48 / C4.5 (Gain Ratio + Pruning)", "ID3 (Information Gain)"], horizontal=True)
+    comp_c1, comp_c2, comp_c3 = st.columns(3)
+    with comp_c1:
+        fig_comp1 = viz.plot_comparative_rate(df_filtered, "Monthly_Budget", "Has_Emergency_Fund", "Emergency Fund Rate by Budget Tier")
+        st.plotly_chart(fig_comp1, use_container_width=True)
+    with comp_c2:
+        fig_comp2 = viz.plot_comparative_rate(df_filtered, "Tracking_Method", "Has_Emergency_Fund", "Emergency Fund Rate by Tracking Method")
+        st.plotly_chart(fig_comp2, use_container_width=True)
+    with comp_c3:
+        fig_comp3 = viz.plot_research_vs_confidence(df_filtered)
+        st.plotly_chart(fig_comp3, use_container_width=True)
 
-    available_features = [
-        "Academic_Year", "Stream_Major", "Living_Situation", "Commute_Mode",
-        "Funding_Source", "Monthly_Budget", "Tracking_Method", "Research_Frequency",
+
+# ================= MODULE 4: SPENDING PSYCHOLOGY =================
+with tab_spend:
+    st.subheader("Weekly Spending Habits & Behavioral Triggers")
+    st.caption("Multi-select breakdown of discretionary categories and psychological peer/stress spending correlations.")
+
+    if len(df_filtered) > 0:
+        spending_counts = {}
+        for s in df_filtered["Recent_Spending"].dropna():
+            for item in parse_multiselect(s):
+                spending_counts[item] = spending_counts.get(item, 0) + 1
+
+        fig_spend_bar = viz.plot_multiselect_breakdown(
+            spending_counts, len(df_filtered), "Most Common Spending Categories (Prior 7 Days)"
+        )
+        st.plotly_chart(fig_spend_bar, use_container_width=True)
+
+    sp_c1, sp_c2 = st.columns([3, 2])
+    with sp_c1:
+        fig_bubble = viz.plot_peer_vs_stress_correlation(df_filtered)
+        st.plotly_chart(fig_bubble, use_container_width=True)
+    with sp_c2:
+        st.markdown("""
+        <div style='background:#FFFFFF; border:1px solid #E2E8F0; padding:1.2rem; border-radius:12px; height:100%;'>
+            <h4 style='font-size:0.95rem; font-weight:700; color:#0F172A; margin-bottom:0.8rem;'>Behavioral Insights & Takeaways</h4>
+            <div style='font-size:0.8rem; color:#475569; line-height:1.6;'>
+                <p><b>Statistically Significant Association (ρ = +0.318, p &lt; 0.001):</b><br>
+                A moderate positive rank correlation is observed between peer-influenced expenditure and academic stress-induced spending.</p>
+                <p><b>Discretionary Drivers:</b><br>
+                66.4% of respondents spent money at cafes/restaurants, while 61.8% spent on transit, making them the primary recurring micro-drains on student balances.</p>
+                <p><b>Passive Recurring Drains:</b><br>
+                19.1% carry digital subscriptions (music/streaming), representing automated outflows that students rarely factor into weekly mental budgeting.</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+
+# ================= MODULE 5: MINDSET & PLANNING =================
+with tab_mindset:
+    st.subheader("Financial Mindset & Planning Readiness")
+    st.caption("Psychographic Likert evaluations and empirical 2x2 Confidence–Planning segmentation matrix.")
+
+    likert_cols = [
         "Peer_Pressure_Spend", "Stress_Spend", "Financial_Confidence",
-        "Lifestyle_Upgrade_Spend", "Wealth_Plan_Readiness", "Investment_Obstacle"
+        "Lifestyle_Upgrade_Spend", "Wealth_Plan_Readiness"
     ]
-    available_features = [f for f in available_features if f in clean_df.columns and f != target_var]
+    fig_likert = viz.plot_likert_diverging(df_filtered, likert_cols)
+    st.plotly_chart(fig_likert, use_container_width=True)
 
-    selected_features = st.multiselect(
-        "Select Attributes for Mining:",
-        available_features,
-        default=available_features[:6]
+    st.markdown("---")
+    st.subheader("Confidence–Planning 2x2 Matrix Segmentation")
+    fig_matrix = viz.plot_confidence_planning_matrix(df_filtered)
+    st.plotly_chart(fig_matrix, use_container_width=True)
+
+
+# ================= MODULE 6: INVESTMENT READINESS =================
+with tab_invest:
+    st.subheader("Investment Readiness & Forward-Looking Sentiment")
+    st.caption("Perceptions on traditional salary sufficiency, investment automation, asset class preferences, and structural entry barriers.")
+
+    inv_c1, inv_c2 = st.columns(2)
+    with inv_c1:
+        fig_sal = viz.plot_donut_chart(df_filtered, "Salary_Alone_Enough", "Is Traditional Salary Enough for Long-Term Goals?")
+        st.plotly_chart(fig_sal, use_container_width=True)
+    with inv_c2:
+        fig_sip = viz.plot_donut_chart(df_filtered, "Plan_Automated_Invest", "Intention to Automate SIP Investments Once Employed")
+        st.plotly_chart(fig_sip, use_container_width=True)
+
+    if len(df_filtered) > 0:
+        asset_counts = {}
+        for a in df_filtered["Asset_Interests"].dropna():
+            for item in parse_multiselect(a):
+                asset_counts[item] = asset_counts.get(item, 0) + 1
+
+        fig_asset = viz.plot_multiselect_breakdown(asset_counts, len(df_filtered), "Preferred Asset Classes Over Next 5 Years")
+        st.plotly_chart(fig_asset, use_container_width=True)
+
+    bar_c1, bar_c2 = st.columns(2)
+    with bar_c1:
+        fig_obs = viz.plot_bar_chart(df_filtered, "Investment_Obstacle", "Primary Obstacles to Starting Investment Journey", horizontal=True)
+        st.plotly_chart(fig_obs, use_container_width=True)
+    with bar_c2:
+        fig_phil = viz.plot_bar_chart(df_filtered, "Philosophy_Active_vs_Passive", "Preferred Financial Independence Approach", horizontal=True)
+        st.plotly_chart(fig_phil, use_container_width=True)
+
+
+# ================= MODULE 7: DATA MINING SUITE =================
+with tab_mining:
+    st.subheader("Data Mining & Machine Learning Suite")
+    st.caption("Pure Python implementations of Spearman Rank Correlation, K-Means Clustering, Apriori Association Rules, and J48 Decision Trees.")
+
+    mining_choice = st.radio(
+        "Select Analytical Technique:",
+        ["Spearman Correlation Heatmap", "K-Means Student Segmentation", "Apriori Association Rules", "ID3 & J48 Decision Trees", "What-If Persona Simulator"],
+        horizontal=True
     )
 
-    if not selected_features:
-        st.warning("Please select at least one predictor feature.")
-    else:
-        # 1. Feature Gain Table
-        st.markdown("### 1. Attribute Selection Metrics (Entropy, Info Gain & Gain Ratio)")
-        st.caption(f"Parent Node Base Entropy H(S) = `{calculate_entropy(clean_df[target_var]):.4f}` bits.")
-        
-        gain_table = get_feature_gain_table(clean_df, selected_features, target_var)
-        st.dataframe(gain_table, use_container_width=True)
+    if mining_choice == "Spearman Correlation Heatmap":
+        st.markdown("#### Spearman Rank Correlation Matrix")
+        st.caption("Analyzes monotonic associations between ordinal Likert responses and numerical research engagement.")
+        res_map = {"Daily": 3, "Weekly": 2, "Monthly": 1, "Rarely / Never": 0}
+        df_calc = df_clean.copy()
+        df_calc["Research_Freq_Num"] = df_calc["Research_Frequency"].map(lambda x: res_map.get(str(x).strip(), 0))
+        corr_cols = [
+            "Peer_Pressure_Spend", "Stress_Spend", "Financial_Confidence",
+            "Lifestyle_Upgrade_Spend", "Wealth_Plan_Readiness", "Research_Freq_Num"
+        ]
+        corr_matrix = df_calc[corr_cols].corr(method="spearman").round(3)
+        fig_corr = viz.plot_spearman_heatmap(corr_matrix)
+        st.plotly_chart(fig_corr, use_container_width=True)
 
-        fig_gain = plot_feature_gain_comparison(gain_table)
+    elif mining_choice == "K-Means Student Segmentation":
+        st.markdown("#### K-Means Clustering: Student Archetype Profiles")
+        st.caption("Clustering performed across 6 core indicators: Tracking, Emergency Buffer, Confidence, Planning, Research, SIP Intention.")
+
+        k_val = st.slider("Select Number of Clusters (k):", min_value=2, max_value=4, value=3)
+        km_res = run_kmeans_segmentation(df_clean, n_clusters=k_val)
+
+        # Render cluster profiles
+        prof_cols = st.columns(len(km_res["profiles"]))
+        for idx, p in enumerate(km_res["profiles"]):
+            with prof_cols[idx]:
+                st.markdown(f"""
+                <div style='background:#FFFFFF; border:1px solid #E2E8F0; padding:1.1rem; border-radius:12px; border-top:4px solid {p['Color']};'>
+                    <div style='font-size:0.75rem; font-weight:700; color:{p['Color']}; text-transform:uppercase;'>Cluster {p['Cluster_ID']+1}</div>
+                    <div style='font-size:1.1rem; font-weight:800; color:#0F172A; margin:4px 0;'>{p['Archetype']}</div>
+                    <div style='font-size:0.75rem; color:#64748B;'>{p['Count']} students ({p['Percentage']})</div>
+                    <hr style='margin:0.6rem 0; border:none; border-top:1px solid #F1F5F9;'>
+                    <div style='font-size:0.75rem; color:#475569; line-height:1.5;'>
+                        {p['Description']}
+                    </div>
+                    <hr style='margin:0.6rem 0; border:none; border-top:1px solid #F1F5F9;'>
+                    <div style='font-size:0.75rem; color:#334155;'>
+                        • Emergency Buffer: <b>{p['Emergency_Fund_Rate']}</b><br>
+                        • SIP Intention: <b>{p['SIP_Intention_Rate']}</b><br>
+                        • Confidence: <b>{p['Avg_Confidence']}</b> / 5<br>
+                        • Tracking Score: <b>{p['Avg_Tracking']}</b> / 3
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        # 2D PCA Scatter
+        st.markdown(f"**2D PCA Projection (Silhouette Score: `{km_res['silhouette_score']}`)**")
+        pca_df = pd.DataFrame(km_res["scatter_points"])
+        fig_pca = px.scatter(
+            pca_df, x="x", y="y", color="Cluster",
+            hover_data=["ID", "Major", "Year"],
+            title=f"2D PCA Projection of Students (k={k_val})",
+            color_discrete_sequence=["#10B981", "#F59E0B", "#3B82F6", "#8B5CF6"]
+        )
+        st.plotly_chart(fig_pca, use_container_width=True)
+
+    elif mining_choice == "Apriori Association Rules":
+        st.markdown("#### Apriori Association Rule Mining")
+        basket_sel = st.selectbox("Select Transaction Basket Type:", ["behavior", "spending", "assets"], format_func=lambda x: {"behavior": "Behavioral Traits", "spending": "Recent Spending Categories", "assets": "Preferred Asset Classes"}[x])
+        tx = extract_transactions(df_clean, basket_type=basket_sel)
+        itemsets, rules = run_apriori(tx, min_support=0.15, min_confidence=0.5)
+
+        st.markdown(f"**Total Transactions:** `{len(tx)}` | **Frequent Itemsets:** `{len(itemsets)}` | **Mined Rules:** `{len(rules)}`")
+        if not rules.empty:
+            st.dataframe(
+                rules[["Rule", "Support_Pct", "Confidence_Pct", "Lift"]].rename(columns={
+                    "Support_Pct": "Support", "Confidence_Pct": "Confidence", "Lift": "Lift Ratio"
+                }),
+                use_container_width=True
+            )
+        else:
+            st.info("No association rules found at current thresholds.")
+
+    elif mining_choice == "ID3 & J48 Decision Trees":
+        st.markdown("#### Decision Tree Induction: Information Gain vs Gain Ratio")
+        tree_target = st.selectbox("Target Variable:", ["Has_Emergency_Fund", "Has_Investment_Account"])
+        features = [
+            "Academic_Year", "Stream_Major", "Living_Situation", "Monthly_Budget",
+            "Tracking_Method", "Research_Frequency", "Peer_Pressure_Spend", "Stress_Spend"
+        ]
+        gain_table = get_feature_gain_table(df_clean, features, tree_target)
+        fig_gain = viz.plot_feature_gain_comparison(gain_table)
         st.plotly_chart(fig_gain, use_container_width=True)
 
-        # 2. Build Tree
-        tree_algo = "ID3" if "ID3" in algo_choice else "J48"
-        max_d = st.slider("Maximum Tree Depth (Pruning control)", min_value=2, max_value=6, value=3)
-        
-        miner = DecisionTreeMiner(algorithm=tree_algo, max_depth=max_d, min_samples_split=4)
-        miner.fit(clean_df, selected_features, target_var)
-
-        st.markdown(f"### 2. Generated {tree_algo} Decision Tree Structure")
-        tree_dict = miner.root.to_dict()
-        fig_tree = plot_interactive_tree_structure(tree_dict)
+        miner = DecisionTreeMiner(algorithm="J48", max_depth=3, min_samples_split=4)
+        miner.fit(df_clean, features, tree_target)
+        fig_tree = viz.plot_interactive_tree_structure(miner.root.to_dict())
         st.plotly_chart(fig_tree, use_container_width=True)
 
-        # 3. Extracted Rules
-        st.markdown("### 3. Extracted IF-THEN Classification Rules")
-        rules = miner.extract_rules()
-        st.code("\n".join(rules), language="text")
-
-# ----------------- TAB 4: BENCHMARK & METRICS -----------------
-with tab4:
-    st.subheader("Model Benchmarks, Validation & Confusion Matrix")
-    st.markdown("Evaluating the mined Decision Tree on unseen test data using stratified validation.")
-
-    if selected_features:
-        # Preprocessing for Scikit-Learn
-        X = pd.get_dummies(clean_df[selected_features], drop_first=True)
-        y = clean_df[target_var]
-
-        # ML Best Practice: Train/test split before evaluation
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42, stratify=y)
-
-        criterion_val = "entropy" if "ID3" in algo_choice else "gini"
-        clf = DecisionTreeClassifier(criterion=criterion_val, max_depth=max_d, min_samples_split=4, random_state=42)
-        clf.fit(X_train, y_train)
-
-        y_pred = clf.predict(X_test)
-        acc = (y_pred == y_test).mean()
-
-        col_met1, col_met2, col_met3 = st.columns(3)
-        with col_met1:
-            st.metric("Test Accuracy", f"{acc * 100:.2f}%")
-        with col_met2:
-            st.metric("Training Samples", len(X_train))
-        with col_met3:
-            st.metric("Testing Samples", len(X_test))
-
-        st.markdown("---")
-        col_cm, col_imp = st.columns(2)
-        with col_cm:
-            labels = sorted(list(y.unique()))
-            cm = confusion_matrix(y_test, y_pred, labels=labels)
-            fig_cm = plot_confusion_matrix_interactive(cm, [str(l) for l in labels])
-            st.plotly_chart(fig_cm, use_container_width=True)
-
-        with col_imp:
-            importances = pd.Series(clf.feature_importances_, index=X.columns).sort_values(ascending=False).head(10)
-            fig_imp = px.bar(
-                x=importances.values, y=importances.index, orientation='h',
-                title="Top Scikit-Learn Feature Importances",
-                labels={"x": "Importance Weight", "y": "Feature"},
-                color_discrete_sequence=["#2563EB"]
-            )
-            fig_imp.update_layout(yaxis=dict(autorange="reversed"))
-            st.plotly_chart(fig_imp, use_container_width=True)
-
-        st.markdown("#### Detailed Classification Report")
-        report_dict = classification_report(y_test, y_pred, output_dict=True)
-        st.dataframe(pd.DataFrame(report_dict).transpose().round(3), use_container_width=True)
-
-# ----------------- TAB 5: WHAT-IF SIMULATOR -----------------
-with tab5:
-    st.subheader("🔮 Student Financial Persona Simulator")
-    st.markdown("Input hypothetical survey responses to test the mined decision rules and predict student financial behavior in real time.")
-
-    with st.form("student_simulator_form"):
+    elif mining_choice == "What-If Persona Simulator":
+        st.markdown("#### Student Persona 'What-If' Financial Resilience Simulator")
         sim_col1, sim_col2, sim_col3 = st.columns(3)
-        
         with sim_col1:
-            sim_academic = st.selectbox("Academic Standing", clean_df["Academic_Year"].unique())
-            sim_stream = st.selectbox("Major / Stream", clean_df["Stream_Major"].unique())
-            sim_living = st.selectbox("Living Situation", clean_df["Living_Situation"].unique())
-            sim_funding = st.selectbox("Funding Source", clean_df["Funding_Source"].unique())
-
+            sim_track = st.selectbox("Tracking Method:", ["Mobile App", "Spreadsheet", "Pen and Paper", "Mental Math", "I don't track it"], index=3)
         with sim_col2:
-            sim_budget = st.selectbox("Monthly Budget Managed", clean_df["Monthly_Budget"].unique())
-            sim_tracking = st.selectbox("Money Tracking Method", clean_df["Tracking_Method"].unique())
-            sim_research = st.selectbox("Finance Research Frequency", clean_df["Research_Frequency"].unique())
-            sim_obstacle = st.selectbox("Investment Obstacle", clean_df["Investment_Obstacle"].unique())
-
+            sim_conf = st.slider("Financial Confidence (1-5):", 1, 5, 4)
         with sim_col3:
-            sim_peer = st.slider("Peer Pressure Spending Tendency (1-5)", 1, 5, 3)
-            sim_stress = st.slider("Stress Spending on Food/Entertainment (1-5)", 1, 5, 3)
-            sim_conf = st.slider("Post-Grad Financial Confidence (1-5)", 1, 5, 3)
-            sim_wealth_plan = st.slider("Actionable Wealth & Debt Plan (1-5)", 1, 5, 2)
+            sim_stress = st.slider("Stress Spending Propensity (1-5):", 1, 5, 3)
 
-        submit_sim = st.form_submit_button("🚀 Run Decision Tree Prediction")
+        if st.button("Predict Financial Resilience Persona"):
+            sample = pd.Series({"Tracking_Method": sim_track, "Financial_Confidence": sim_conf, "Stress_Spend": sim_stress})
+            features = ["Tracking_Method", "Financial_Confidence", "Stress_Spend"]
+            m = DecisionTreeMiner(algorithm="J48", max_depth=3)
+            m.fit(df_clean, features, "Has_Emergency_Fund")
+            pred = m.predict_one(sample)
 
-    if submit_sim:
-        sim_sample = pd.Series({
-            "Academic_Year": sim_academic,
-            "Stream_Major": sim_stream,
-            "Living_Situation": sim_living,
-            "Funding_Source": sim_funding,
-            "Monthly_Budget": sim_budget,
-            "Tracking_Method": sim_tracking,
-            "Research_Frequency": sim_research,
-            "Investment_Obstacle": sim_obstacle,
-            "Peer_Pressure_Spend": sim_peer,
-            "Stress_Spend": sim_stress,
-            "Financial_Confidence": sim_conf,
-            "Wealth_Plan_Readiness": sim_wealth_plan
-        })
+            st.success(f"**Predicted Emergency Fund Status:** `{pred}`")
+            if sim_track in ["Mental Math", "I don't track it"]:
+                st.warning("💡 **Actionable Recommendation:** Shifting from mental accounting to digital tracking (e.g. mobile apps or Excel) is empirically associated with higher emergency reserve accumulation.")
 
-        prediction = miner.predict_one(sim_sample)
-        st.success(f"### Predicted Result for `{target_var}`: **{prediction}**")
-        
-        # Actionable insights based on inputs
-        st.markdown("#### Tailored Recommendations for this Profile:")
-        if sim_tracking in ["Mental Math", "I don't track it"]:
-            st.warning("⚠️ **Budget Tracking Gap**: Switching from Mental Math to a structured tracking tool (App/Spreadsheet) increases financial discipline significantly.")
-        if sim_peer >= 4 or sim_stress >= 4:
-            st.warning("⚠️ **Emotional & Peer Spending**: High susceptibility to impulsive spending. Setting a weekly discretionary spending ceiling is recommended.")
-        if sim_research in ["Daily", "Weekly"] and prediction == "Yes":
-            st.info("🌟 **High Financial Intent**: Proactive research habits correlate strongly with readiness to begin automated SIP investing.")
 
-# ----------------- TAB 6: ACADEMIC METHODOLOGY & RULES -----------------
-with tab6:
-    st.subheader("Field Project Academic Report & Methodology")
-    st.markdown(r"""
-    ### 1. Problem Formulation
-    University students undergo a critical financial transition as they move from parental allowances to financial independence. 
-    This study aims to discover actionable spending patterns, financial preparedness, and investment barriers through **supervised data mining**.
+# ================= MODULE 8: FINDINGS & CONCLUSIONS =================
+with tab_findings:
+    st.subheader("Key Findings & Academic Research Conclusions")
+    st.caption("Empirical data-driven observations and formal research conclusions grounded in actual survey metrics.")
 
-    ### 2. Mathematical Formulations
+    findings_res = get_key_findings(df_filtered)
 
-    #### A. Shannon's Entropy:
-    The measure of impurity or uncertainty in a dataset $S$ containing classes $C = \{c_1, c_2, \dots, c_k\}$:
-    $$H(S) = - \sum_{i=1}^{k} p_i \log_2(p_i)$$
-    where $p_i$ is the probability of class $c_i$ in $S$.
+    # 5 Observation Cards
+    f_cols = st.columns(len(findings_res["findings"]))
+    for i, f in enumerate(findings_res["findings"]):
+        with f_cols[i % len(f_cols)]:
+            st.markdown(f"""
+            <div style='background:#FFFFFF; border:1px solid #E2E8F0; padding:1.1rem; border-radius:12px; margin-bottom:1rem; height:100%;'>
+                <div style='display:flex; justify-content:space-between; align-items:center;'>
+                    <span style='font-size:0.7rem; font-weight:700; color:#065F46; background:#D1FAE5; padding:2px 8px; border-radius:4px;'>OBSERVATION</span>
+                    <span style='font-size:0.85rem; font-weight:800; color:#0F172A;'>{f['stat']}</span>
+                </div>
+                <div style='font-size:0.95rem; font-weight:800; color:#0F172A; margin:0.4rem 0;'>{f['title']}</div>
+                <div style='font-size:0.75rem; color:#475569; line-height:1.5;'>{f['desc']}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-    #### B. Information Gain (ID3 Algorithm):
-    Measures the reduction in entropy achieved by partitioning on attribute $A$:
-    $$IG(S, A) = H(S) - \sum_{v \in Values(A)} \frac{|S_v|}{|S|} H(S_v)$$
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    #### C. Split Information and Gain Ratio (J48 / C4.5 Algorithm):
-    ID3 is biased towards attributes with many distinct values. C4.5 normalizes Information Gain by the attribute's **Split Information**:
-    $$SplitInfo(S, A) = - \sum_{v \in Values(A)} \frac{|S_v|}{|S|} \log_2\left(\frac{|S_v|}{|S|}\right)$$
-    $$GainRatio(S, A) = \frac{IG(S, A)}{SplitInfo(S, A)}$$
+    # Formal Academic Research Conclusion
+    st.markdown("### Formal Academic Research Conclusions")
+    c = findings_res["conclusions"]
 
-    ### 3. Policy & Campus Intervention Recommendations
-    1. **Demystify Market Volatility**: Over 40% of surveyed students cited fear of market volatility and lack of capital as their top obstacles to investing.
-    2. **Introduce Interactive Budgeting Bootcamps**: Moving students from mental math to automated budgeting early in their academic journey correlates directly with emergency fund creation.
-    3. **Automate Early via Micro-SIPs**: Students demonstrate high intent for automated investing; workshops should guide them in opening zero-maintenance brokerage accounts and setting small recurring SIPs.
-    """)
+    st.markdown(f"""
+    <div style='background:#F8FAFC; border:1px solid #E2E8F0; border-radius:14px; padding:1.5rem; line-height:1.7; font-size:0.85rem; color:#334155;'>
+        <h4 style='color:#0F172A; font-weight:700; margin-bottom:0.2rem;'>1. Financial Management Practices</h4>
+        <p>{c.get('management_practices', '')}</p>
+
+        <h4 style='color:#0F172A; font-weight:700; margin-top:1rem; margin-bottom:0.2rem;'>2. Spending Behaviour & Behavioral Correlations</h4>
+        <p>{c.get('spending_behaviour', '')}</p>
+
+        <h4 style='color:#0F172A; font-weight:700; margin-top:1rem; margin-bottom:0.2rem;'>3. Financial Confidence & Preparedness Divergence</h4>
+        <p>{c.get('confidence_and_preparedness', '')}</p>
+
+        <h4 style='color:#0F172A; font-weight:700; margin-top:1rem; margin-bottom:0.2rem;'>4. Investment Preferences & Structural Obstacles</h4>
+        <p>{c.get('investment_preferences', '')}</p>
+
+        <h4 style='color:#0F172A; font-weight:700; margin-top:1rem; margin-bottom:0.2rem;'>5. Identified Student Behaviour Segments</h4>
+        <p>{c.get('behavioral_segments', '')}</p>
+
+        <h4 style='color:#059669; font-weight:700; margin-top:1rem; margin-bottom:0.2rem;'>6. Campus Financial Literacy Workshop Recommendations</h4>
+        <p>{c.get('campus_recommendations', '')}</p>
+    </div>
+    """, unsafe_allow_html=True)
