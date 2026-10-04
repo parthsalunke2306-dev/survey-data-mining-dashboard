@@ -88,10 +88,12 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        /* Ensure Plotly chart containers never cause horizontal overflow */
+        /* Keep Plotly containers within their parent's width.
+           NOTE: do NOT set overflow:hidden here - Plotly's inner .svg-container
+           computes to height 0, so hiding overflow clips the whole chart (blank box). */
         .js-plotly-plot, .plot-container, .plotly, .svg-container {
             max-width: 100% !important;
-            overflow-x: hidden !important;
+            overflow: visible !important;
         }
     </style>
 </head>

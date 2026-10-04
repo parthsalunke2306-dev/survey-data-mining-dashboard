@@ -292,9 +292,11 @@ def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
         dtick=10,
         title=dict(text="Financial Discipline Score (0 = Minimal, 100 = Exemplary)")
     )
+    y_top = (max(int(c) for c in counts) * 1.25) if fdi else 1  # headroom so the mean label doesn't overlap the bars
     layout["yaxis"] = dict(
         gridcolor="#F1F5F9",
         zeroline=False,
+        range=[0, y_top],
         title=dict(text="Number of Students")
     )
     layout["margin"] = dict(t=40, b=40, l=45, r=25)
