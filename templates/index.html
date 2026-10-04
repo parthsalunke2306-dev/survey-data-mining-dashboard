@@ -33,7 +33,9 @@
         .nav-tab {
             color: #475569;
             transition: all 0.15s ease-in-out;
-            border-bottom: 2px solid transparent;
+            border-left: 3px solid transparent;
+            border-radius: 0.5rem;
+            text-align: left;
         }
         .nav-tab:hover {
             color: #0F172A;
@@ -42,8 +44,18 @@
         .nav-tab.active {
             color: #047857;
             background-color: #ECFDF5;
-            border-bottom: 2px solid #10B981;
+            border-left: 3px solid #10B981;
             font-weight: 700;
+        }
+        .nav-tab i {
+            color: #64748B;
+            transition: color 0.15s ease;
+        }
+        .nav-tab:hover i {
+            color: #0F172A;
+        }
+        .nav-tab.active i {
+            color: #059669;
         }
         .kpi-card {
             background: #FFFFFF;
@@ -101,11 +113,11 @@
 
     <!-- Top Navigation Header -->
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Branding & Title -->
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
                         <i data-lucide="wallet" class="w-5 h-5"></i>
                     </div>
                     <div>
@@ -134,7 +146,7 @@
 
         <!-- Global Interactive Filter Bar -->
         <div class="bg-slate-100/90 border-t border-slate-200 px-4 py-2">
-            <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="max-w-7xl 2xl:max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="flex items-center space-x-1.5">
                         <i data-lucide="filter" class="w-3.5 h-3.5 text-slate-500"></i>
@@ -178,47 +190,99 @@
             </div>
         </div>
 
-        <!-- Navigation Tabs: Arranged strictly on ONE SINGLE LINE without scrollbar -->
-        <nav class="border-t border-slate-200 bg-white overflow-hidden">
-            <div class="max-w-7xl mx-auto px-1 sm:px-3 flex flex-nowrap items-center justify-between gap-1 py-1 text-[11px] xl:text-xs font-semibold overflow-hidden">
-                <button onclick="switchTab('overview')" class="nav-tab active flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-overview" title="Executive Overview">
-                    <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
-                    <span class="truncate"><span class="hidden xl:inline">Executive </span>Overview</span>
-                </button>
-                <button onclick="switchTab('demographics')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-demographics" title="Student Demographics">
-                    <i data-lucide="users" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
-                    <span class="truncate">Demographics</span>
-                </button>
-                <button onclick="switchTab('income')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-income" title="Income & Financial Discipline">
-                    <i data-lucide="landmark" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
-                    <span class="truncate">Income &amp; <span class="hidden lg:inline">Discipline</span><span class="inline lg:hidden">Budget</span></span>
-                </button>
-                <button onclick="switchTab('spending')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-spending" title="Spending Behaviour & Psychology">
-                    <i data-lucide="shopping-cart" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
-                    <span class="truncate">Spending<span class="hidden xl:inline"> Psychology</span></span>
-                </button>
-                <button onclick="switchTab('mindset')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-mindset" title="Financial Mindset & Planning">
-                    <i data-lucide="brain" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
-                    <span class="truncate">Mindset &amp; <span class="hidden lg:inline">Planning</span><span class="inline lg:hidden">Plan</span></span>
-                </button>
-                <button onclick="switchTab('invest')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-invest" title="Investment Readiness">
-                    <i data-lucide="trending-up" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
-                    <span class="truncate">Investment<span class="hidden xl:inline"> Readiness</span></span>
-                </button>
-                <button onclick="switchTab('datamining')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-datamining" title="Data Mining Suite">
-                    <i data-lucide="cpu" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
-                    <span class="truncate">Data Mining<span class="hidden xl:inline"> Suite</span></span>
-                </button>
-                <button onclick="switchTab('findings')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-findings" title="Key Findings & Academic Conclusions">
-                    <i data-lucide="lightbulb" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
-                    <span class="truncate">Findings<span class="hidden lg:inline"> &amp; Conclusion</span></span>
-                </button>
-            </div>
-        </nav>
     </header>
 
-    <!-- Main Content Body -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-8">
+    <!-- Main Application Layout: Left Sidebar Navigation + Main Content Area -->
+    <div class="flex-1 flex flex-col md:flex-row w-full max-w-7xl 2xl:max-w-[1600px] mx-auto">
+
+        <!-- Left Vertical Navigation Sidebar -->
+        <aside class="w-full md:w-64 lg:w-72 bg-white md:bg-transparent border-b md:border-b-0 md:border-r border-slate-200 flex-shrink-0 p-3 sm:p-4 md:sticky md:top-[106px] md:self-start md:max-h-[calc(100vh-106px)] md:overflow-y-auto">
+            <div class="mb-3 px-2 hidden md:flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Navigation Modules</span>
+                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-100">8 Modules</span>
+            </div>
+
+            <!-- Navigation Buttons: Stacked Vertically on Desktop -->
+            <nav class="space-y-1 grid grid-cols-2 gap-1.5 sm:grid-cols-4 md:flex md:flex-col md:space-y-1">
+                <button onclick="switchTab('overview')" class="nav-tab active w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-overview" title="Executive Overview">
+                    <div class="flex items-center space-x-2.5 min-w-0">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4 flex-shrink-0"></i>
+                        <span class="truncate">Executive Overview</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M1</span>
+                </button>
+
+                <button onclick="switchTab('demographics')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-demographics" title="Student Demographics">
+                    <div class="flex items-center space-x-2.5 min-w-0">
+                        <i data-lucide="users" class="w-4 h-4 flex-shrink-0"></i>
+                        <span class="truncate">Demographics</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M2</span>
+                </button>
+
+                <button onclick="switchTab('income')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-income" title="Income & Financial Discipline">
+                    <div class="flex items-center space-x-2.5 min-w-0">
+                        <i data-lucide="landmark" class="w-4 h-4 flex-shrink-0"></i>
+                        <span class="truncate">Income & Discipline</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M3</span>
+                </button>
+
+                <button onclick="switchTab('spending')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-spending" title="Spending Behaviour & Psychology">
+                    <div class="flex items-center space-x-2.5 min-w-0">
+                        <i data-lucide="shopping-cart" class="w-4 h-4 flex-shrink-0"></i>
+                        <span class="truncate">Spending Psychology</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M4</span>
+                </button>
+
+                <button onclick="switchTab('mindset')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-mindset" title="Financial Mindset & Planning">
+                    <div class="flex items-center space-x-2.5 min-w-0">
+                        <i data-lucide="brain" class="w-4 h-4 flex-shrink-0"></i>
+                        <span class="truncate">Mindset & Planning</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M5</span>
+                </button>
+
+                <button onclick="switchTab('invest')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-invest" title="Investment Readiness">
+                    <div class="flex items-center space-x-2.5 min-w-0">
+                        <i data-lucide="trending-up" class="w-4 h-4 flex-shrink-0"></i>
+                        <span class="truncate">Investment Readiness</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M6</span>
+                </button>
+
+                <button onclick="switchTab('datamining')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-datamining" title="Data Mining Suite">
+                    <div class="flex items-center space-x-2.5 min-w-0">
+                        <i data-lucide="cpu" class="w-4 h-4 flex-shrink-0"></i>
+                        <span class="truncate">Data Mining Suite</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M7</span>
+                </button>
+
+                <button onclick="switchTab('findings')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-findings" title="Key Findings & Academic Conclusions">
+                    <div class="flex items-center space-x-2.5 min-w-0">
+                        <i data-lucide="lightbulb" class="w-4 h-4 flex-shrink-0"></i>
+                        <span class="truncate">Findings & Conclusion</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M8</span>
+                </button>
+            </nav>
+
+            <!-- Sidebar Project Meta Badge -->
+            <div class="mt-6 pt-4 border-t border-slate-200/70 hidden md:block">
+                <div class="p-3 rounded-xl bg-slate-100/70 border border-slate-200/80 text-[11px] text-slate-500 space-y-1">
+                    <div class="font-bold text-slate-700 flex items-center space-x-1.5">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <span>BSc Data Science</span>
+                    </div>
+                    <p class="text-[10px] leading-relaxed text-slate-500">Field Survey Analytics • 131 Respondents</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Body -->
+        <main class="flex-1 px-4 sm:px-6 lg:px-8 py-6 min-w-0 w-full space-y-8">
 
         <!-- ================= MODULE 1: EXECUTIVE OVERVIEW ================= -->
         <section id="tab-overview" class="space-y-6">
@@ -829,10 +893,11 @@
         </section>
 
     </main>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-12">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
             <span>© 2026 Student Financial Habits & Spending Behavior Survey Analytics • BSc Data Science Field Project</span>
             <span class="text-slate-400">Pure Python Implementation • Zero Fake Data • Fully Anonymized</span>
         </div>
