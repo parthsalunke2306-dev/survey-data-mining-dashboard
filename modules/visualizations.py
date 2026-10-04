@@ -8,23 +8,23 @@ import pandas as pd
 import numpy as np
 from typing import Dict, List, Any
 
-# Restrained, cohesive slate-and-forest-emerald professional palette (zero rainbow)
-THEME_COLORS = ["#047857", "#334155", "#059669", "#64748B", "#0D9488", "#475569", "#10B981", "#94A3B8"]
-EMERALD = "#047857"
+# Restrained, elegant professional palette: slate, emerald/green, subtle blues and grays
+THEME_COLORS = ["#10B981", "#3B82F6", "#64748B", "#F59E0B", "#8B5CF6", "#06B6D4", "#EF4444", "#94A3B8"]
+EMERALD = "#10B981"
 SLATE_DARK = "#1E293B"
 SLATE_LIGHT = "#F8FAFC"
-BORDER_GRAY = "#CBD5E1"
+BORDER_GRAY = "#E2E8F0"
 
 def get_base_layout(title: str = "") -> dict:
-    """Standardized clean styling dictionary for Plotly charts (transparent background, zero white)."""
+    """Standardized clean styling dictionary for Plotly charts."""
     return dict(
         title=dict(text=title, font=dict(family="Plus Jakarta Sans, sans-serif", size=14, color=SLATE_DARK, weight=600)),
         font=dict(family="Plus Jakarta Sans, sans-serif", color="#334155", size=12),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="white",
+        plot_bgcolor="white",
         margin=dict(t=45, b=35, l=45, r=30),
-        xaxis=dict(gridcolor="#E2E8F0", zeroline=False),
-        yaxis=dict(gridcolor="#E2E8F0", zeroline=False),
+        xaxis=dict(gridcolor="#F1F5F9", zeroline=False),
+        yaxis=dict(gridcolor="#F1F5F9", zeroline=False),
     )
 
 def plot_donut_chart(df: pd.DataFrame, column: str, title: str = None) -> go.Figure:
@@ -67,7 +67,7 @@ def plot_bar_chart(df: pd.DataFrame, column: str, title: str = None, horizontal:
     else:
         fig = go.Figure(go.Bar(
             x=counts[column], y=counts["Count"],
-            marker=dict(color="#334155"),
+            marker=dict(color=THEME_COLORS[1]),
             text=counts["Count"],
             textposition="outside"
         ))
@@ -86,7 +86,7 @@ def plot_stacked_academic_budget(df: pd.DataFrame) -> go.Figure:
     ct = ct[cols]
 
     fig = go.Figure()
-    palette = ["#94A3B8", "#64748B", "#334155", "#047857"]
+    palette = ["#94A3B8", "#38BDF8", "#10B981", "#059669"]
     for i, col in enumerate(cols):
         fig.add_trace(go.Bar(
             name=col,
@@ -137,7 +137,7 @@ def plot_comparative_rate(df: pd.DataFrame, group_col: str, target_col: str, tit
     fig = go.Figure(go.Bar(
         x=rate_df[group_col],
         y=rate_df["Emergency_Fund_Rate"].round(1),
-        marker_color="#047857",
+        marker_color="#3B82F6",
         text=rate_df["Emergency_Fund_Rate"].apply(lambda x: f"{x:.1f}%"),
         textposition="outside"
     ))
@@ -183,13 +183,13 @@ def plot_peer_vs_stress_correlation(df: pd.DataFrame) -> go.Figure:
         marker=dict(
             size=melted["Count"] * 5 + 10,
             color=melted["Count"],
-            colorscale=[[0, "#E2E8F0"], [0.5, "#059669"], [1, "#064E3B"]],
+            colorscale="Viridis",
             showscale=True,
             colorbar=dict(title="Respondents")
         ),
         text=melted["Count"],
         textposition="middle center",
-        textfont=dict(color="#1E293B", size=10, weight="bold")
+        textfont=dict(color="white", size=10, weight="bold")
     ))
     layout = get_base_layout(f"Peer Pressure vs Emotional/Stress Spending (Spearman ρ = +{rho:.3f})")
     layout["xaxis"]["title"] = "Stress-Related Spending Rating (1 = Disagree, 5 = Agree)"
@@ -200,7 +200,7 @@ def plot_peer_vs_stress_correlation(df: pd.DataFrame) -> go.Figure:
     return fig
 
 def plot_likert_diverging(df: pd.DataFrame, likert_columns: List[str]) -> go.Figure:
-    """Diverging stacked bar chart for 1-5 Likert scales (Tonal slate to emerald, zero rainbow)."""
+    """Diverging stacked bar chart for 1-5 Likert scales."""
     data = []
     labels_map = {
         "Peer_Pressure_Spend": "Peer-Influenced Spending",
@@ -219,7 +219,7 @@ def plot_likert_diverging(df: pd.DataFrame, likert_columns: List[str]) -> go.Fig
     plot_df = pd.DataFrame(data)
     fig = px.bar(
         plot_df, y="Question", x="Percentage", color="Rating", orientation="h",
-        color_discrete_sequence=["#475569", "#64748B", "#94A3B8", "#34D399", "#047857"],
+        color_discrete_sequence=["#EF4444", "#F97316", "#CBD5E1", "#34D399", "#10B981"],
         title="Mindset & Behavioral Likert Distribution (1 = Strongly Disagree to 5 = Strongly Agree)"
     )
     layout = get_base_layout("Mindset & Behavioral Likert Distribution")
@@ -231,17 +231,17 @@ def plot_likert_diverging(df: pd.DataFrame, likert_columns: List[str]) -> go.Fig
     return fig
 
 def plot_confidence_planning_matrix(df: pd.DataFrame) -> go.Figure:
-    """2x2 matrix bar chart for Confidence vs Planning Segmentation (Tonal slate and emerald)."""
+    """2x2 matrix bar chart for Confidence vs Planning Segmentation."""
     counts = df["Confidence_Planning_Segment"].value_counts().reset_index()
     counts.columns = ["Segment", "Count"]
     n = len(df)
     counts["Pct"] = (counts["Count"] / n * 100).round(1)
 
     colors = {
-        "Prudent Strategists (High Conf + Action Plan)": "#047857",
-        "Overconfident Optimists (High Conf + No Action Plan)": "#64748B",
-        "Cautious Planners (Low Conf + Action Plan)": "#475569",
-        "Unprepared / At-Risk (Low Conf + No Action Plan)": "#334155"
+        "Prudent Strategists (High Conf + Action Plan)": "#10B981",
+        "Overconfident Optimists (High Conf + No Action Plan)": "#F59E0B",
+        "Cautious Planners (Low Conf + Action Plan)": "#3B82F6",
+        "Unprepared / At-Risk (Low Conf + No Action Plan)": "#EF4444"
     }
 
     fig = go.Figure(go.Bar(
@@ -268,7 +268,7 @@ def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
     fig.add_trace(go.Histogram(
         x=fdi,
         nbinsx=12,
-        marker=dict(color="#047857", line=dict(color="#CBD5E1", width=1.5)),
+        marker=dict(color="#10B981", line=dict(color="white", width=1.5)),
         name="FDI Score"
     ))
     fig.add_vline(
@@ -282,13 +282,13 @@ def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
     return fig
 
 def plot_spearman_heatmap(corr_df: pd.DataFrame) -> go.Figure:
-    """Interactive Spearman correlation heatmap (Slate to Emerald scale, zero red/blue)."""
+    """Interactive Spearman correlation heatmap."""
     clean_labels = [c.replace("_", " ") for c in corr_df.columns]
     fig = px.imshow(
         corr_df.values,
         x=clean_labels,
         y=clean_labels,
-        color_continuous_scale=[[0, "#334155"], [0.5, "#F1F5F9"], [1, "#047857"]],
+        color_continuous_scale="RdBu_r",
         zmin=-1, zmax=1,
         text_auto=".2f",
         title="Spearman Rank Correlation Matrix (Behavioral & Planning Variables)"
@@ -309,7 +309,7 @@ def plot_crosstab_heatmap(df: pd.DataFrame, col_x: str, col_y: str) -> go.Figure
     ct = pd.crosstab(df[col_y], df[col_x])
     fig = px.imshow(
         ct, text_auto=True, aspect="auto",
-        color_continuous_scale=[[0, "#F8FAFC"], [1, "#047857"]],
+        color_continuous_scale="Blues",
         title=f"Cross-Tabulation: {col_y} vs {col_x}"
     )
     layout = get_base_layout(f"Cross-Tabulation: {col_y} vs {col_x}")
@@ -331,7 +331,7 @@ def plot_feature_gain_comparison(gain_df: pd.DataFrame) -> go.Figure:
     fig = go.Figure()
     fig.add_trace(go.Bar(
         x=gain_df["Feature"], y=gain_df["Info Gain (ID3)"],
-        name="ID3 (Information Gain)", marker_color="#334155"
+        name="ID3 (Information Gain)", marker_color="#3B82F6"
     ))
     fig.add_trace(go.Bar(
         x=gain_df["Feature"], y=gain_df["Gain Ratio (J48/C4.5)"],
@@ -359,7 +359,7 @@ def plot_interactive_tree_structure(tree_dict: Dict) -> go.Figure:
             color_nodes.append(EMERALD)
         else:
             text_nodes.append(f"<b>{node.get('feature')}</b><br>H={node.get('entropy', 0):.2f}<br>n={node.get('samples')}")
-            color_nodes.append("#334155")
+            color_nodes.append("#3B82F6")
 
         children = node.get("children", [])
         n_children = len(children)

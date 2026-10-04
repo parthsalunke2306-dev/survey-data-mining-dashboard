@@ -60,11 +60,11 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
     .kpi-box {
-        background-color: #F8FAFC;
-        border: 1px solid #CBD5E1;
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
         border-radius: 12px;
         padding: 1.1rem;
-        box-shadow: none !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .kpi-label {
         font-size: 0.75rem;
@@ -81,17 +81,17 @@ st.markdown("""
     }
     .kpi-sub {
         font-size: 0.75rem;
-        color: #047857;
+        color: #10B981;
         font-weight: 600;
         margin-top: 0.2rem;
     }
     .narrative-card {
-        background: #1E293B;
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
         color: #F8FAFC;
         padding: 1.5rem;
         border-radius: 14px;
         margin-bottom: 1.5rem;
-        border-left: 5px solid #047857;
+        border-left: 5px solid #10B981;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -398,7 +398,7 @@ with tab_spend:
         st.plotly_chart(fig_bubble, use_container_width=True)
     with sp_c2:
         st.markdown("""
-        <div style='background:#F8FAFC; border:1px solid #CBD5E1; padding:1.2rem; border-radius:12px; height:100%;'>
+        <div style='background:#FFFFFF; border:1px solid #E2E8F0; padding:1.2rem; border-radius:12px; height:100%;'>
             <h4 style='font-size:0.95rem; font-weight:700; color:#0F172A; margin-bottom:0.8rem;'>Behavioral Insights & Takeaways</h4>
             <div style='font-size:0.8rem; color:#475569; line-height:1.6;'>
                 <p><b>Statistically Significant Association (ρ = +0.318, p &lt; 0.001):</b><br>
@@ -499,7 +499,7 @@ with tab_mining:
         for idx, p in enumerate(km_res["profiles"]):
             with prof_cols[idx]:
                 st.markdown(f"""
-                <div style='background:#F8FAFC; border:1px solid #CBD5E1; padding:1.1rem; border-radius:12px; border-top:4px solid {p['Color']};'>
+                <div style='background:#FFFFFF; border:1px solid #E2E8F0; padding:1.1rem; border-radius:12px; border-top:4px solid {p['Color']};'>
                     <div style='font-size:0.75rem; font-weight:700; color:{p['Color']}; text-transform:uppercase;'>Cluster {p['Cluster_ID']+1}</div>
                     <div style='font-size:1.1rem; font-weight:800; color:#0F172A; margin:4px 0;'>{p['Archetype']}</div>
                     <div style='font-size:0.75rem; color:#64748B;'>{p['Count']} students ({p['Percentage']})</div>
@@ -525,7 +525,7 @@ with tab_mining:
             pca_df, x="x", y="y", color="Cluster",
             hover_data=["ID", "Major", "Year"],
             title=f"2D PCA Projection of Students (k={k_val})",
-            color_discrete_sequence=["#047857", "#334155", "#059669", "#64748B"]
+            color_discrete_sequence=["#10B981", "#F59E0B", "#3B82F6", "#8B5CF6"]
         )
         st.plotly_chart(fig_pca, use_container_width=True)
 
@@ -596,7 +596,7 @@ with tab_findings:
     for i, f in enumerate(findings_res["findings"]):
         with f_cols[i % len(f_cols)]:
             st.markdown(f"""
-            <div style='background:#F8FAFC; border:1px solid #CBD5E1; padding:1.1rem; border-radius:12px; margin-bottom:1rem; height:100%;'>
+            <div style='background:#FFFFFF; border:1px solid #E2E8F0; padding:1.1rem; border-radius:12px; margin-bottom:1rem; height:100%;'>
                 <div style='display:flex; justify-content:space-between; align-items:center;'>
                     <span style='font-size:0.7rem; font-weight:700; color:#065F46; background:#D1FAE5; padding:2px 8px; border-radius:4px;'>OBSERVATION</span>
                     <span style='font-size:0.85rem; font-weight:800; color:#0F172A;'>{f['stat']}</span>

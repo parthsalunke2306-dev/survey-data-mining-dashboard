@@ -153,19 +153,19 @@ def run_kmeans_segmentation(df: pd.DataFrame, n_clusters: int = 3, max_iter: int
         if avg_em >= 0.65 and avg_sip >= 0.7:
             archetype = "Disciplined Future Planners"
             desc = "High emergency reserve coverage, active research habits, and high commitment to future SIP investment automation."
-            color = "#047857"
+            color = "#10B981"
         elif avg_sip >= 0.7 and avg_em < 0.4:
             archetype = "Aspirational but Unprepared"
             desc = "High optimism and automation intent, but vulnerable liquidity cushions and low daily budgeting discipline."
-            color = "#334155"
+            color = "#F59E0B"
         elif avg_sip < 0.5:
             archetype = "Cautious Traditional Non-Investors"
             desc = "Conservative stance, lower research frequency, and hesitant towards market-linked automated investments."
-            color = "#475569"
+            color = "#3B82F6"
         else:
             archetype = "Developing Financial Students"
             desc = "Moderate discipline across tracking, emerging savings habits, and growing interest in investment tools."
-            color = "#059669"
+            color = "#8B5CF6"
 
         profiles.append({
             "Cluster_ID": c,
