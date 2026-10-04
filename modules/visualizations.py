@@ -1,6 +1,7 @@
 """
 Visualization Module using Plotly for Field Survey Analytics & Data Mining
-Styled with a clean slate/white/soft-neutral palette with restrained emerald/green accents (#27478C).
+Balanced multi-color gamut (harmonizing cool and warm accents) on a pure white background.
+Designed for BSc Data Science clarity, elegance, and viva explainability.
 """
 import plotly.express as px
 import plotly.graph_objects as go
@@ -9,15 +10,36 @@ import pandas as pd
 import numpy as np
 from typing import Dict, List, Any
 
-# Restrained, elegant professional palette: slate, emerald/green, subtle blues and grays
-THEME_COLORS = ["#27478C","#7C97CC","#B7791F","#5A6678","#2F7D6D","#A9B4C6","#A34A3A","#D3D9E3"]
-EMERALD = "#27478C"
+# Balanced, harmonious multi-color palette:
+# Neutral-cool (Teal), Structured (Indigo), Warm-gold (Amber), Energetic (Rose),
+# Open (Sky), Creative (Violet), Fresh (Emerald), Terracotta (Tangerine)
+THEME_COLORS = [
+    "#0D9488",  # Teal (balanced cool-green)
+    "#6366F1",  # Indigo (balanced blue-violet)
+    "#F59E0B",  # Amber (warm gold)
+    "#E11D48",  # Rose (warm berry/coral)
+    "#0284C7",  # Sky (cool azure)
+    "#8B5CF6",  # Violet (cool-warm purple)
+    "#10B981",  # Emerald (fresh green)
+    "#EA580C",  # Tangerine (warm terracotta)
+    "#06B6D4",  # Cyan (luminous cyan)
+    "#EC4899",  # Pink (vibrant magenta)
+]
+
+TEAL = "#0D9488"
+INDIGO = "#6366F1"
+AMBER = "#F59E0B"
+ROSE = "#E11D48"
+SKY = "#0284C7"
+VIOLET = "#8B5CF6"
+EMERALD = "#10B981"
+TANGERINE = "#EA580C"
 SLATE_DARK = "#1E293B"
-SLATE_LIGHT = "#F8FAFC"
+SLATE_MUTED = "#64748B"
 BORDER_GRAY = "#E2E8F0"
 
 def get_base_layout(title: str = "") -> dict:
-    """Standardized clean styling dictionary for Plotly charts."""
+    """Standardized clean styling dictionary for Plotly charts with pure white background."""
     return dict(
         title=dict(text=title, font=dict(family="IBM Plex Sans, sans-serif", size=14, color=SLATE_DARK, weight=600)),
         font=dict(family="IBM Plex Sans, sans-serif", color="#334155", size=12),
@@ -29,7 +51,7 @@ def get_base_layout(title: str = "") -> dict:
     )
 
 def plot_donut_chart(df: pd.DataFrame, column: str, title: str = None) -> go.Figure:
-    """Donut chart: legend carries label + share, so small slices never collide with leader-line labels."""
+    """Donut chart: slices cycle through balanced multi-color palette with side legend."""
     counts = df[column].value_counts().reset_index()
     counts.columns = [column, "Count"]
     total = float(counts["Count"].sum()) or 1.0
@@ -59,18 +81,20 @@ def plot_donut_chart(df: pd.DataFrame, column: str, title: str = None) -> go.Fig
     return fig
 
 def plot_bar_chart(df: pd.DataFrame, column: str, title: str = None, horizontal: bool = False, order: List[str] = None) -> go.Figure:
-    """Generates a clean bar chart with count labels."""
+    """Generates a clean bar chart with categorical balanced colors and count labels."""
     counts = df[column].value_counts().reset_index()
     counts.columns = [column, "Count"]
     if order:
         counts[column] = pd.Categorical(counts[column], categories=order, ordered=True)
         counts = counts.sort_values(column).dropna()
 
+    bar_colors = [THEME_COLORS[i % len(THEME_COLORS)] for i in range(len(counts))]
+
     if horizontal:
         fig = go.Figure(go.Bar(
             y=counts[column].tolist(), x=counts["Count"].tolist(),
             orientation="h",
-            marker=dict(color=EMERALD),
+            marker=dict(color=bar_colors),
             text=counts["Count"].tolist(),
             textposition="outside"
         ))
@@ -79,7 +103,7 @@ def plot_bar_chart(df: pd.DataFrame, column: str, title: str = None, horizontal:
     else:
         fig = go.Figure(go.Bar(
             x=counts[column].tolist(), y=counts["Count"].tolist(),
-            marker=dict(color=THEME_COLORS[1]),
+            marker=dict(color=bar_colors),
             text=counts["Count"].tolist(),
             textposition="outside"
         ))
@@ -90,7 +114,7 @@ def plot_bar_chart(df: pd.DataFrame, column: str, title: str = None, horizontal:
     return fig
 
 def plot_stacked_academic_budget(df: pd.DataFrame) -> go.Figure:
-    """Stacked bar chart of Academic Year vs Monthly Budget."""
+    """Stacked bar chart of Academic Year vs Monthly Budget with balanced multi-color palette."""
     budget_order = ["Under ₹2,000", "₹2,000 - ₹5,000", "₹5,000 - ₹10,000", "Above ₹10,000"]
     ct = pd.crosstab(df["Academic_Year"], df["Monthly_Budget"])
     # Reindex columns to natural budget order
@@ -98,7 +122,8 @@ def plot_stacked_academic_budget(df: pd.DataFrame) -> go.Figure:
     ct = ct[cols]
 
     fig = go.Figure()
-    palette = ["#C3CDE3", "#8FA6D3", "#4C6BAA", "#1D3570"]
+    # Balanced budget palette: Mint, Teal, Indigo, Amber
+    palette = ["#5EEAD4", "#0D9488", "#6366F1", "#F59E0B"]
     for i, col in enumerate(cols):
         fig.add_trace(go.Bar(
             name=col,
@@ -114,23 +139,23 @@ def plot_stacked_academic_budget(df: pd.DataFrame) -> go.Figure:
     return fig
 
 def plot_multiselect_breakdown(counts_dict: Dict[str, int], total_n: int, title: str, xlabel: str = "Respondents") -> go.Figure:
-    """Horizontal bar chart for multi-select questions with percentage annotation."""
+    """Horizontal bar chart for multi-select categories with distinct balanced colors."""
     sorted_items = sorted(counts_dict.items(), key=lambda x: x[1])
     labels = [str(k) for k, v in sorted_items]
     vals = [int(v) for k, v in sorted_items]
     pcts = [f"{v/total_n*100:.1f}% ({v})" for v in vals]
+    colors = [THEME_COLORS[i % len(THEME_COLORS)] for i in range(len(sorted_items))]
 
     fig = go.Figure(go.Bar(
         y=labels, x=vals,
         orientation="h",
-        marker=dict(color=EMERALD),
+        marker=dict(color=colors),
         text=pcts,
         textposition="outside"
     ))
     layout = get_base_layout(title)
     layout["xaxis"]["title"] = xlabel
     layout["margin"]["r"] = 60
-    # Add footnote note that percentages can exceed 100%
     layout["annotations"] = [dict(
         x=0.5, y=-0.22, xref="paper", yref="paper",
         text="* Note: Percentages exceed 100% collectively as respondents could select multiple categories.",
@@ -140,16 +165,17 @@ def plot_multiselect_breakdown(counts_dict: Dict[str, int], total_n: int, title:
     return fig
 
 def plot_comparative_rate(df: pd.DataFrame, group_col: str, target_col: str, title: str) -> go.Figure:
-    """Grouped percentage rate comparison."""
+    """Grouped percentage rate comparison with distinct categorical accents."""
     rate_df = df.groupby(group_col)[target_col].apply(
         lambda s: (s == "Yes").mean() * 100
     ).reset_index()
     rate_df.columns = [group_col, "Emergency_Fund_Rate"]
+    bar_colors = [THEME_COLORS[i % len(THEME_COLORS)] for i in range(len(rate_df))]
 
     fig = go.Figure(go.Bar(
         x=rate_df[group_col].tolist(),
         y=[float(round(r, 1)) for r in rate_df["Emergency_Fund_Rate"]],
-        marker_color="#4C6BAA",
+        marker_color=bar_colors,
         text=[f"{r:.1f}%" for r in rate_df["Emergency_Fund_Rate"]],
         textposition="outside"
     ))
@@ -160,16 +186,24 @@ def plot_comparative_rate(df: pd.DataFrame, group_col: str, target_col: str, tit
     return fig
 
 def plot_research_vs_confidence(df: pd.DataFrame) -> go.Figure:
-    """Bar chart of average financial confidence score across research frequency tiers."""
+    """Bar chart with meaningful intuitive colors: Red (Rarely) -> Amber -> Teal -> Indigo."""
     order = ["Rarely / Never", "Monthly", "Weekly", "Daily"]
     agg = df.groupby("Research_Frequency")["Financial_Confidence"].agg(["mean", "count"]).reset_index()
     agg["Research_Frequency"] = pd.Categorical(agg["Research_Frequency"], categories=order, ordered=True)
     agg = agg.sort_values("Research_Frequency").dropna()
 
+    tier_colors = {
+        "Rarely / Never": "#E11D48",  # Rose
+        "Monthly": "#F59E0B",        # Amber
+        "Weekly": "#0D9488",         # Teal
+        "Daily": "#6366F1"           # Indigo
+    }
+    colors = [tier_colors.get(f, TEAL) for f in agg["Research_Frequency"]]
+
     fig = go.Figure(go.Bar(
         x=agg["Research_Frequency"].tolist(),
         y=[float(round(m, 2)) for m in agg["mean"]],
-        marker_color=EMERALD,
+        marker_color=colors,
         text=[f"{m:.2f} / 5 (n={int(c)})" for m, c in zip(agg["mean"], agg["count"])],
         textposition="outside"
     ))
@@ -185,7 +219,6 @@ def plot_peer_vs_stress_correlation(df: pd.DataFrame) -> go.Figure:
     melted = ct.melt(id_vars="Peer_Pressure_Spend", var_name="Stress_Spend", value_name="Count")
     melted = melted[melted["Count"] > 0]
 
-    # Calculate Spearman correlation via ranks (pure Pandas/NumPy, no external scipy needed)
     rho = float(df["Peer_Pressure_Spend"].rank().corr(df["Stress_Spend"].rank()))
 
     fig = go.Figure(go.Scatter(
@@ -195,7 +228,7 @@ def plot_peer_vs_stress_correlation(df: pd.DataFrame) -> go.Figure:
         marker=dict(
             size=[int(c * 5 + 10) for c in melted["Count"]],
             color=melted["Count"].tolist(),
-            colorscale="Viridis",
+            colorscale="Tealrose",
             showscale=True,
             colorbar=dict(title="Respondents")
         ),
@@ -212,7 +245,7 @@ def plot_peer_vs_stress_correlation(df: pd.DataFrame) -> go.Figure:
     return fig
 
 def plot_likert_diverging(df: pd.DataFrame, likert_columns: List[str]) -> go.Figure:
-    """Diverging stacked bar chart for 1-5 Likert scales."""
+    """Diverging stacked bar chart for 1-5 Likert scales (Rose -> Peach -> Slate -> Mint -> Teal)."""
     data = []
     labels_map = {
         "Peer_Pressure_Spend": "Peer-Influenced Spending",
@@ -229,9 +262,11 @@ def plot_likert_diverging(df: pd.DataFrame, likert_columns: List[str]) -> go.Fig
                 data.append({"Question": labels_map.get(col, col), "Rating": f"Score {rating}", "Percentage": pct})
     
     plot_df = pd.DataFrame(data)
+    # Balanced diverging scale: Warm Rose (Disagree) -> Neutral Slate -> Balanced Teal (Agree)
+    diverging_palette = ["#E11D48", "#FDA4AF", "#CBD5E1", "#5EEAD4", "#0D9488"]
     fig = px.bar(
         plot_df, y="Question", x="Percentage", color="Rating", orientation="h",
-        color_discrete_sequence=["#A34A3A", "#D49A8E", "#D3D9E3", "#8FA6D3", "#27478C"],
+        color_discrete_sequence=diverging_palette,
         title="Mindset & Behavioral Likert Distribution (1 = Strongly Disagree to 5 = Strongly Agree)"
     )
     layout = get_base_layout("Mindset & Behavioral Likert Distribution")
@@ -250,10 +285,10 @@ def plot_confidence_planning_matrix(df: pd.DataFrame) -> go.Figure:
     counts["Pct"] = (counts["Count"] / n * 100).round(1)
 
     colors = {
-        "Prudent Strategists (High Conf + Action Plan)": "#27478C",
-        "Overconfident Optimists (High Conf + No Action Plan)": "#B7791F",
-        "Cautious Planners (Low Conf + Action Plan)": "#4C6BAA",
-        "Unprepared / At-Risk (Low Conf + No Action Plan)": "#A34A3A"
+        "Prudent Strategists (High Conf + Action Plan)": "#10B981",       # Emerald
+        "Overconfident Optimists (High Conf + No Action Plan)": "#F59E0B", # Amber
+        "Cautious Planners (Low Conf + Action Plan)": "#6366F1",           # Indigo
+        "Unprepared / At-Risk (Low Conf + No Action Plan)": "#E11D48"      # Rose
     }
 
     fig = go.Figure(go.Bar(
@@ -272,32 +307,33 @@ def plot_confidence_planning_matrix(df: pd.DataFrame) -> go.Figure:
     return fig
 
 def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
-    """Financial Discipline Index (FDI) distribution manually binned to avoid rendering issues."""
+    """Financial Discipline Index (FDI) distribution with tier-colored bars (Amber, Teal, Indigo)."""
     fdi = [float(round(v, 1)) for v in df["FDI_Score"].dropna().tolist()] if (len(df) > 0 and "FDI_Score" in df.columns) else []
     mean_val = float(round(sum(fdi) / len(fdi), 1)) if fdi else 0.0
 
     fig = go.Figure()
     
     if fdi:
-        import numpy as np
         counts, bins = np.histogram(fdi, bins=10, range=(0, 100))
         bin_centers = [(bins[i] + bins[i+1])/2 for i in range(len(bins)-1)]
+        
+        # Color each bar based on the 3 FDI tiers: Low (<36: Amber), Mod (36-65: Teal), High (>65: Indigo)
+        bar_colors = [AMBER if x < 35 else (TEAL if x <= 65 else INDIGO) for x in bin_centers]
         
         fig.add_trace(go.Bar(
             x=[float(x) for x in bin_centers],
             y=[int(c) for c in counts],
             width=9.5,
-            marker=dict(color="#27478C", line=dict(color="white", width=1.5)),
+            marker=dict(color=bar_colors, line=dict(color="white", width=1.5)),
             name="FDI Score"
         ))
     
     fig.add_vline(
-        x=mean_val, line_dash="dash", line_color="#1E293B", line_width=2,
+        x=mean_val, line_dash="dash", line_color="#E11D48", line_width=2,
         annotation_text=f"Mean: {mean_val:.1f}", annotation_position="top right",
-        annotation_font=dict(size=11)
+        annotation_font=dict(size=11, color="#E11D48")
     )
     
-    # No in-chart title: the card header already names the chart, and a long title gets clipped on phones.
     layout = get_base_layout("")
     layout["xaxis"] = dict(
         gridcolor="#F1F5F9",
@@ -307,7 +343,7 @@ def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
         title=dict(text="FDI score (0–100)", font=dict(size=11), standoff=4),
         tickfont=dict(size=10)
     )
-    y_top = (max(int(c) for c in counts) * 1.25) if fdi else 1  # headroom so the mean label doesn't overlap the bars
+    y_top = (max(int(c) for c in counts) * 1.25) if fdi else 1
     layout["yaxis"] = dict(
         gridcolor="#F1F5F9",
         zeroline=False,
@@ -320,13 +356,13 @@ def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
     return fig
 
 def plot_spearman_heatmap(corr_df: pd.DataFrame) -> go.Figure:
-    """Interactive Spearman correlation heatmap."""
+    """Interactive Spearman correlation heatmap with balanced Tealrose diverging scale."""
     clean_labels = [c.replace("_", " ") for c in corr_df.columns]
     fig = px.imshow(
         corr_df.values,
         x=clean_labels,
         y=clean_labels,
-        color_continuous_scale="RdBu_r",
+        color_continuous_scale="Tealrose",
         zmin=-1, zmax=1,
         text_auto=".2f",
         title="Spearman Rank Correlation Matrix (Behavioral & Planning Variables)"
@@ -347,7 +383,7 @@ def plot_crosstab_heatmap(df: pd.DataFrame, col_x: str, col_y: str) -> go.Figure
     ct = pd.crosstab(df[col_y], df[col_x])
     fig = px.imshow(
         ct, text_auto=True, aspect="auto",
-        color_continuous_scale="Blues",
+        color_continuous_scale="Teal",
         title=f"Cross-Tabulation: {col_y} vs {col_x}"
     )
     layout = get_base_layout(f"Cross-Tabulation: {col_y} vs {col_x}")
@@ -369,11 +405,11 @@ def plot_feature_gain_comparison(gain_df: pd.DataFrame) -> go.Figure:
     fig = go.Figure()
     fig.add_trace(go.Bar(
         x=gain_df["Feature"], y=gain_df["Info Gain (ID3)"],
-        name="ID3 (Information Gain)", marker_color="#4C6BAA"
+        name="ID3 (Information Gain)", marker_color=INDIGO
     ))
     fig.add_trace(go.Bar(
         x=gain_df["Feature"], y=gain_df["Gain Ratio (J48/C4.5)"],
-        name="J48 / C4.5 (Gain Ratio)", marker_color=EMERALD
+        name="J48 / C4.5 (Gain Ratio)", marker_color=TEAL
     ))
     layout = get_base_layout("Feature Splitting Power: ID3 Information Gain vs. J48 Gain Ratio")
     layout["barmode"] = "group"
@@ -384,7 +420,7 @@ def plot_feature_gain_comparison(gain_df: pd.DataFrame) -> go.Figure:
     return fig
 
 def plot_interactive_tree_structure(tree_dict: Dict) -> go.Figure:
-    """Renders tree structure using Plotly scatter."""
+    """Renders tree structure with Indigo decision nodes and Emerald leaf predictions."""
     x_nodes, y_nodes, text_nodes, color_nodes = [], [], [], []
     edge_x, edge_y = [], []
 
@@ -397,7 +433,7 @@ def plot_interactive_tree_structure(tree_dict: Dict) -> go.Figure:
             color_nodes.append(EMERALD)
         else:
             text_nodes.append(f"<b>{node.get('feature')}</b><br>H={node.get('entropy', 0):.2f}<br>n={node.get('samples')}")
-            color_nodes.append("#4C6BAA")
+            color_nodes.append(INDIGO)
 
         children = node.get("children", [])
         n_children = len(children)

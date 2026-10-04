@@ -10,63 +10,143 @@
     <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js" onerror="this.onerror=null;this.src='https://cdn.plot.ly/plotly-2.35.2.min.js';"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Font: Plus Jakarta Sans -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --canvas: #FFFFFF;
+            --surface: #FFFFFF;
+            --ink: #0F172A;
+            --muted: #64748B;
+            --rule: #E2E8F0;
+            --accent-teal: #0D9488;
+            --accent-indigo: #4F46E5;
+            --accent-amber: #D97706;
+            --accent-rose: #E11D48;
+            --accent-emerald: #059669;
+            --accent-sky: #0284C7;
+            --accent-purple: #7C3AED;
+        }
+
         html, body {
             overflow-x: hidden !important;
             max-width: 100vw;
             width: 100%;
+            background-color: #FFFFFF !important;
         }
         body {
             font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            background: #FFFFFF !important;
+            color: #0F172A !important;
             overflow-x: hidden !important;
+            font-feature-settings: 'tnum';
         }
+        h1, h2, h3, h4 {
+            font-family: 'Source Serif 4', Georgia, serif !important;
+            font-weight: 600 !important;
+            letter-spacing: -0.005em !important;
+            color: #0F172A !important;
+        }
+        h2 { font-size: 1.35rem !important; }
+        h3 { font-size: 1.05rem !important; }
+        .uppercase { text-transform: none !important; letter-spacing: 0 !important; }
+        [class*="font-extrabold"], [class*="font-bold"] { font-weight: 600 !important; }
+        [class*="rounded-"]:not(.rounded-full) { border-radius: 6px !important; }
+        .rounded-full { border-radius: 4px !important; }
+
         .glass-panel {
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-        }
-        .nav-tab {
-            color: #475569;
-            transition: all 0.15s ease-in-out;
-            border-radius: 0.75rem;
-            text-align: left;
-            border: 1px solid transparent;
-        }
-        .nav-tab:hover {
-            color: #0F172A;
-            background-color: #F8FAFC;
-        }
-        .nav-tab.active {
-            color: #065F46;
-            background-color: #ECFDF5;
-            border-color: #A7F3D0;
-            font-weight: 700;
-            box-shadow: 0 1px 2px 0 rgba(16, 185, 129, 0.05);
-        }
-        .nav-tab i {
-            color: #64748B;
-            transition: color 0.15s ease;
-        }
-        .nav-tab:hover i {
-            color: #0F172A;
-        }
-        .nav-tab.active i {
-            color: #059669;
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
         }
         .kpi-card {
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            transition: all 0.2s ease-in-out;
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
+            transition: all 0.2s ease-in-out !important;
         }
         .kpi-card:hover {
-            border-color: #10B981;
-            box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.1);
+            border-color: #CBD5E1 !important;
+            box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08) !important;
         }
+
+        .nav-tab {
+            color: #475569 !important;
+            transition: all 0.15s ease-in-out !important;
+            border-radius: 6px !important;
+            text-align: left !important;
+            border: 1px solid transparent !important;
+            border-left: 3px solid transparent !important;
+            padding: 0.5rem 0.75rem !important;
+            font-weight: 500 !important;
+            min-height: 38px !important;
+        }
+        .nav-tab:hover {
+            color: #0F172A !important;
+            background-color: #F8FAFC !important;
+        }
+        .nav-tab.active {
+            color: #0F766E !important;
+            background-color: #F0FDFA !important;
+            border-left-color: #0D9488 !important;
+            border-color: #CCFBF1 !important;
+            box-shadow: none !important;
+            font-weight: 600 !important;
+        }
+        .nav-tab i, .nav-tab svg {
+            transition: color 0.15s ease;
+        }
+
+        /* Hero narrative banner */
+        .rd-hero {
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            border-left: 4px solid #0D9488 !important;
+            border-radius: 6px !important;
+            padding: 1rem 1.25rem !important;
+        }
+        .rd-hero h2 {
+            font-size: 1.2rem !important;
+            margin-bottom: 0.35rem !important;
+            color: #0F172A !important;
+        }
+        .rd-hero p {
+            color: #334155 !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+            max-width: 80ch !important;
+            -webkit-line-clamp: unset !important;
+            display: block !important;
+            overflow: visible !important;
+        }
+
+        /* Numerals */
+        [id^="kpi-"], [id^="fdi-"][id$="-stat"], #fdi-mean-score {
+            font-family: 'Source Serif 4', Georgia, serif !important;
+            font-weight: 600 !important;
+        }
+        #fdi-mean-score {
+            color: #0D9488 !important;
+        }
+
+        /* Form elements */
+        select, button, a {
+            border-radius: 4px !important;
+            min-height: 30px;
+        }
+        select {
+            border: 1px solid #E2E8F0 !important;
+            background: #FFFFFF !important;
+            color: #0F172A !important;
+        }
+        :focus-visible {
+            outline: 2px solid #0D9488;
+            outline-offset: 2px;
+        }
+
         /* Completely eliminate ALL scrollbars (vertical & horizontal) across all elements & browsers */
         html, body, *, ::-webkit-scrollbar {
             scrollbar-width: none !important;
@@ -105,102 +185,65 @@
             -ms-overflow-style: none !important;
             scrollbar-width: none !important;
         }
-        /* Keep Plotly containers within their parent's width.
-           NOTE: do NOT set overflow:hidden here - Plotly's inner .svg-container
-           computes to height 0, so hiding overflow clips the whole chart (blank box). */
+
+        /* Keep Plotly containers within their parent's width */
         .js-plotly-plot, .plot-container, .plotly, .svg-container {
             max-width: 100% !important;
             overflow: visible !important;
         }
-    
-/* ===== Redesign: research-report design system ===== */
-:root{--ink:#16202E;--muted:#5A6678;--canvas:#F4F5F7;--rule:#D8DDE5;--accent:#27478C;--accent-tint:#EDF1F9;--ochre:#B7791F}
-body{background:var(--canvas)!important;color:var(--ink)!important;font-family:'IBM Plex Sans',system-ui,sans-serif!important;font-feature-settings:'tnum'}
-h1,h2,h3,h4{font-family:'Source Serif 4',Georgia,serif!important;font-weight:600!important;letter-spacing:-.005em!important;color:var(--ink)!important}
-h2{font-size:1.35rem!important}h3{font-size:1.05rem!important}
-.uppercase{text-transform:none!important;letter-spacing:0!important}
-[class*="font-extrabold"],[class*="font-bold"]{font-weight:600!important}
-[class*="rounded-"]:not(.rounded-full){border-radius:6px!important}
-.rounded-full{border-radius:4px!important}
-.glass-panel,[class*="shadow"]{box-shadow:none!important}
-.glass-panel,[class*="bg-white"]{border-color:var(--rule)!important}
-[class*="border-slate-"]{border-color:var(--rule)!important}
-/* one accent instead of emerald/amber/blue rainbow */
-[class*="text-emerald"],[class*="text-blue-"]{color:var(--accent)!important}
-[class*="text-amber-"]{color:var(--ochre)!important}
-[class*="bg-emerald-"],[class*="bg-blue-50"],[class*="bg-amber-50"]{background:#fff!important}
-[class*="border-emerald"],[class*="border-blue-"],[class*="border-amber-"]{border-color:var(--rule)!important}
-[class*="text-slate-"]{color:var(--muted)!important}
-[class*="text-slate-800"],[class*="text-slate-900"]{color:var(--ink)!important}
-/* chrome */
-header{background:#fff!important;border-bottom:1px solid var(--rule)!important;backdrop-filter:none!important}
-aside{background:#fff!important;border-color:var(--rule)!important}
-.rd-hide{display:none!important}
-select,button,a{border-radius:4px!important}
-select{border:1px solid var(--rule)!important;background:#fff!important;color:var(--ink)!important}
-.nav-tab{border-radius:4px!important;border:0!important;border-left:3px solid transparent!important;padding:.5rem .75rem!important;font-weight:500!important;color:var(--muted)!important}
-.nav-tab:hover{background:var(--canvas)!important}
-body .nav-tab.active{background:var(--accent-tint)!important;color:var(--accent)!important;border-left-color:var(--accent)!important;box-shadow:none!important;font-weight:600!important}
-.nav-tab i,.nav-tab svg{display:none!important}
-.rd-hero{background:#fff;border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem}
-.rd-hero h2{font-size:1.2rem!important;margin-bottom:.35rem}
-.rd-hero p{color:var(--ink)!important;font-size:.9rem!important;line-height:1.6!important;max-width:75ch}
-/* key figures: serif numerals, quiet labels */
-[id^="kpi-"],[id^="fdi-"][id$="-stat"],#fdi-mean-score{font-family:'Source Serif 4',Georgia,serif!important;font-weight:600!important;color:var(--ink)!important}
-#fdi-mean-score{color:var(--ochre)!important}
-i[data-lucide],svg.lucide{color:var(--muted)!important}
-[class*="bg-emerald-6"],[class*="bg-emerald-7"]{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
-[class*="bg-emerald-6"] *,[class*="bg-emerald-7"] *{color:#fff!important}
-.rd-hero p{-webkit-line-clamp:unset!important;display:block!important;overflow:visible!important}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-/* ===== App shell: header + sidebar fixed, only the content pane scrolls (md and up) ===== */
-@media (min-width:768px){
-  html,body{height:100%!important;overflow:hidden!important}
-  body{display:flex!important;flex-direction:column!important;min-height:0!important}
-  header{position:relative!important;flex:none!important}
-  body>div.flex-1{flex:1 1 0!important;min-height:0!important;height:auto!important;overflow:hidden!important}
-  aside{position:static!important;align-self:stretch!important;min-height:0!important;height:100%!important;overflow-y:auto!important}
-  main,aside{scrollbar-width:thin!important;scrollbar-color:#9AA6B8 #EEF0F4!important}
-  main{height:100%!important;overflow-y:auto!important;overflow-x:hidden!important}
-  aside{overflow-x:hidden!important;overscroll-behavior:contain}
-  main{overscroll-behavior:contain}
-  aside::-webkit-scrollbar{display:block!important;width:10px!important;height:10px!important;background:#EEF0F4!important}
-  aside::-webkit-scrollbar-track{display:block!important;background:#EEF0F4!important}
-  aside::-webkit-scrollbar-thumb{display:block!important;background:#9AA6B8!important;border-radius:6px!important;border:2px solid #EEF0F4!important}
-  aside::-webkit-scrollbar-thumb:hover{background:#6B7A90!important}
-  main::-webkit-scrollbar{display:block!important;width:10px!important;height:10px!important;background:#EEF0F4!important}
-  main::-webkit-scrollbar-track{display:block!important;background:#EEF0F4!important}
-  main::-webkit-scrollbar-thumb{display:block!important;background:#9AA6B8!important;border-radius:6px!important;border:2px solid #EEF0F4!important}
-  main::-webkit-scrollbar-thumb:hover{background:#6B7A90!important}
-}
+        /* Chrome headers and sidebar */
+        header {
+            background: #FFFFFF !important;
+            border-bottom: 1px solid #E2E8F0 !important;
+            backdrop-filter: none !important;
+        }
+        aside {
+            background: #FFFFFF !important;
+            border-color: #E2E8F0 !important;
+        }
+        main {
+            background: #FFFFFF !important;
+        }
 
-/* ===== UX fixes: readable minimum type size ===== */
-[class*="text-[8px]"],[class*="text-[9px]"],[class*="text-[10px]"]{font-size:11px!important;line-height:1.35!important}
-[class*="text-[11px]"]{font-size:12px!important}
-button,select,a{min-height:30px}
-.nav-tab{min-height:38px}
+        @media (prefers-reduced-motion:reduce) {
+            * { animation: none !important; transition: none !important; }
+        }
 
-@media (max-width:639px){
-  header .h-12{height:auto!important;min-height:3rem;padding-top:.5rem;padding-bottom:.5rem;gap:.5rem}
-  header h1{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:.9rem!important;line-height:1.25!important}
-  header p.truncate{display:none!important}
-  header .h-12{flex-wrap:wrap}
-  header .h-12>div:first-child{flex:1 1 100%}
-  header .h-12>div:last-child{flex:1 1 100%;justify-content:flex-start}
-}
-</style>
+        /* App shell: header + sidebar fixed, only content pane scrolls on desktop */
+        @media (min-width: 768px) {
+            html, body { height: 100% !important; overflow: hidden !important; }
+            body { display: flex !important; flex-direction: column !important; min-height: 0 !important; }
+            header { position: relative !important; flex: none !important; }
+            body > div.flex-1 { flex: 1 1 0 !important; min-height: 0 !important; height: auto !important; overflow: hidden !important; }
+            aside { position: static !important; align-self: stretch !important; min-height: 0 !important; height: 100% !important; overflow-y: auto !important; }
+            main, aside { scrollbar-width: thin !important; scrollbar-color: #9AA6B8 #EEF0F4 !important; }
+            main { height: 100% !important; overflow-y: auto !important; overflow-x: hidden !important; overscroll-behavior: contain; }
+            aside { overflow-x: hidden !important; overscroll-behavior: contain; }
+        }
+
+        /* Minimum type sizes */
+        [class*="text-[8px]"], [class*="text-[9px]"], [class*="text-[10px]"] { font-size: 11px !important; line-height: 1.35 !important; }
+        [class*="text-[11px]"] { font-size: 12px !important; }
+
+        @media (max-width: 639px) {
+            header .h-12 { height: auto !important; min-height: 3rem; padding-top: 0.5rem; padding-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap; }
+            header h1 { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; font-size: 0.9rem !important; line-height: 1.25 !important; }
+            header p.truncate { display: none !important; }
+            header .h-12 > div:first-child { flex: 1 1 100%; }
+            header .h-12 > div:last-child { flex: 1 1 100%; justify-content: flex-start; }
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-white text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- Top Navigation Header -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs w-full">
+    <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-xs w-full">
         <div class="w-full px-4 sm:px-6">
             <div class="flex justify-between items-center h-12 sm:h-13">
                 <!-- Branding & Title -->
                 <div class="flex items-center space-x-2.5 min-w-0">
-                    <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-xs flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white shadow-xs flex-shrink-0">
                         <i data-lucide="wallet" class="w-4 h-4"></i>
                     </div>
                     <div class="min-w-0">
@@ -217,10 +260,10 @@ button,select,a{min-height:30px}
                         <span class="w-1.5 h-1.5 mr-1 bg-emerald-500 rounded-full animate-pulse"></span>
                         <span>n = <span id="header-sample-count">131</span> students</span>
                     </span>
-                    <a href="/api/download/cleaned-data" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition border border-slate-200">
+                    <a href="/api/download/cleaned-data" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 transition border border-slate-200">
                         <i data-lucide="download" class="w-3 h-3 mr-1 text-slate-500"></i> Cleaned CSV
                     </a>
-                    <a href="/api/download/summary" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-xs">
+                    <a href="/api/download/summary" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-teal-600 hover:bg-teal-700 text-white transition shadow-xs">
                         <i data-lucide="file-text" class="w-3 h-3 mr-1"></i> Report
                     </a>
                 </div>
@@ -228,18 +271,18 @@ button,select,a{min-height:30px}
         </div>
 
         <!-- Global Interactive Filter Bar -->
-        <div class="bg-slate-50 border-t border-slate-200/80 px-4 sm:px-6 py-1 w-full">
+        <div class="bg-slate-50/70 border-t border-slate-200 px-4 sm:px-6 py-1 w-full">
             <div class="w-full flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                     <div class="flex items-center space-x-1">
-                        <i data-lucide="filter" class="w-3 h-3 text-slate-500"></i>
+                        <i data-lucide="filter" class="w-3 h-3 text-teal-600"></i>
                         <span class="font-bold text-slate-700 text-[11px]">Filters:</span>
                     </div>
 
                     <!-- Academic Year Filter -->
                     <div class="flex items-center space-x-1">
                         <label for="filter-year" class="text-slate-500 font-medium text-[11px]">Year:</label>
-                        <select id="filter-year" onchange="applyFilters()" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        <select id="filter-year" onchange="applyFilters()" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-teal-500">
                             <option value="All">All Years</option>
                         </select>
                     </div>
@@ -247,7 +290,7 @@ button,select,a{min-height:30px}
                     <!-- Stream / Major Filter -->
                     <div class="flex items-center space-x-1">
                         <label for="filter-stream" class="text-slate-500 font-medium text-[11px]">Stream:</label>
-                        <select id="filter-stream" onchange="applyFilters()" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500 max-w-[140px] truncate">
+                        <select id="filter-stream" onchange="applyFilters()" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-teal-500 max-w-[140px] truncate">
                             <option value="All">All Streams</option>
                         </select>
                     </div>
@@ -255,30 +298,30 @@ button,select,a{min-height:30px}
                     <!-- Living Situation Filter -->
                     <div class="flex items-center space-x-1">
                         <label for="filter-living" class="text-slate-500 font-medium text-[11px]">Living:</label>
-                        <select id="filter-living" onchange="applyFilters()" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        <select id="filter-living" onchange="applyFilters()" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-teal-500">
                             <option value="All">All Situations</option>
                         </select>
                     </div>
 
                     <!-- Reset Filters Button -->
                     <button onclick="resetFilters()" class="inline-flex items-center px-2 py-0.5 rounded bg-white hover:bg-slate-50 border border-slate-300 text-slate-600 text-[11px] font-medium transition">
-                        <i data-lucide="rotate-ccw" class="w-2.5 h-2.5 mr-1"></i> Reset
+                        <i data-lucide="rotate-ccw" class="w-2.5 h-2.5 mr-1 text-slate-400"></i> Reset
                     </button>
                 </div>
 
                 <!-- Active Filter Indicator -->
                 <div class="text-slate-500 text-[11px] font-medium">
-                    Showing <span id="filter-active-count" class="font-bold text-emerald-700">131</span> of 131 responses
+                    Showing <span id="filter-active-count" class="font-bold text-teal-700">131</span> of 131 responses
                 </div>
             </div>
         </div>
 
     </header>
 
-    <!-- Main Application Layout: Full-Width Left Sidebar + Main Content Area -->
-    <div class="flex-1 flex flex-col md:flex-row w-full min-h-[calc(100vh-74px)]">
+    <!-- Main Application Layout: Left Sidebar + Main Content Area -->
+    <div class="flex-1 flex flex-col md:flex-row w-full min-h-[calc(100vh-74px)] bg-white">
 
-        <!-- Left Vertical Navigation Sidebar (Full Screen Docked) -->
+        <!-- Left Vertical Navigation Sidebar -->
         <aside class="w-full md:w-64 lg:w-72 bg-white border-b md:border-b-0 md:border-r border-slate-200 flex-shrink-0 p-3 md:sticky md:top-[74px] md:self-start md:min-h-[calc(100vh-74px)] flex flex-col justify-between">
             <!-- Top Section: Navigation Modules -->
             <div class="space-y-1.5">
@@ -290,56 +333,56 @@ button,select,a{min-height:30px}
                 <nav class="space-y-0.5 grid grid-cols-2 gap-1 sm:grid-cols-4 md:flex md:flex-col md:space-y-0.5">
                     <button onclick="switchTab('overview')" class="nav-tab active w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-overview" title="Executive Overview">
                         <div class="flex items-center space-x-2 min-w-0">
-                            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 flex-shrink-0 text-teal-600"></i>
                             <span class="truncate">Overview</span>
                         </div>
                     </button>
 
                     <button onclick="switchTab('demographics')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-demographics" title="Student Demographics">
                         <div class="flex items-center space-x-2 min-w-0">
-                            <i data-lucide="users" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                            <i data-lucide="users" class="w-3.5 h-3.5 flex-shrink-0 text-indigo-600"></i>
                             <span class="truncate">Demographics</span>
                         </div>
                     </button>
 
                     <button onclick="switchTab('income')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-income" title="Income & Financial Discipline">
                         <div class="flex items-center space-x-2 min-w-0">
-                            <i data-lucide="landmark" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                            <i data-lucide="landmark" class="w-3.5 h-3.5 flex-shrink-0 text-sky-600"></i>
                             <span class="truncate">Income & Discipline</span>
                         </div>
                     </button>
 
                     <button onclick="switchTab('spending')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-spending" title="Spending Behaviour & Psychology">
                         <div class="flex items-center space-x-2 min-w-0">
-                            <i data-lucide="shopping-cart" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                            <i data-lucide="shopping-cart" class="w-3.5 h-3.5 flex-shrink-0 text-rose-600"></i>
                             <span class="truncate">Spending Psychology</span>
                         </div>
                     </button>
 
                     <button onclick="switchTab('mindset')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-mindset" title="Financial Mindset & Planning">
                         <div class="flex items-center space-x-2 min-w-0">
-                            <i data-lucide="brain" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                            <i data-lucide="brain" class="w-3.5 h-3.5 flex-shrink-0 text-amber-600"></i>
                             <span class="truncate">Mindset & Planning</span>
                         </div>
                     </button>
 
                     <button onclick="switchTab('invest')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-invest" title="Investment Readiness">
                         <div class="flex items-center space-x-2 min-w-0">
-                            <i data-lucide="trending-up" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                            <i data-lucide="trending-up" class="w-3.5 h-3.5 flex-shrink-0 text-emerald-600"></i>
                             <span class="truncate">Investment Readiness</span>
                         </div>
                     </button>
 
                     <button onclick="switchTab('datamining')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-datamining" title="Data Mining Suite">
                         <div class="flex items-center space-x-2 min-w-0">
-                            <i data-lucide="cpu" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                            <i data-lucide="cpu" class="w-3.5 h-3.5 flex-shrink-0 text-purple-600"></i>
                             <span class="truncate">Data Mining Suite</span>
                         </div>
                     </button>
 
                     <button onclick="switchTab('findings')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-findings" title="Key Findings & Academic Conclusions">
                         <div class="flex items-center space-x-2 min-w-0">
-                            <i data-lucide="lightbulb" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                            <i data-lucide="lightbulb" class="w-3.5 h-3.5 flex-shrink-0 text-amber-600"></i>
                             <span class="truncate">Findings & Insights</span>
                         </div>
                     </button>
@@ -347,12 +390,12 @@ button,select,a{min-height:30px}
             </div>
 
             <!-- Bottom Section: Telemetry, Active Models & Research Details -->
-            <div class="mt-3 pt-2.5 border-t border-slate-200/80 space-y-2 hidden md:block">
+            <div class="mt-3 pt-2.5 border-t border-slate-200 space-y-2 hidden md:block">
                 <!-- Live Cohort Snapshot Widget -->
-                <div class="rd-hide p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-200 space-y-1.5">
                     <div class="flex items-center justify-between">
                         <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Cohort Telemetry</span>
-                        <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800">
+                        <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
                             <span class="w-1.5 h-1.5 mr-1 bg-emerald-500 rounded-full animate-pulse"></span>
                             n = 131
                         </span>
@@ -360,7 +403,7 @@ button,select,a{min-height:30px}
                     <div class="grid grid-cols-2 gap-1.5 text-center">
                         <div class="bg-white p-1 rounded-lg border border-slate-200 shadow-xs">
                             <div class="text-[8px] text-slate-400 font-semibold uppercase">Cohort FDI</div>
-                            <div class="text-xs font-extrabold text-emerald-700">46.0 <span class="text-[8px] font-normal text-slate-400">/ 100</span></div>
+                            <div class="text-xs font-extrabold text-teal-700">46.0 <span class="text-[8px] font-normal text-slate-400">/ 100</span></div>
                         </div>
                         <div class="bg-white p-1 rounded-lg border border-slate-200 shadow-xs">
                             <div class="text-[8px] text-slate-400 font-semibold uppercase">Emergency</div>
@@ -368,34 +411,34 @@ button,select,a{min-height:30px}
                         </div>
                         <div class="bg-white p-1 rounded-lg border border-slate-200 shadow-xs">
                             <div class="text-[8px] text-slate-400 font-semibold uppercase">Tracking</div>
-                            <div class="text-xs font-extrabold text-slate-800">30.5%</div>
+                            <div class="text-xs font-extrabold text-rose-600">30.5%</div>
                         </div>
                         <div class="bg-white p-1 rounded-lg border border-slate-200 shadow-xs">
                             <div class="text-[8px] text-slate-400 font-semibold uppercase">SIP Auto</div>
-                            <div class="text-xs font-extrabold text-slate-800">79.4%</div>
+                            <div class="text-xs font-extrabold text-indigo-700">79.4%</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Active Data Mining Algorithms Card -->
-                <div class="rd-hide p-2 rounded-xl bg-emerald-50/50 border border-emerald-200/60 text-[10px] space-y-1">
-                    <div class="flex items-center space-x-1.5 font-bold text-emerald-900">
-                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-600"></i>
+                <div class="p-2 rounded-xl bg-purple-50/40 border border-purple-200/60 text-[10px] space-y-1">
+                    <div class="flex items-center space-x-1.5 font-bold text-purple-900">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-600"></i>
                         <span>Active Mining Models</span>
                     </div>
-                    <div class="space-y-0.5 text-[9px] text-emerald-800/90 pl-4 font-medium">
-                        <div>• Spearman Rank Correlation (ρ)</div>
-                        <div>• K-Means Archetypes (k = 3)</div>
-                        <div>• Apriori Associations (Lift &gt; 1.2)</div>
-                        <div>• ID3 &amp; J48 Induction (Entropy 0.99)</div>
+                    <div class="space-y-0.5 text-[9px] text-slate-700 pl-4 font-medium">
+                        <div>• <span class="text-teal-700 font-semibold">Spearman Rank</span> (ρ correlation)</div>
+                        <div>• <span class="text-indigo-700 font-semibold">K-Means</span> (k = 3 archetypes)</div>
+                        <div>• <span class="text-amber-700 font-semibold">Apriori</span> (Lift &gt; 1.2 rules)</div>
+                        <div>• <span class="text-emerald-700 font-semibold">ID3 &amp; J48</span> (Gain Ratio trees)</div>
                     </div>
                 </div>
 
                 <!-- Field Research Meta & Quick Downloads -->
-                <div class="p-2 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <div class="p-2 rounded-xl bg-white border border-slate-200 space-y-1.5 shadow-xs">
                     <div class="flex items-center justify-between text-[10px]">
                         <span class="font-bold text-slate-700 flex items-center space-x-1">
-                            <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-emerald-600"></i>
+                            <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-teal-600"></i>
                             <span>BSc Data Science</span>
                         </span>
                     </div>
@@ -404,7 +447,7 @@ button,select,a{min-height:30px}
                         <a href="/api/download/cleaned-data" class="flex items-center justify-center py-1 px-1.5 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold transition text-center shadow-xs">
                             <i data-lucide="download" class="w-3 h-3 mr-1 text-slate-400"></i> CSV
                         </a>
-                        <a href="/api/download/summary" class="flex items-center justify-center py-1 px-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition text-center shadow-xs">
+                        <a href="/api/download/summary" class="flex items-center justify-center py-1 px-1.5 rounded-md bg-teal-600 hover:bg-teal-700 text-white font-semibold transition text-center shadow-xs">
                             <i data-lucide="file-text" class="w-3 h-3 mr-1"></i> Report
                         </a>
                     </div>
@@ -412,8 +455,8 @@ button,select,a{min-height:30px}
             </div>
         </aside>
 
-        <!-- Main Content Body (Expands Full Remaining Width) -->
-        <main class="flex-1 px-4 sm:px-6 py-2.5 min-w-0 w-full space-y-3">
+        <!-- Main Content Body -->
+        <main class="flex-1 px-4 sm:px-6 py-2.5 min-w-0 w-full space-y-3 bg-white">
 
         <!-- ================= MODULE 1: EXECUTIVE OVERVIEW ================= -->
         <section id="tab-overview" class="space-y-2.5">
@@ -421,36 +464,36 @@ button,select,a{min-height:30px}
             <div class="rd-hero">
                 <div class="relative z-10 max-w-5xl space-y-1.5">
                     <h2 class="text-sm sm:text-base font-extrabold tracking-tight">Summary of findings</h2>
-                    <p id="executive-narrative-text" class="text-xs text-slate-300 leading-snug line-clamp-2 hover:line-clamp-none transition-all cursor-pointer" title="Hover or click to view full narrative">
+                    <p id="executive-narrative-text" class="text-xs text-slate-700 leading-relaxed cursor-pointer" title="Hover or click to view full narrative">
                         Loading dynamically computed narrative summary...
                     </p>
                 </div>
             </div>
 
-            <!-- 6 Dynamically Computed KPI Cards -->
+            <!-- 6 Dynamically Computed KPI Cards with Balanced Color Accents -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-                <!-- KPI 1: Respondents -->
-                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                <!-- KPI 1: Respondents (Indigo Accent) -->
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg border-t-2 border-t-indigo-500">
                     <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
                         <span>Respondents</span>
-                        <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <i data-lucide="users" class="w-3.5 h-3.5 text-indigo-600"></i>
                     </div>
                     <div id="kpi-respondents" class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">131</div>
                     <div class="text-[10px] text-slate-500 mt-0.5 leading-tight">100% complete</div>
                 </div>
 
-                <!-- KPI 2: Confidence -->
-                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                <!-- KPI 2: Confidence (Amber Accent) -->
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg border-t-2 border-t-amber-500">
                     <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
                         <span>Confidence</span>
-                        <i data-lucide="smile" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <i data-lucide="smile" class="w-3.5 h-3.5 text-amber-600"></i>
                     </div>
-                    <div id="kpi-confidence" class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">3.96 <span class="text-[10px] text-slate-400 font-normal">/ 5</span></div>
-                    <div class="text-[10px] text-emerald-700 font-semibold mt-0.5 leading-tight">High optimism</div>
+                    <div id="kpi-confidence" class="text-lg sm:text-xl font-extrabold text-amber-600 mt-0.5">3.96 <span class="text-[10px] text-slate-400 font-normal">/ 5</span></div>
+                    <div class="text-[10px] text-amber-700 font-semibold mt-0.5 leading-tight">High optimism</div>
                 </div>
 
-                <!-- KPI 3: Emergency Fund -->
-                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                <!-- KPI 3: Emergency Fund (Emerald Accent) -->
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg border-t-2 border-t-emerald-500">
                     <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
                         <span>Emergency</span>
                         <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
@@ -459,34 +502,34 @@ button,select,a{min-height:30px}
                     <div class="text-[10px] text-slate-500 mt-0.5 leading-tight">1-mo cushion</div>
                 </div>
 
-                <!-- KPI 4: Tracking Rate -->
-                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                <!-- KPI 4: Tracking Rate (Rose Accent) -->
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg border-t-2 border-t-rose-500">
                     <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
                         <span>Tracking Rate</span>
-                        <i data-lucide="activity" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <i data-lucide="activity" class="w-3.5 h-3.5 text-rose-600"></i>
                     </div>
                     <div id="kpi-tracking" class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">30.5%</div>
-                    <div class="text-[10px] text-amber-600 font-medium mt-0.5 leading-tight">Structured tracking</div>
+                    <div class="text-[10px] text-rose-600 font-medium mt-0.5 leading-tight">Structured tracking</div>
                 </div>
 
-                <!-- KPI 5: SIP Intention -->
-                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                <!-- KPI 5: SIP Intention (Sky Accent) -->
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg border-t-2 border-t-sky-500">
                     <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
                         <span>SIP Auto</span>
-                        <i data-lucide="repeat" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <i data-lucide="repeat" class="w-3.5 h-3.5 text-sky-600"></i>
                     </div>
                     <div id="kpi-sip" class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">79.4%</div>
-                    <div class="text-[10px] text-emerald-700 font-medium mt-0.5 leading-tight">Plan auto-invest</div>
+                    <div class="text-[10px] text-sky-700 font-medium mt-0.5 leading-tight">Plan auto-invest</div>
                 </div>
 
-                <!-- KPI 6: Actionable Plan -->
-                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                <!-- KPI 6: Actionable Plan (Purple Accent) -->
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg border-t-2 border-t-purple-500">
                     <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
                         <span>3-Yr Plan</span>
-                        <i data-lucide="target" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <i data-lucide="target" class="w-3.5 h-3.5 text-purple-600"></i>
                     </div>
                     <div id="kpi-plan" class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">40.5%</div>
-                    <div class="text-[10px] text-slate-500 mt-0.5 leading-tight">Score 4-5 on plan</div>
+                    <div class="text-[10px] text-purple-700 font-medium mt-0.5 leading-tight">Score 4-5 on plan</div>
                 </div>
             </div>
 
@@ -495,7 +538,7 @@ button,select,a{min-height:30px}
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-slate-100 gap-1.5">
                     <div>
                         <div class="flex items-center space-x-1.5">
-                            <span class="p-1 rounded bg-emerald-100 text-emerald-800">
+                            <span class="p-1 rounded bg-teal-100 text-teal-800">
                                 <i data-lucide="gauge" class="w-3.5 h-3.5"></i>
                             </span>
                             <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Financial Discipline Index (FDI)</h3>
@@ -507,7 +550,7 @@ button,select,a{min-height:30px}
                     </div>
                     <div class="text-right sm:self-center">
                         <span class="text-[10px] text-slate-400 uppercase font-semibold">Cohort Mean FDI</span>
-                        <div id="fdi-mean-score" class="text-lg sm:text-xl font-extrabold text-emerald-700 leading-tight">46.0 <span class="text-[10px] text-slate-500 font-normal">/ 100</span></div>
+                        <div id="fdi-mean-score" class="text-lg sm:text-xl font-extrabold text-teal-700 leading-tight">46.0 <span class="text-[10px] text-slate-500 font-normal">/ 100</span></div>
                     </div>
                 </div>
 
@@ -521,15 +564,15 @@ button,select,a{min-height:30px}
                                 <span id="fdi-low-stat" class="font-extrabold text-amber-900 text-xs sm:text-sm">33.6%</span>
                                 <span id="fdi-low-sub" class="text-[9px] text-amber-700 block">44 students</span>
                             </div>
-                            <div class="p-1.5 rounded-lg bg-blue-50/80 border border-blue-200/80">
-                                <span class="text-[9px] uppercase font-bold text-blue-700 block tracking-wider">Moderate (36–65)</span>
-                                <span id="fdi-mod-stat" class="font-extrabold text-blue-900 text-xs sm:text-sm">42.7%</span>
-                                <span id="fdi-mod-sub" class="text-[9px] text-blue-700 block">56 students</span>
+                            <div class="p-1.5 rounded-lg bg-teal-50/80 border border-teal-200/80">
+                                <span class="text-[9px] uppercase font-bold text-teal-700 block tracking-wider">Moderate (36–65)</span>
+                                <span id="fdi-mod-stat" class="font-extrabold text-teal-900 text-xs sm:text-sm">42.7%</span>
+                                <span id="fdi-mod-sub" class="text-[9px] text-teal-700 block">56 students</span>
                             </div>
-                            <div class="p-1.5 rounded-lg bg-emerald-50/80 border border-emerald-200/80">
-                                <span class="text-[9px] uppercase font-bold text-emerald-700 block tracking-wider">High (66–100)</span>
-                                <span id="fdi-high-stat" class="font-extrabold text-emerald-900 text-xs sm:text-sm">23.7%</span>
-                                <span id="fdi-high-sub" class="text-[9px] text-emerald-700 block">31 students</span>
+                            <div class="p-1.5 rounded-lg bg-indigo-50/80 border border-indigo-200/80">
+                                <span class="text-[9px] uppercase font-bold text-indigo-700 block tracking-wider">High (66–100)</span>
+                                <span id="fdi-high-stat" class="font-extrabold text-indigo-900 text-xs sm:text-sm">23.7%</span>
+                                <span id="fdi-high-sub" class="text-[9px] text-indigo-700 block">31 students</span>
                             </div>
                         </div>
 
@@ -538,9 +581,9 @@ button,select,a{min-height:30px}
                             <div id="chart-fdi-dist" class="w-full h-60 sm:h-64"></div>
                         </div>
                     </div>
-                    <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-200 space-y-1.5 text-[11px]">
+                    <div class="bg-slate-50/70 rounded-lg p-2.5 border border-slate-200 space-y-1.5 text-[11px]">
                         <h4 class="font-bold text-slate-800 flex items-center space-x-1 text-xs">
-                            <i data-lucide="binary" class="w-3.5 h-3.5 text-emerald-600"></i>
+                            <i data-lucide="binary" class="w-3.5 h-3.5 text-teal-600"></i>
                             <span>FDI Weighting Formula</span>
                         </h4>
                         <ul class="space-y-1 text-slate-600 text-[10px]">
@@ -561,7 +604,7 @@ button,select,a{min-height:30px}
                                 <span class="font-bold text-slate-800">25 pts</span>
                             </li>
                         </ul>
-                        <div class="p-1.5 rounded bg-emerald-50 border border-emerald-100 text-emerald-800 text-[9px] leading-tight">
+                        <div class="p-1.5 rounded bg-teal-50 border border-teal-100 text-teal-900 text-[9px] leading-tight">
                             <strong>Academic Note:</strong> The FDI is a project-defined exploratory research metric evaluating student preparedness. Not an accredited credit score.
                         </div>
                     </div>
@@ -655,7 +698,7 @@ button,select,a{min-height:30px}
             <!-- Comparative Analysis Row -->
             <div class="glass-panel p-2.5 rounded-xl space-y-2">
                 <h3 class="font-bold text-xs sm:text-sm text-slate-900 flex items-center space-x-1.5">
-                    <i data-lucide="git-compare" class="w-3.5 h-3.5 text-emerald-600"></i>
+                    <i data-lucide="git-compare" class="w-3.5 h-3.5 text-teal-600"></i>
                     <span>Comparative Empirical Rate Analysis</span>
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
@@ -697,7 +740,7 @@ button,select,a{min-height:30px}
                     <div>
                         <h3 class="font-bold text-xs text-slate-900 mb-1.5">Psychological Spending Takeaways</h3>
                         <div class="space-y-2 text-[11px] text-slate-600 mt-2 leading-relaxed">
-                            <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-900">
+                            <div class="p-2 rounded-lg bg-teal-50 border border-teal-100 text-teal-900">
                                 <strong>Positive Association (ρ = +0.318):</strong> Students spending because "friends are doing it" display a statistically significant correlation with academic stress spending.
                             </div>
                             <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-700">
@@ -799,13 +842,13 @@ button,select,a{min-height:30px}
                 </div>
             </div>
 
-            <!-- Sub-tabs for Data Mining -->
+            <!-- Sub-tabs for Data Mining with Multi-Color Accents -->
             <div class="flex flex-wrap border-b border-slate-200 gap-1.5 pb-1 text-xs font-bold">
-                <button onclick="switchMiningSubtab('correlation')" class="mining-btn px-2.5 py-1.5 border-b-2 border-emerald-600 text-emerald-700" id="mbtn-correlation">📊 Spearman Heatmap</button>
-                <button onclick="switchMiningSubtab('kmeans')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-kmeans">🎯 K-Means Archetypes</button>
-                <button onclick="switchMiningSubtab('apriori')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-apriori">🛒 Apriori (Rules)</button>
-                <button onclick="switchMiningSubtab('trees')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-trees">🌳 ID3 & J48 Trees</button>
-                <button onclick="switchMiningSubtab('simulator')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-simulator">🔮 What-If Simulator</button>
+                <button onclick="switchMiningSubtab('correlation')" class="mining-btn px-2.5 py-1.5 border-b-2 border-teal-600 text-teal-700 transition" id="mbtn-correlation">📊 Spearman Heatmap</button>
+                <button onclick="switchMiningSubtab('kmeans')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition" id="mbtn-kmeans">🎯 K-Means Archetypes</button>
+                <button onclick="switchMiningSubtab('apriori')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition" id="mbtn-apriori">🛒 Apriori (Rules)</button>
+                <button onclick="switchMiningSubtab('trees')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition" id="mbtn-trees">🌳 ID3 & J48 Trees</button>
+                <button onclick="switchMiningSubtab('simulator')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition" id="mbtn-simulator">🔮 What-If Simulator</button>
             </div>
 
             <!-- Subtab 1: Spearman Correlation -->
@@ -869,7 +912,7 @@ button,select,a{min-height:30px}
                     <!-- Mined Rules Table -->
                     <div class="border border-slate-200 rounded-lg overflow-x-hidden">
                         <table class="w-full text-xs text-left table-auto">
-                            <thead class="bg-slate-100 text-slate-700 font-bold uppercase text-[9px] tracking-wider border-b border-slate-200">
+                            <thead class="bg-slate-50 text-slate-700 font-bold uppercase text-[9px] tracking-wider border-b border-slate-200">
                                 <tr>
                                     <th class="px-3 py-2">Mined Association Rule (IF → THEN)</th>
                                     <th class="px-2 py-2 text-center">Support</th>
@@ -893,7 +936,7 @@ button,select,a{min-height:30px}
                             <h3 class="font-bold text-xs sm:text-sm text-slate-900">Decision Tree Induction (ID3 vs J48/C4.5)</h3>
                             <p class="text-[10px] text-slate-500">Information Gain vs Gain Ratio calculation and recursive tree induction.</p>
                         </div>
-                        <button onclick="fetchDecisionTree()" class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition">
+                        <button onclick="fetchDecisionTree()" class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition shadow-xs">
                             Mine Decision Tree
                         </button>
                     </div>
@@ -920,22 +963,22 @@ button,select,a{min-height:30px}
                         </div>
                         <div>
                             <label class="font-bold text-slate-700 block mb-0.5 text-[11px]">Financial Confidence (1-5):</label>
-                            <input type="range" id="sim-conf" min="1" max="5" value="4" class="w-full" oninput="document.getElementById('sim-conf-val').innerText = this.value">
-                            <span id="sim-conf-val" class="font-bold text-emerald-700">4</span> / 5
+                            <input type="range" id="sim-conf" min="1" max="5" value="4" class="w-full accent-teal-600" oninput="document.getElementById('sim-conf-val').innerText = this.value">
+                            <span id="sim-conf-val" class="font-bold text-teal-700">4</span> / 5
                         </div>
                         <div>
                             <label class="font-bold text-slate-700 block mb-0.5 text-[11px]">Stress Spending Likelihood (1-5):</label>
-                            <input type="range" id="sim-stress" min="1" max="5" value="3" class="w-full" oninput="document.getElementById('sim-stress-val').innerText = this.value">
-                            <span id="sim-stress-val" class="font-bold text-emerald-700">3</span> / 5
+                            <input type="range" id="sim-stress" min="1" max="5" value="3" class="w-full accent-teal-600" oninput="document.getElementById('sim-stress-val').innerText = this.value">
+                            <span id="sim-stress-val" class="font-bold text-rose-700">3</span> / 5
                         </div>
                     </div>
 
-                    <button onclick="runSimulation()" class="px-3 py-1.5 rounded-md text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition">
+                    <button onclick="runSimulation()" class="px-3 py-1.5 rounded-md text-xs font-bold bg-purple-600 text-white hover:bg-purple-700 transition shadow-xs">
                         Run Persona Inference
                     </button>
 
-                    <div id="sim-result-box" class="hidden p-2.5 rounded-lg border border-emerald-200 bg-emerald-50 text-xs text-emerald-900 space-y-1">
-                        <div class="font-bold text-xs">Predicted Emergency Fund Status: <span id="sim-pred-val" class="underline">Yes</span></div>
+                    <div id="sim-result-box" class="hidden p-2.5 rounded-lg border border-purple-200 bg-purple-50/70 text-xs text-purple-950 space-y-1">
+                        <div class="font-bold text-xs">Predicted Emergency Fund Status: <span id="sim-pred-val" class="underline font-extrabold">Yes</span></div>
                         <div id="sim-advice-val" class="text-slate-700 leading-snug text-[11px]">Advice text</div>
                     </div>
                 </div>
@@ -953,7 +996,7 @@ button,select,a{min-height:30px}
 
             <!-- Dynamic Observations Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5" id="findings-container">
-                <!-- Dynamically populated from get_key_findings -->
+                <!-- Dynamically populated from get_key_findings with alternating accents -->
             </div>
 
             <!-- Formal Academic Research Conclusions -->
@@ -964,49 +1007,49 @@ button,select,a{min-height:30px}
                 </div>
 
                 <div class="space-y-2 text-xs text-slate-700 leading-relaxed">
-                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                    <div class="p-2.5 rounded-lg bg-slate-50/60 border border-slate-200 border-l-4 border-l-teal-500">
                         <h4 class="font-bold text-slate-900 text-xs mb-1 flex items-center space-x-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span class="w-2 h-2 rounded-full bg-teal-500"></span>
                             <span>1. Financial Management Practices</span>
                         </h4>
                         <p id="conc-management" class="text-[11px] text-slate-600">Loading...</p>
                     </div>
 
-                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                    <div class="p-2.5 rounded-lg bg-slate-50/60 border border-slate-200 border-l-4 border-l-rose-500">
                         <h4 class="font-bold text-slate-900 text-xs mb-1 flex items-center space-x-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
                             <span>2. Spending Behaviour & Behavioral Correlations</span>
                         </h4>
                         <p id="conc-spending" class="text-[11px] text-slate-600">Loading...</p>
                     </div>
 
-                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                    <div class="p-2.5 rounded-lg bg-slate-50/60 border border-slate-200 border-l-4 border-l-amber-500">
                         <h4 class="font-bold text-slate-900 text-xs mb-1 flex items-center space-x-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
                             <span>3. Financial Confidence & Preparedness Divergence</span>
                         </h4>
                         <p id="conc-confidence" class="text-[11px] text-slate-600">Loading...</p>
                     </div>
 
-                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                    <div class="p-2.5 rounded-lg bg-slate-50/60 border border-slate-200 border-l-4 border-l-sky-500">
                         <h4 class="font-bold text-slate-900 text-xs mb-1 flex items-center space-x-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
                             <span>4. Investment Preferences & Structural Obstacles</span>
                         </h4>
                         <p id="conc-investment" class="text-[11px] text-slate-600">Loading...</p>
                     </div>
 
-                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                    <div class="p-2.5 rounded-lg bg-slate-50/60 border border-slate-200 border-l-4 border-l-indigo-500">
                         <h4 class="font-bold text-slate-900 text-xs mb-1 flex items-center space-x-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
                             <span>5. Identified Student Behaviour Segments</span>
                         </h4>
                         <p id="conc-segments" class="text-[11px] text-slate-600">Loading...</p>
                     </div>
 
-                    <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-950">
+                    <div class="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-200 border-l-4 border-l-emerald-600 text-emerald-950">
                         <h4 class="font-bold text-emerald-900 text-xs mb-1 flex items-center space-x-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
                             <span>6. Recommendations for Campus Financial Literacy Initiatives</span>
                         </h4>
                         <p id="conc-recommendations" class="text-[11px] text-emerald-900">Loading...</p>
@@ -1015,17 +1058,15 @@ button,select,a{min-height:30px}
             </div>
         </section>
 
-    
-    <footer class="bg-white border-t border-slate-200 py-2 text-center text-[10px] text-slate-500 mt-2.5 w-full">
-        <div class="w-full px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-1">
-            <span>© 2026 Student Financial Habits & Spending Behavior Survey • BSc Data Science Project</span>
-            <span class="text-slate-400">Pure Python • Zero Fake Data • Anonymized</span>
-        </div>
-    </footer>
+        <!-- Footer -->
+        <footer class="bg-white border-t border-slate-200 py-2 text-center text-[10px] text-slate-500 mt-2.5 w-full">
+            <div class="w-full px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-1">
+                <span>© 2026 Student Financial Habits & Spending Behavior Survey • BSc Data Science Project</span>
+                <span class="text-slate-400">Pure Python • Zero Fake Data • Anonymized</span>
+            </div>
+        </footer>
         </main>
     </div>
-
-    <!-- Footer -->
 
     <!-- Frontend Interactive Script -->
     <script>
@@ -1065,24 +1106,30 @@ button,select,a{min-height:30px}
             window.dispatchEvent(new Event('resize'));
         }
 
-        // Data Mining Sub-tab Switcher
+        // Data Mining Sub-tab Switcher with Balanced Multi-Color Accents
         function switchMiningSubtab(subId) {
-            ['correlation', 'kmeans', 'apriori', 'trees', 'simulator'].forEach(id => {
+            const configs = {
+                'correlation': { border: 'border-teal-600', text: 'text-teal-700' },
+                'kmeans': { border: 'border-indigo-600', text: 'text-indigo-700' },
+                'apriori': { border: 'border-amber-600', text: 'text-amber-700' },
+                'trees': { border: 'border-emerald-600', text: 'text-emerald-700' },
+                'simulator': { border: 'border-purple-600', text: 'text-purple-700' }
+            };
+
+            Object.keys(configs).forEach(id => {
                 const el = document.getElementById('msub-' + id);
                 const btn = document.getElementById('mbtn-' + id);
                 if (el) el.classList.add('hidden');
                 if (btn) {
-                    btn.classList.remove('border-emerald-600', 'text-emerald-700');
-                    btn.classList.add('border-transparent', 'text-slate-600');
+                    btn.className = 'mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition font-bold text-xs';
                 }
             });
 
             const activeEl = document.getElementById('msub-' + subId);
             const activeBtn = document.getElementById('mbtn-' + subId);
             if (activeEl) activeEl.classList.remove('hidden');
-            if (activeBtn) {
-                activeBtn.classList.add('border-emerald-600', 'text-emerald-700');
-                activeBtn.classList.remove('border-transparent', 'text-slate-600');
+            if (activeBtn && configs[subId]) {
+                activeBtn.className = `mining-btn px-2.5 py-1.5 border-b-2 ${configs[subId].border} ${configs[subId].text} transition font-bold text-xs`;
             }
 
             if (subId === 'kmeans') fetchKMeans();
@@ -1121,7 +1168,6 @@ button,select,a{min-height:30px}
             const el = document.getElementById(elementId);
             if (!el) return;
             (window.__chartArgs = window.__chartArgs || {})[elementId] = [figureData, figureLayout, config];
-            // Charts in a hidden tab have no width yet, so margins/legends can't be sized: draw them when the tab is shown
             if (!el.clientWidth) { el.dataset.pending = '1'; return; }
             delete el.dataset.pending;
 
@@ -1138,43 +1184,67 @@ button,select,a{min-height:30px}
 
             try {
                 const lay = JSON.parse(JSON.stringify(figureLayout || {}));
-                // The card header already names a single-chart card, so drop the duplicate in-chart title
                 const card = el.closest('.glass-panel, section, div[class*="rounded"]');
                 if (card && card.querySelectorAll('.js-plotly-plot, [id^="chart-"]').length === 1 && card.querySelector('h2, h3, h4')) {
                     lay.title = {text: ''};
                     lay.margin = Object.assign({}, lay.margin, {t: 28});
                 }
-                // Let Plotly grow margins so axis titles and tick labels are never clipped
                 ['xaxis','yaxis'].forEach(a => { if (lay[a]) lay[a].automargin = true; });
-                // Hardcoded desktop margins can leave almost no plot on a phone: let automargin size them instead
-                if (el.clientWidth && el.clientWidth < 520 && lay.margin) { lay.margin.l = Math.min(lay.margin.l || 0, 12); lay.margin.r = Math.min(lay.margin.r || 0, 40); }
-                // Wrap long text so nothing is clipped: titles, axis titles, long category ticks, annotations
+                if (el.clientWidth && el.clientWidth < 520 && lay.margin) {
+                    lay.margin.l = Math.min(lay.margin.l || 0, 12);
+                    lay.margin.r = Math.min(lay.margin.r || 0, 40);
+                }
                 const cw = el.clientWidth || 360, ch = el.clientHeight || 220;
-                const wrap = (txt, n) => { if (typeof txt !== 'string' || txt.includes('<br>') || txt.length <= n) return txt;
+                const wrap = (txt, n) => {
+                    if (typeof txt !== 'string' || txt.includes('<br>') || txt.length <= n) return txt;
                     const out = []; let line = '';
-                    txt.split(' ').forEach(w => { if ((line + ' ' + w).trim().length > n) { out.push(line.trim()); line = w; } else line += ' ' + w; });
-                    out.push(line.trim()); return out.join('<br>'); };
-                if (lay.title && lay.title.text) { lay.title.text = wrap(lay.title.text, Math.floor(cw / 10)); lay.title.x = 0.02; lay.title.xanchor = 'left'; lay.margin = Object.assign({}, lay.margin, {t: Math.max((lay.margin || {}).t || 0, 60)}); }
+                    txt.split(' ').forEach(w => {
+                        if ((line + ' ' + w).trim().length > n) { out.push(line.trim()); line = w; }
+                        else line += ' ' + w;
+                    });
+                    out.push(line.trim()); return out.join('<br>');
+                };
+                if (lay.title && lay.title.text) {
+                    lay.title.text = wrap(lay.title.text, Math.floor(cw / 10));
+                    lay.title.x = 0.02; lay.title.xanchor = 'left';
+                    lay.margin = Object.assign({}, lay.margin, {t: Math.max((lay.margin || {}).t || 0, 60)});
+                }
                 if (lay.xaxis && lay.xaxis.title && lay.xaxis.title.text) lay.xaxis.title.text = wrap(lay.xaxis.title.text, Math.floor(cw / 12));
                 if (lay.yaxis && lay.yaxis.title && lay.yaxis.title.text) lay.yaxis.title.text = wrap(lay.yaxis.title.text, Math.floor(ch / 13));
-                (lay.annotations || []).forEach(a => { if (a.text && !a.xref?.includes('x') ) a.text = wrap(a.text, Math.floor(cw / 9)); });
-                (figureData || []).forEach(tr => { if (tr.type === 'bar' && tr.orientation === 'h' && Array.isArray(tr.y) && tr.y.some(v => typeof v === 'string' && v.length > (cw < 520 ? 18 : 26))) {
-                    lay.yaxis = lay.yaxis || {}; lay.yaxis.tickmode = 'array'; lay.yaxis.tickvals = tr.y; lay.yaxis.ticktext = tr.y.map(v => wrap(String(v), cw < 520 ? 18 : 26)); } });
+                (lay.annotations || []).forEach(a => { if (a.text && !a.xref?.includes('x')) a.text = wrap(a.text, Math.floor(cw / 9)); });
+                (figureData || []).forEach(tr => {
+                    if (tr.type === 'bar' && tr.orientation === 'h' && Array.isArray(tr.y) && tr.y.some(v => typeof v === 'string' && v.length > (cw < 520 ? 18 : 26))) {
+                        lay.yaxis = lay.yaxis || {}; lay.yaxis.tickmode = 'array'; lay.yaxis.tickvals = tr.y;
+                        lay.yaxis.ticktext = tr.y.map(v => wrap(String(v), cw < 520 ? 18 : 26));
+                    }
+                });
                 (figureData || []).forEach(tr => { if (tr.type === 'bar') tr.cliponaxis = false; });
                 if (cw < 520) (figureData || []).forEach(tr => { if (tr.type === 'bar' && Array.isArray(tr.text)) tr.text = tr.text.map(t => typeof t === 'string' ? t.replace(' (', '<br>(') : t); });
-                (lay.annotations || []).forEach(a => { if (a.yref === 'paper' && a.y < 0) { const n = (a.text || '').split('<br>').length;
-                    const shift = (lay.xaxis && lay.xaxis.title && lay.xaxis.title.text) ? 56 : 36;
-                    a.y = 0; a.yanchor = 'top'; a.yshift = -shift; a.xanchor = 'center'; a.x = 0.5;
-                    lay.margin = Object.assign({}, lay.margin, {b: Math.max((lay.margin || {}).b || 0, shift + 15 * n + 10)}); } });
-                // On narrow screens a side legend squeezes the plot: move multi-series legends underneath
+                (lay.annotations || []).forEach(a => {
+                    if (a.yref === 'paper' && a.y < 0) {
+                        const n = (a.text || '').split('<br>').length;
+                        const shift = (lay.xaxis && lay.xaxis.title && lay.xaxis.title.text) ? 56 : 36;
+                        a.y = 0; a.yanchor = 'top'; a.yshift = -shift; a.xanchor = 'center'; a.x = 0.5;
+                        lay.margin = Object.assign({}, lay.margin, {b: Math.max((lay.margin || {}).b || 0, shift + 15 * n + 10)});
+                    }
+                });
                 if (cw < 520 && lay.showlegend !== false && (figureData || []).length > 1 && !(figureData || []).some(tr => tr.type === 'pie')) {
                     lay.legend = Object.assign({}, lay.legend, {orientation: 'h', x: 0.5, xanchor: 'center', yref: 'container', y: 0, yanchor: 'bottom', title: {text: ''}, entrywidth: 76, entrywidthmode: 'pixels'});
-                    lay.margin = Object.assign({}, lay.margin, {b: Math.max((lay.margin || {}).b || 0, 118)}); }
-                // Charts with many horizontal bars get height in proportion to the number of categories
-                (figureData || []).forEach(tr => { if (tr.type === 'bar' && tr.orientation === 'h' && Array.isArray(tr.y) && tr.y.length > 3) {
-                    const need = tr.y.length * 42 + 180; if (el.clientHeight < need) el.style.height = need + 'px'; } });
-                if (cw < 520) (figureData || []).forEach(tr => { if (tr.type === 'bar' && tr.orientation === 'h' && /outside/.test(String(tr.textposition)) && Array.isArray(tr.x)) {
-                    const mx = Math.max.apply(null, tr.x.filter(v => typeof v === 'number')); if (isFinite(mx)) { lay.xaxis = lay.xaxis || {}; lay.xaxis.range = [0, mx * 2.0]; } } });
+                    lay.margin = Object.assign({}, lay.margin, {b: Math.max((lay.margin || {}).b || 0, 118)});
+                }
+                (figureData || []).forEach(tr => {
+                    if (tr.type === 'bar' && tr.orientation === 'h' && Array.isArray(tr.y) && tr.y.length > 3) {
+                        const need = tr.y.length * 42 + 180;
+                        if (el.clientHeight < need) el.style.height = need + 'px';
+                    }
+                });
+                if (cw < 520) (figureData || []).forEach(tr => {
+                    if (tr.type === 'bar' && tr.orientation === 'h' && /outside/.test(String(tr.textposition)) && Array.isArray(tr.x)) {
+                        const mx = Math.max.apply(null, tr.x.filter(v => typeof v === 'number'));
+                        if (isFinite(mx)) { lay.xaxis = lay.xaxis || {}; lay.xaxis.range = [0, mx * 2.0]; }
+                    }
+                });
+
                 await plotLib.newPlot(elementId, figureData, lay, config);
                 plotLib.Plots.resize(elementId);
             } catch (err) {
@@ -1320,16 +1390,34 @@ button,select,a{min-height:30px}
                 if (inv.obstacle_bar) safePlotlyRender('chart-obstacle-bar', inv.obstacle_bar.data, inv.obstacle_bar.layout);
                 if (inv.philosophy_bar) safePlotlyRender('chart-philosophy-bar', inv.philosophy_bar.data, inv.philosophy_bar.layout);
 
-                // 8. Render Findings
+                // 8. Render Findings with Alternating Balanced Color Badges & Borders
                 const findingsBox = document.getElementById('findings-container');
                 findingsBox.innerHTML = '';
-                dashboardData.findings.forEach(f => {
+                const badgeStyles = [
+                    'bg-teal-50 text-teal-800 border-teal-200',
+                    'bg-indigo-50 text-indigo-800 border-indigo-200',
+                    'bg-amber-50 text-amber-800 border-amber-200',
+                    'bg-rose-50 text-rose-800 border-rose-200',
+                    'bg-sky-50 text-sky-800 border-sky-200',
+                    'bg-purple-50 text-purple-800 border-purple-200'
+                ];
+                const cardBorders = [
+                    'border-l-4 border-l-teal-500',
+                    'border-l-4 border-l-indigo-500',
+                    'border-l-4 border-l-amber-500',
+                    'border-l-4 border-l-rose-500',
+                    'border-l-4 border-l-sky-500',
+                    'border-l-4 border-l-purple-500'
+                ];
+                dashboardData.findings.forEach((f, idx) => {
                     const card = document.createElement('div');
-                    card.className = 'glass-panel p-5 rounded-2xl flex flex-col justify-between';
+                    const bStyle = badgeStyles[idx % badgeStyles.length];
+                    const cBorder = cardBorders[idx % cardBorders.length];
+                    card.className = `glass-panel p-4 rounded-xl flex flex-col justify-between ${cBorder}`;
                     card.innerHTML = `
                         <div>
                             <div class="flex items-center justify-between mb-2">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">Observation</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${bStyle}">Observation ${idx + 1}</span>
                                 <span class="text-xs font-extrabold text-slate-800">${f.stat}</span>
                             </div>
                             <h4 class="font-bold text-sm text-slate-900 mb-1">${f.title}</h4>
@@ -1393,10 +1481,10 @@ button,select,a{min-height:30px}
                 container.innerHTML = '';
                 data.profiles.forEach(p => {
                     const card = document.createElement('div');
-                    card.className = 'p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-2';
+                    card.className = 'p-4 rounded-xl border border-slate-200 bg-white shadow-xs space-y-2';
                     card.innerHTML = `
                         <div class="flex items-center justify-between">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase text-white" style="background-color: ${p.Color}">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase text-white shadow-xs" style="background-color: ${p.Color}">
                                 ${p.Cluster_Name.split(':')[0]}
                             </span>
                             <span class="text-xs font-bold text-slate-700">${p.Percentage} (${p.Count} students)</span>
@@ -1404,10 +1492,10 @@ button,select,a{min-height:30px}
                         <h4 class="font-bold text-sm text-slate-900">${p.Archetype}</h4>
                         <p class="text-xs text-slate-500 leading-relaxed">${p.Description}</p>
                         <div class="pt-2 border-t border-slate-100 grid grid-cols-2 gap-1 text-[11px] text-slate-600">
-                            <div>EM Buffer: <b>${p.Emergency_Fund_Rate}</b></div>
-                            <div>SIP Intent: <b>${p.SIP_Intention_Rate}</b></div>
-                            <div>Confidence: <b>${p.Avg_Confidence}</b> / 5</div>
-                            <div>Tracking: <b>${p.Avg_Tracking}</b> / 3</div>
+                            <div>EM Buffer: <b class="text-slate-800">${p.Emergency_Fund_Rate}</b></div>
+                            <div>SIP Intent: <b class="text-slate-800">${p.SIP_Intention_Rate}</b></div>
+                            <div>Confidence: <b class="text-slate-800">${p.Avg_Confidence}</b> / 5</div>
+                            <div>Tracking: <b class="text-slate-800">${p.Avg_Tracking}</b> / 3</div>
                         </div>
                     `;
                     container.appendChild(card);
@@ -1416,7 +1504,7 @@ button,select,a{min-height:30px}
                 // PCA Scatter
                 const traces = [];
                 const clusters = [...new Set(data.scatter_points.map(pt => pt.Cluster))].sort();
-                const colors = ['#10B981', '#F59E0B', '#3B82F6', '#8B5CF6'];
+                const colors = ['#0D9488', '#6366F1', '#F59E0B', '#E11D48'];
 
                 clusters.forEach((cl, idx) => {
                     const pts = data.scatter_points.filter(pt => pt.Cluster === cl);
@@ -1432,8 +1520,8 @@ button,select,a{min-height:30px}
                 });
 
                 const pcaLayout = {
-                    title: {text: `2D PCA Projection (k = ${k}, Silhouette Score = ${data.silhouette_score})`, font: {size: 13, family: 'Plus Jakarta Sans'}},
-                    font: {family: 'Plus Jakarta Sans', size: 11},
+                    title: {text: `2D PCA Projection (k = ${k}, Silhouette Score = ${data.silhouette_score})`, font: {size: 13, family: 'IBM Plex Sans'}},
+                    font: {family: 'IBM Plex Sans', size: 11},
                     paper_bgcolor: 'white', plot_bgcolor: 'white',
                     margin: {t: 40, b: 35, l: 35, r: 25},
                     xaxis: {title: 'Principal Component 1', gridcolor: '#F1F5F9'},
@@ -1472,13 +1560,13 @@ button,select,a{min-height:30px}
                     tr.innerHTML = `
                         <td class="px-4 py-2.5 font-medium text-slate-900 break-words max-w-xs sm:max-w-md">
                             <span class="text-slate-500 font-semibold">IF</span> <span class="bg-slate-100 px-1.5 py-0.5 rounded inline-block my-0.5">${r.Antecedent}</span>
-                            <span class="text-emerald-600 font-bold mx-1.5">➔ THEN</span>
-                            <span class="bg-emerald-50 text-emerald-900 px-1.5 py-0.5 rounded font-semibold inline-block my-0.5">${r.Consequent}</span>
+                            <span class="text-teal-600 font-bold mx-1.5">➔ THEN</span>
+                            <span class="bg-teal-50 text-teal-900 border border-teal-200/60 px-1.5 py-0.5 rounded font-semibold inline-block my-0.5">${r.Consequent}</span>
                         </td>
-                        <td class="px-3 py-2.5 text-center font-semibold">${r.Support_Pct}</td>
-                        <td class="px-3 py-2.5 text-center font-bold text-emerald-700">${r.Confidence_Pct}</td>
+                        <td class="px-3 py-2.5 text-center font-semibold text-slate-700">${r.Support_Pct}</td>
+                        <td class="px-3 py-2.5 text-center font-bold text-teal-700">${r.Confidence_Pct}</td>
                         <td class="px-3 py-2.5 text-center">
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${r.Lift > 1.2 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}">
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${r.Lift > 1.2 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-700'}">
                                 ${r.Lift.toFixed(2)}x
                             </span>
                         </td>
