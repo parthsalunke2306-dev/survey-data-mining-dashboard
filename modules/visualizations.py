@@ -281,25 +281,29 @@ def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
     
     fig.add_vline(
         x=mean_val, line_dash="dash", line_color="#1E293B", line_width=2,
-        annotation_text=f"Cohort Mean: {mean_val:.1f} / 100", annotation_position="top right"
+        annotation_text=f"Mean: {mean_val:.1f}", annotation_position="top right",
+        annotation_font=dict(size=11)
     )
     
-    layout = get_base_layout("Financial Discipline Index (FDI) Distribution (0-100 Scale)")
+    # No in-chart title: the card header already names the chart, and a long title gets clipped on phones.
+    layout = get_base_layout("")
     layout["xaxis"] = dict(
         gridcolor="#F1F5F9",
         zeroline=False,
         range=[-5, 105],
         dtick=10,
-        title=dict(text="Financial Discipline Score (0 = Minimal, 100 = Exemplary)")
+        title=dict(text="FDI score (0–100)", font=dict(size=11), standoff=4),
+        tickfont=dict(size=10)
     )
     y_top = (max(int(c) for c in counts) * 1.25) if fdi else 1  # headroom so the mean label doesn't overlap the bars
     layout["yaxis"] = dict(
         gridcolor="#F1F5F9",
         zeroline=False,
         range=[0, y_top],
-        title=dict(text="Number of Students")
+        title=dict(text="Students", font=dict(size=11), standoff=4),
+        tickfont=dict(size=10)
     )
-    layout["margin"] = dict(t=40, b=40, l=45, r=25)
+    layout["margin"] = dict(t=12, b=38, l=42, r=12)
     fig.update_layout(**layout)
     return fig
 
