@@ -30,6 +30,15 @@
             border: 1px solid #E2E8F0;
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
         }
+        .nav-tab {
+            color: #475569;
+            transition: all 0.15s ease-in-out;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-tab:hover {
+            color: #0F172A;
+            background-color: #F8FAFC;
+        }
         .nav-tab.active {
             color: #047857;
             background-color: #ECFDF5;
@@ -167,32 +176,40 @@
             </div>
         </div>
 
-        <!-- Navigation Tabs -->
-        <nav class="border-t border-slate-200 bg-white">
-            <div class="max-w-7xl mx-auto px-4 flex flex-wrap gap-1.5 py-1.5 text-xs font-semibold">
-                <button onclick="switchTab('overview')" class="nav-tab active px-3.5 py-2 rounded-md transition" id="tab-btn-overview">
-                    <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 inline mr-1"></i> Executive Overview
+        <!-- Navigation Tabs: Arranged strictly on ONE SINGLE LINE without scrollbar -->
+        <nav class="border-t border-slate-200 bg-white overflow-hidden">
+            <div class="max-w-7xl mx-auto px-1 sm:px-3 flex flex-nowrap items-center justify-between gap-1 py-1 text-[11px] xl:text-xs font-semibold overflow-hidden">
+                <button onclick="switchTab('overview')" class="nav-tab active flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-overview" title="Executive Overview">
+                    <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
+                    <span class="truncate"><span class="hidden xl:inline">Executive </span>Overview</span>
                 </button>
-                <button onclick="switchTab('demographics')" class="nav-tab px-3.5 py-2 rounded-md transition" id="tab-btn-demographics">
-                    <i data-lucide="users" class="w-3.5 h-3.5 inline mr-1"></i> Demographics
+                <button onclick="switchTab('demographics')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-demographics" title="Student Demographics">
+                    <i data-lucide="users" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
+                    <span class="truncate">Demographics</span>
                 </button>
-                <button onclick="switchTab('income')" class="nav-tab px-3.5 py-2 rounded-md transition" id="tab-btn-income">
-                    <i data-lucide="landmark" class="w-3.5 h-3.5 inline mr-1"></i> Income & Discipline
+                <button onclick="switchTab('income')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-income" title="Income & Financial Discipline">
+                    <i data-lucide="landmark" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
+                    <span class="truncate">Income &amp; <span class="hidden lg:inline">Discipline</span><span class="inline lg:hidden">Budget</span></span>
                 </button>
-                <button onclick="switchTab('spending')" class="nav-tab px-3.5 py-2 rounded-md transition" id="tab-btn-spending">
-                    <i data-lucide="shopping-cart" class="w-3.5 h-3.5 inline mr-1"></i> Spending Psychology
+                <button onclick="switchTab('spending')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-spending" title="Spending Behaviour & Psychology">
+                    <i data-lucide="shopping-cart" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
+                    <span class="truncate">Spending<span class="hidden xl:inline"> Psychology</span></span>
                 </button>
-                <button onclick="switchTab('mindset')" class="nav-tab px-3.5 py-2 rounded-md transition" id="tab-btn-mindset">
-                    <i data-lucide="brain" class="w-3.5 h-3.5 inline mr-1"></i> Mindset & Planning
+                <button onclick="switchTab('mindset')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-mindset" title="Financial Mindset & Planning">
+                    <i data-lucide="brain" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
+                    <span class="truncate">Mindset &amp; <span class="hidden lg:inline">Planning</span><span class="inline lg:hidden">Plan</span></span>
                 </button>
-                <button onclick="switchTab('invest')" class="nav-tab px-3.5 py-2 rounded-md transition" id="tab-btn-invest">
-                    <i data-lucide="trending-up" class="w-3.5 h-3.5 inline mr-1"></i> Investment Readiness
+                <button onclick="switchTab('invest')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-invest" title="Investment Readiness">
+                    <i data-lucide="trending-up" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
+                    <span class="truncate">Investment<span class="hidden xl:inline"> Readiness</span></span>
                 </button>
-                <button onclick="switchTab('datamining')" class="nav-tab px-3.5 py-2 rounded-md transition" id="tab-btn-datamining">
-                    <i data-lucide="cpu" class="w-3.5 h-3.5 inline mr-1"></i> Data Mining Suite
+                <button onclick="switchTab('datamining')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-datamining" title="Data Mining Suite">
+                    <i data-lucide="cpu" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
+                    <span class="truncate">Data Mining<span class="hidden xl:inline"> Suite</span></span>
                 </button>
-                <button onclick="switchTab('findings')" class="nav-tab px-3.5 py-2 rounded-md transition" id="tab-btn-findings">
-                    <i data-lucide="lightbulb" class="w-3.5 h-3.5 inline mr-1"></i> Findings & Conclusion
+                <button onclick="switchTab('findings')" class="nav-tab flex-1 min-w-0 py-2 px-1 rounded-md transition flex items-center justify-center whitespace-nowrap overflow-hidden" id="tab-btn-findings" title="Key Findings & Academic Conclusions">
+                    <i data-lucide="lightbulb" class="w-3.5 h-3.5 hidden sm:inline mr-1 flex-shrink-0"></i>
+                    <span class="truncate">Findings<span class="hidden lg:inline"> &amp; Conclusion</span></span>
                 </button>
             </div>
         </nav>
