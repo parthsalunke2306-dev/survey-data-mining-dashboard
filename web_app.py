@@ -124,8 +124,12 @@ def get_filtered_df(
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_index(request: Request):
-    """Serves the primary web dashboard interface."""
-    return templates.TemplateResponse(request=request, name="index.html")
+    """Serves the primary web dashboard interface with cache-busting headers."""
+    response = templates.TemplateResponse(request=request, name="index.html")
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 @app.get("/api/filter-options")
 async def get_filter_options():
