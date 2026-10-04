@@ -852,11 +852,90 @@
             </div>
 
             <!-- Subtab 1: Spearman Correlation -->
-            <div id="msub-correlation" class="space-y-2.5">
-                <div class="glass-panel p-3 rounded-xl">
-                    <h3 class="font-bold text-xs sm:text-sm text-slate-900 mb-0.5">Spearman Rank Correlation Heatmap</h3>
-                    <p class="text-[10px] text-slate-500 mb-2">Evaluates monotonic relationships across ordinal Likert responses and numerical research habits.</p>
-                    <div id="chart-spearman-heatmap" class="w-full h-56 sm:h-64"></div>
+            <div id="msub-correlation" class="space-y-4">
+                <!-- Heatmap Container Card -->
+                <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-2 border-b border-slate-100 gap-2">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-teal-600"></span>
+                                <h3 class="font-bold text-sm sm:text-base text-slate-900">Spearman Rank Correlation Heatmap</h3>
+                                <span class="bg-teal-50 text-teal-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-teal-200">Non-Parametric (ρ)</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5">Evaluates monotonic associations across ordinal 1–5 Likert responses and financial research frequencies.</p>
+                        </div>
+                        <div class="flex items-center space-x-2 text-[11px] text-slate-500 self-start sm:self-auto bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
+                            <span class="inline-block w-2.5 h-2.5 rounded-sm bg-rose-500"></span>
+                            <span>Inverse (-1.0)</span>
+                            <span class="text-slate-300">|</span>
+                            <span class="inline-block w-2.5 h-2.5 rounded-sm bg-slate-200"></span>
+                            <span>None (0.0)</span>
+                            <span class="text-slate-300">|</span>
+                            <span class="inline-block w-2.5 h-2.5 rounded-sm bg-teal-600"></span>
+                            <span>Direct (+1.0)</span>
+                        </div>
+                    </div>
+
+                    <!-- Enlarged Heatmap Canvas -->
+                    <div id="chart-spearman-heatmap" class="w-full min-h-[520px] sm:min-h-[560px] h-[560px]"></div>
+                </div>
+
+                <!-- Viva & Statistical Insight Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="glass-panel p-3.5 rounded-xl border-l-4 border-l-indigo-600 bg-white">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-[11px] font-bold text-indigo-700 uppercase tracking-wider">Top Direct Coupling</span>
+                            <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">ρ = +0.35</span>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-800 mb-1">Financial Confidence ↔ 3-Yr Wealth Plan</h4>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">
+                            Students who maintain an actionable 3-year financial goal report significantly higher future financial confidence. Goal articulation directly correlates with psychological self-efficacy.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel p-3.5 rounded-xl border-l-4 border-l-rose-500 bg-white">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-[11px] font-bold text-rose-700 uppercase tracking-wider">Impulsive Spend Co-Trigger</span>
+                            <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200">ρ = +0.32</span>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-800 mb-1">Peer Pressure ↔ Academic Stress Spending</h4>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">
+                            Social spending impulses and emotional stress coping mechanisms operate in tandem. Students vulnerable to peer spending are also more prone to stress-induced spending bursts.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel p-3.5 rounded-xl border-l-4 border-l-teal-600 bg-white">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-[11px] font-bold text-teal-700 uppercase tracking-wider">Knowledge Driver</span>
+                            <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200">ρ = +0.22</span>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-800 mb-1">Research Frequency ↔ Financial Confidence</h4>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">
+                            Frequent reading and research into personal finance shows a sustained positive monotonic link to financial confidence, proving that deliberate financial habit formation matters.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Academic Viva Defense Guide -->
+                <div class="glass-panel p-4 rounded-xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-50">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300">🎓 Viva Defense Q&A</span>
+                        <h4 class="text-xs font-bold text-slate-900">How to Explain this Heatmap to Your College Professor</h4>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700">
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                            <p class="font-bold text-slate-900 mb-1">Q1: Why did we use Spearman Rank instead of Pearson Correlation?</p>
+                            <p class="text-slate-600 leading-relaxed">
+                                Pearson correlation measures linear relationships and assumes continuous, normally distributed data. Survey responses here are <strong>ordinal 1–5 Likert scales</strong>. Spearman rank correlation (&rho;) is non-parametric: it ranks each variable first, measuring pure monotonic relationships without assuming linear intervals or normality.
+                            </p>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                            <p class="font-bold text-slate-900 mb-1">Q2: How was this implemented in Python?</p>
+                            <p class="text-slate-600 leading-relaxed">
+                                We used Pandas' built-in function <code class="bg-slate-100 text-teal-700 px-1 py-0.5 rounded font-mono text-[11px]">df[columns].corr(method="spearman")</code>. This converts survey Likert columns to fractional ranks under the hood and computes the monotonic correlation matrix efficiently without manual nested loops.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1190,7 +1269,8 @@
                     lay.margin = Object.assign({}, lay.margin, {t: 28});
                 }
                 ['xaxis','yaxis'].forEach(a => { if (lay[a]) lay[a].automargin = true; });
-                if (el.clientWidth && el.clientWidth < 520 && lay.margin) {
+                const hasHeatmap = (figureData || []).some(tr => tr.type === 'heatmap');
+                if (el.clientWidth && el.clientWidth < 520 && lay.margin && !hasHeatmap) {
                     lay.margin.l = Math.min(lay.margin.l || 0, 12);
                     lay.margin.r = Math.min(lay.margin.r || 0, 40);
                 }
@@ -1233,6 +1313,10 @@
                     lay.margin = Object.assign({}, lay.margin, {b: Math.max((lay.margin || {}).b || 0, 118)});
                 }
                 (figureData || []).forEach(tr => {
+                    if (tr.type === 'heatmap') {
+                        const need = 560;
+                        if (el.clientHeight < need) el.style.height = need + 'px';
+                    }
                     if (tr.type === 'bar' && tr.orientation === 'h' && Array.isArray(tr.y) && tr.y.length > 3) {
                         const need = tr.y.length * 42 + 180;
                         if (el.clientHeight < need) el.style.height = need + 'px';

@@ -356,18 +356,77 @@ def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
     return fig
 
 def plot_spearman_heatmap(corr_df: pd.DataFrame) -> go.Figure:
-    """Interactive Spearman correlation heatmap with balanced Tealrose diverging scale."""
-    clean_labels = [c.replace("_", " ") for c in corr_df.columns]
-    fig = px.imshow(
-        corr_df.values,
-        x=clean_labels,
-        y=clean_labels,
-        color_continuous_scale="Tealrose",
-        zmin=-1, zmax=1,
-        text_auto=".2f",
-        title="Spearman Rank Correlation Matrix (Behavioral & Planning Variables)"
+    """
+    Spearman Rank Correlation Heatmap with balanced multi-color palette (Tealrose).
+    Features generous dimensions, distinct grid gaps, horizontal wrapped labels,
+    and bold typography for viva presentation.
+    """
+    name_map = {
+        "Peer_Pressure_Spend": "Peer Pressure Spend",
+        "Stress_Spend": "Academic Stress Spend",
+        "Financial_Confidence": "Financial Confidence",
+        "Lifestyle_Upgrade_Spend": "Lifestyle Upgrades",
+        "Wealth_Plan_Readiness": "3-Yr Wealth Plan",
+        "Research_Freq_Num": "Research Frequency"
+    }
+    labels_y = [name_map.get(c, c.replace("_", " ")) for c in corr_df.index]
+
+    x_map = {
+        "Peer_Pressure_Spend": "Peer Pressure<br>Spend",
+        "Stress_Spend": "Academic Stress<br>Spend",
+        "Financial_Confidence": "Financial<br>Confidence",
+        "Lifestyle_Upgrade_Spend": "Lifestyle<br>Upgrades",
+        "Wealth_Plan_Readiness": "3-Yr Wealth<br>Plan",
+        "Research_Freq_Num": "Research<br>Frequency"
+    }
+    labels_x = [x_map.get(c, c.replace("_", "<br>")) for c in corr_df.columns]
+
+    z_values = corr_df.values.round(2)
+    text_values = [
+        [f"{val:+.2f}" if val != 1.0 else "1.00" for val in row]
+        for row in z_values
+    ]
+
+    fig = go.Figure(data=go.Heatmap(
+        z=z_values,
+        x=labels_x,
+        y=labels_y,
+        colorscale="Tealrose",
+        zmin=-1.0,
+        zmax=1.0,
+        text=text_values,
+        texttemplate="<b>%{text}</b>",
+        textfont=dict(size=13, family="IBM Plex Sans, sans-serif"),
+        colorbar=dict(
+            title=dict(text="Spearman ρ", side="top", font=dict(size=11, family="IBM Plex Sans, sans-serif")),
+            tickfont=dict(size=11),
+            len=0.85,
+            thickness=18,
+            outlinewidth=0,
+            ticks="outside"
+        ),
+        xgap=3,
+        ygap=3,
+        hoverongaps=False,
+        hovertemplate="<b>%{y}</b> × <b>%{x}</b><br>Spearman Rank Correlation: <b>%{z:.3f}</b><extra></extra>"
+    ))
+
+    layout = get_base_layout("")
+    layout["height"] = 560
+    layout["margin"] = dict(t=25, b=75, l=160, r=40)
+    layout["xaxis"] = dict(
+        tickfont=dict(size=11, family="IBM Plex Sans, sans-serif", color="#1E293B"),
+        tickangle=0,
+        side="bottom",
+        showgrid=False,
+        zeroline=False
     )
-    layout = get_base_layout("Spearman Rank Correlation Matrix")
+    layout["yaxis"] = dict(
+        tickfont=dict(size=11, family="IBM Plex Sans, sans-serif", color="#1E293B"),
+        autorange="reversed",
+        showgrid=False,
+        zeroline=False
+    )
     fig.update_layout(**layout)
     return fig
 
