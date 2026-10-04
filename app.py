@@ -32,6 +32,21 @@ st.set_page_config(
 # Custom Styling: Slate and Emerald palette (#10B981)
 st.markdown("""
 <style>
+    html, body, [data-testid="stAppViewContainer"] {
+        overflow-x: hidden !important;
+        max-width: 100vw;
+    }
+    ::-webkit-scrollbar:horizontal {
+        display: none !important;
+        height: 0px !important;
+    }
+    *::-webkit-scrollbar:horizontal {
+        display: none !important;
+        height: 0px !important;
+    }
+    * {
+        scrollbar-width: thin;
+    }
     .main-title {
         font-size: 1.8rem;
         font-weight: 800;
