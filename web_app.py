@@ -28,10 +28,13 @@ from modules.kmeans import run_kmeans_segmentation
 from modules.knn import run_knn_classification
 from modules.naive_bayes import run_naive_bayes_classification
 from modules.decision_tree import train_cart_tree
-from modules.text_mining import analyze_survey_text
-from modules.spatial_mining import run_spatial_mining
-from modules.web_mining import run_web_mining
-from modules.multimedia_mining import extract_visual_behavioral_signatures
+try:
+    from modules.text_mining import analyze_survey_text
+    from modules.spatial_mining import run_spatial_mining
+    from modules.web_mining import run_web_mining
+    from modules.multimedia_mining import extract_visual_behavioral_signatures
+except ImportError as e:
+    print(f"Warning: Extended mining module missing dependency: {e}")
 
 # Initialize App & Directories
 app = FastAPI(title="Student Financial Behaviour Analytics Dashboard")
@@ -92,12 +95,19 @@ class PredictRequest(BaseModel):
     target: str = "Has_Emergency_Fund"
 
 
-# Helper for Filtering
+import functools
+
+_df_cache = {}
+
 def get_filtered_df(
     academic_year: Optional[str] = "All",
     stream_major: Optional[str] = "All",
     living_situation: Optional[str] = "All"
 ) -> pd.DataFrame:
+    cache_key = (academic_year, stream_major, living_situation)
+    if cache_key in _df_cache:
+        return _df_cache[cache_key]
+        
     df_f = clean_df.copy()
     if academic_year and academic_year != "All" and "Academic_Year" in df_f.columns:
         df_f = df_f[df_f["Academic_Year"] == academic_year]
@@ -105,6 +115,8 @@ def get_filtered_df(
         df_f = df_f[df_f["Stream_Major"] == stream_major]
     if living_situation and living_situation != "All" and "Living_Situation" in df_f.columns:
         df_f = df_f[df_f["Living_Situation"] == living_situation]
+        
+    _df_cache[cache_key] = df_f
     return df_f
 
 
@@ -129,6 +141,8 @@ async def get_filter_options():
         "total_records": len(clean_df)
     })
 
+_dashboard_cache = {}
+
 @app.get("/api/dashboard-data")
 async def get_dashboard_data(
     academic_year: Optional[str] = "All",
@@ -139,6 +153,10 @@ async def get_dashboard_data(
     Primary endpoint returning dynamic KPIs, structured module chart JSONs,
     and automatic insights for the selected filters.
     """
+    cache_key = (academic_year, stream_major, living_situation)
+    if cache_key in _dashboard_cache:
+        return JSONResponse(_dashboard_cache[cache_key])
+
     df = get_filtered_df(academic_year, stream_major, living_situation)
     n = len(df)
     
@@ -215,9 +233,9 @@ async def get_dashboard_data(
     # 8. FDI Distribution & Summary Statistics
     fdi_chart = {}
     fdi_stats = {
-        "mean": 46.0, "median": 49.5, "min": 0.0, "max": 95.0,
-        "low_pct": 33.6, "mod_pct": 42.7, "high_pct": 23.7,
-        "low_count": 44, "mod_count": 56, "high_count": 31
+        "mean": 0.0, "median": 0.0, "min": 0.0, "max": 0.0,
+        "low_pct": 0.0, "mod_pct": 0.0, "high_pct": 0.0,
+        "low_count": 0, "mod_count": 0, "high_count": 0
     }
     if n > 0 and "FDI_Score" in df.columns:
         fdi_chart = json.loads(viz.plot_fdi_distribution(df).to_json())
@@ -236,7 +254,7 @@ async def get_dashboard_data(
                 "high_count": int((scores > 65).sum()),
             }
 
-    return JSONResponse({
+    res = {
         "sample_size": n,
         "total_cohort": len(clean_df),
         "kpis": kpis,
@@ -249,13 +267,21 @@ async def get_dashboard_data(
         "invest_charts": invest_charts,
         "findings": findings_data["findings"],
         "conclusions": findings_data["conclusions"]
-    })
+    }
+    _dashboard_cache[cache_key] = res
+    return JSONResponse(res)
 
 # ----------------- MODULE 7: DATA MINING ENDPOINTS -----------------
+
+_correlation_cache = None
 
 @app.get("/api/mining/correlation")
 async def get_correlation_matrix():
     """Computes Spearman rank correlation matrix across ordinal/numeric behavioral dimensions."""
+    global _correlation_cache
+    if _correlation_cache:
+        return JSONResponse(_correlation_cache)
+        
     res_map = {"Daily": 3, "Weekly": 2, "Monthly": 1, "Rarely / Never": 0}
     df_calc = clean_df.copy()
     df_calc["Research_Freq_Num"] = df_calc["Research_Frequency"].map(lambda x: res_map.get(str(x).strip(), 0))
@@ -268,29 +294,45 @@ async def get_correlation_matrix():
     corr_matrix = df_calc[corr_cols].rank().corr().round(3)
     fig = viz.plot_spearman_heatmap(corr_matrix)
 
-    return JSONResponse({
+    _correlation_cache = {
         "columns": corr_cols,
         "matrix": corr_matrix.to_dict(),
         "heatmap": json.loads(fig.to_json())
-    })
+    }
+    return JSONResponse(_correlation_cache)
+
+_kmeans_cache = {}
 
 @app.get("/api/mining/kmeans")
 async def get_kmeans_clusters(k: int = 3):
     """Executes K-Means behavioral clustering and returns profiles, silhouette score, and 2D PCA."""
+    if k in _kmeans_cache:
+        return JSONResponse(_kmeans_cache[k])
     res = run_kmeans_segmentation(clean_df, n_clusters=k)
+    _kmeans_cache[k] = res
     return JSONResponse(res)
+
+_apriori_cache = {}
 
 @app.get("/api/mining/apriori")
 async def get_apriori_rules(basket: str = "behavior", min_support: float = 0.15, min_confidence: float = 0.5):
     """Executes Apriori association rule mining on behavioral traits or multi-select items."""
+    cache_key = (basket, min_support, min_confidence)
+    if cache_key in _apriori_cache:
+        return JSONResponse(_apriori_cache[cache_key])
+        
     transactions = extract_transactions(clean_df, basket_type=basket)
     itemsets_df, rules_df = run_apriori(transactions, min_support=min_support, min_confidence=min_confidence)
-    return JSONResponse({
+    res = {
         "basket_type": basket,
         "total_baskets": len(transactions),
         "frequent_itemsets": itemsets_df.to_dict(orient="records"),
         "rules": rules_df.to_dict(orient="records")
-    })
+    }
+    _apriori_cache[cache_key] = res
+    return JSONResponse(res)
+
+_dt_cache = {}
 
 @app.post("/api/mine")
 async def mine_decision_tree(req: MineRequest):
@@ -306,6 +348,10 @@ async def mine_decision_tree(req: MineRequest):
         "Lifestyle_Upgrade_Spend", "Wealth_Plan_Readiness", "Investment_Obstacle"
     ]
     features = req.features or [f for f in available_features if f in clean_df.columns and f != target][:7]
+    
+    cache_key = (target, req.algorithm, req.max_depth, tuple(features))
+    if cache_key in _dt_cache:
+        return JSONResponse(_dt_cache[cache_key])
 
     gain_table = get_feature_gain_table(clean_df, features, target)
     gain_fig = viz.plot_feature_gain_comparison(gain_table)
@@ -317,12 +363,14 @@ async def mine_decision_tree(req: MineRequest):
     tree_fig = viz.plot_interactive_tree_structure(tree_dict)
     rules = miner.extract_rules()
 
-    return JSONResponse({
+    res = {
         "gain_table": gain_table.to_dict(orient="records"),
         "gain_fig": json.loads(gain_fig.to_json()),
         "tree_fig": json.loads(tree_fig.to_json()),
         "rules": rules
-    })
+    }
+    _dt_cache[cache_key] = res
+    return JSONResponse(res)
 
 @app.post("/api/predict")
 async def predict_student_persona(req: PredictRequest):

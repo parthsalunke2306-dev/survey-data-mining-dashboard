@@ -996,9 +996,12 @@
 
         // Load Dashboard Data
         async function loadDashboardData(year = 'All', stream = 'All', living = 'All') {
+            const sampleCountEl = document.getElementById('filter-active-count');
+            if (sampleCountEl) sampleCountEl.innerHTML = '<span class="animate-pulse">Loading...</span>';
             try {
                 const url = `/api/dashboard-data?academic_year=${encodeURIComponent(year)}&stream_major=${encodeURIComponent(stream)}&living_situation=${encodeURIComponent(living)}`;
                 const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 dashboardData = await res.json();
 
                 // Update Header Sample Indicators
@@ -1110,12 +1113,20 @@
                 lucide.createIcons();
             } catch (err) {
                 console.error("Error loading dashboard data:", err);
+                alert("Failed to load dashboard data. Please try again later.");
+            } finally {
+                const sampleCountEl = document.getElementById('filter-active-count');
+                if (sampleCountEl && dashboardData) {
+                    sampleCountEl.innerHTML = dashboardData.sample_size || '0';
+                }
             }
         }
 
         // Fetch Spearman Correlation
         async function fetchCorrelation() {
             try {
+                const container = document.getElementById('chart-spearman-heatmap');
+                if (container) container.innerHTML = '<div class="flex items-center justify-center h-full text-slate-500 text-xs animate-pulse">Calculating Spearman correlation matrix...</div>';
                 const res = await fetch('/api/mining/correlation');
                 const data = await res.json();
                 if (data.heatmap) {
@@ -1123,6 +1134,7 @@
                 }
             } catch (err) {
                 console.error("Error loading correlation:", err);
+                document.getElementById('chart-spearman-heatmap').innerHTML = '<div class="flex items-center justify-center h-full text-red-500 text-xs">Failed to load correlation matrix.</div>';
             }
         }
 
@@ -1130,10 +1142,16 @@
         async function fetchKMeans() {
             try {
                 const k = document.getElementById('kmeans-k-select').value || 3;
+                
+                const container = document.getElementById('kmeans-cards-container');
+                container.innerHTML = '<div class="col-span-full text-center text-slate-500 text-xs py-4 animate-pulse">Running K-Means algorithm (k='+k+')...</div>';
+                
+                const pcaContainer = document.getElementById('chart-kmeans-pca');
+                if (pcaContainer) pcaContainer.innerHTML = '<div class="flex items-center justify-center h-full text-slate-500 text-xs animate-pulse">Computing PCA projection...</div>';
+
                 const res = await fetch(`/api/mining/kmeans?k=${k}`);
                 const data = await res.json();
 
-                const container = document.getElementById('kmeans-cards-container');
                 container.innerHTML = '';
                 data.profiles.forEach(p => {
                     const card = document.createElement('div');
@@ -1187,6 +1205,9 @@
                 safePlotlyRender('chart-kmeans-pca', traces, pcaLayout, {responsive: true, displayModeBar: false});
             } catch (err) {
                 console.error("Error loading K-Means:", err);
+                document.getElementById('kmeans-cards-container').innerHTML = '<div class="col-span-full text-center text-red-500 text-xs py-4">Failed to run K-Means algorithm.</div>';
+                const pcaContainer = document.getElementById('chart-kmeans-pca');
+                if (pcaContainer) pcaContainer.innerHTML = '';
             }
         }
 
@@ -1194,14 +1215,16 @@
         async function fetchApriori() {
             try {
                 const basket = document.getElementById('apriori-basket-select').value;
+                const tbody = document.getElementById('apriori-rules-tbody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-slate-500 text-xs animate-pulse">Running Apriori algorithm...</td></tr>';
+
                 const res = await fetch(`/api/mining/apriori?basket=${basket}&min_support=0.15&min_confidence=0.5`);
                 const data = await res.json();
 
-                const tbody = document.getElementById('apriori-rules-tbody');
-                tbody.innerHTML = '';
+                if (tbody) tbody.innerHTML = '';
 
                 if (!data.rules || data.rules.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-4 text-center text-slate-400">No association rules meet current minimum support/confidence thresholds.</td></tr>`;
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-4 text-center text-slate-400">No association rules meet current minimum support/confidence thresholds.</td></tr>`;
                     return;
                 }
 
@@ -1222,16 +1245,23 @@
                             </span>
                         </td>
                     `;
-                    tbody.appendChild(tr);
+                    if (tbody) tbody.appendChild(tr);
                 });
             } catch (err) {
                 console.error("Error loading Apriori:", err);
+                const tbody = document.getElementById('apriori-rules-tbody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-red-500 text-xs">Failed to run Apriori algorithm.</td></tr>';
             }
         }
 
         // Fetch Decision Tree
         async function fetchDecisionTree() {
             try {
+                const gainContainer = document.getElementById('chart-tree-gains');
+                const vizContainer = document.getElementById('chart-tree-viz');
+                if (gainContainer) gainContainer.innerHTML = '<div class="flex items-center justify-center h-full text-slate-500 text-xs animate-pulse">Computing feature gains...</div>';
+                if (vizContainer) vizContainer.innerHTML = '<div class="flex items-center justify-center h-full text-slate-500 text-xs animate-pulse">Building Decision Tree...</div>';
+
                 const res = await fetch('/api/mine', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -1242,12 +1272,24 @@
                 if (data.tree_fig) safePlotlyRender('chart-tree-viz', data.tree_fig.data, data.tree_fig.layout, {responsive: true, displayModeBar: false});
             } catch (err) {
                 console.error("Error loading Decision Tree:", err);
+                const gainContainer = document.getElementById('chart-tree-gains');
+                const vizContainer = document.getElementById('chart-tree-viz');
+                if (gainContainer) gainContainer.innerHTML = '<div class="flex items-center justify-center h-full text-red-500 text-xs">Failed to load feature gains.</div>';
+                if (vizContainer) vizContainer.innerHTML = '<div class="flex items-center justify-center h-full text-red-500 text-xs">Failed to build Decision Tree.</div>';
             }
         }
 
         // Run Simulator Inference
         async function runSimulation() {
             try {
+                const box = document.getElementById('sim-result-box');
+                const predVal = document.getElementById('sim-pred-val');
+                const adviceVal = document.getElementById('sim-advice-val');
+                
+                box.classList.remove('hidden');
+                predVal.innerHTML = '<span class="animate-pulse text-slate-500">Predicting...</span>';
+                adviceVal.innerHTML = '<span class="animate-pulse text-slate-500">Generating personalized advice...</span>';
+
                 const sample = {
                     Tracking_Method: document.getElementById('sim-tracking').value,
                     Financial_Confidence: parseInt(document.getElementById('sim-conf').value),
@@ -1259,12 +1301,15 @@
                     body: JSON.stringify({sample: sample, target: 'Has_Emergency_Fund'})
                 });
                 const data = await res.json();
-                const box = document.getElementById('sim-result-box');
-                box.classList.remove('hidden');
-                document.getElementById('sim-pred-val').innerText = data.prediction === 'Yes' ? 'Has Emergency Fund (Resilient)' : 'No Emergency Fund (Vulnerable)';
-                document.getElementById('sim-advice-val').innerText = data.advice;
+                
+                predVal.innerText = data.prediction === 'Yes' ? 'Has Emergency Fund (Resilient)' : 'No Emergency Fund (Vulnerable)';
+                adviceVal.innerText = data.advice;
             } catch (err) {
                 console.error("Error running simulation:", err);
+                const predVal = document.getElementById('sim-pred-val');
+                const adviceVal = document.getElementById('sim-advice-val');
+                if (predVal) predVal.innerText = 'Error running simulation';
+                if (adviceVal) adviceVal.innerText = 'Please try again later.';
             }
         }
     </script>
