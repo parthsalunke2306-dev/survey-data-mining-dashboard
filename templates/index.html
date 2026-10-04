@@ -182,7 +182,14 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
 button,select,a{min-height:30px}
 .nav-tab{min-height:38px}
 
-@media (max-width:639px){header h1,header .truncate{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:.95rem!important;line-height:1.25!important}}
+@media (max-width:639px){
+  header .h-12{height:auto!important;min-height:3rem;padding-top:.5rem;padding-bottom:.5rem;gap:.5rem}
+  header h1{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:.9rem!important;line-height:1.25!important}
+  header p.truncate{display:none!important}
+  header .h-12{flex-wrap:wrap}
+  header .h-12>div:first-child{flex:1 1 100%}
+  header .h-12>div:last-child{flex:1 1 100%;justify-content:flex-start}
+}
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
@@ -1044,6 +1051,10 @@ button,select,a{min-height:30px}
             const btn = document.getElementById('tab-btn-' + tabId);
             if (sec) sec.classList.remove('hidden');
             if (btn) btn.classList.add('active');
+            if (sec) sec.querySelectorAll('[id^="chart-"]').forEach(c => {
+                const a = (window.__chartArgs || {})[c.id];
+                if (a && (c.dataset.pending || !c.querySelector('.main-svg'))) safePlotlyRender(c.id, a[0], a[1], a[2]);
+            });
 
             // Render sub-elements when switching
             if (tabId === 'datamining') {
@@ -1109,6 +1120,10 @@ button,select,a{min-height:30px}
             if (!figureData) return;
             const el = document.getElementById(elementId);
             if (!el) return;
+            (window.__chartArgs = window.__chartArgs || {})[elementId] = [figureData, figureLayout, config];
+            // Charts in a hidden tab have no width yet, so margins/legends can't be sized: draw them when the tab is shown
+            if (!el.clientWidth) { el.dataset.pending = '1'; return; }
+            delete el.dataset.pending;
 
             const plotLib = await waitForPlotly();
             if (!plotLib) {
@@ -1131,6 +1146,8 @@ button,select,a{min-height:30px}
                 }
                 // Let Plotly grow margins so axis titles and tick labels are never clipped
                 ['xaxis','yaxis'].forEach(a => { if (lay[a]) lay[a].automargin = true; });
+                // Hardcoded desktop margins can leave almost no plot on a phone: let automargin size them instead
+                if (el.clientWidth && el.clientWidth < 520 && lay.margin) { lay.margin.l = Math.min(lay.margin.l || 0, 12); lay.margin.r = Math.min(lay.margin.r || 0, 40); }
                 // Wrap long text so nothing is clipped: titles, axis titles, long category ticks, annotations
                 const cw = el.clientWidth || 360, ch = el.clientHeight || 220;
                 const wrap = (txt, n) => { if (typeof txt !== 'string' || txt.includes('<br>') || txt.length <= n) return txt;
@@ -1138,14 +1155,24 @@ button,select,a{min-height:30px}
                     txt.split(' ').forEach(w => { if ((line + ' ' + w).trim().length > n) { out.push(line.trim()); line = w; } else line += ' ' + w; });
                     out.push(line.trim()); return out.join('<br>'); };
                 if (lay.title && lay.title.text) { lay.title.text = wrap(lay.title.text, Math.floor(cw / 10)); lay.title.x = 0.02; lay.title.xanchor = 'left'; lay.margin = Object.assign({}, lay.margin, {t: Math.max((lay.margin || {}).t || 0, 60)}); }
-                if (lay.xaxis && lay.xaxis.title && lay.xaxis.title.text) lay.xaxis.title.text = wrap(lay.xaxis.title.text, Math.floor(cw / 10));
+                if (lay.xaxis && lay.xaxis.title && lay.xaxis.title.text) lay.xaxis.title.text = wrap(lay.xaxis.title.text, Math.floor(cw / 12));
                 if (lay.yaxis && lay.yaxis.title && lay.yaxis.title.text) lay.yaxis.title.text = wrap(lay.yaxis.title.text, Math.floor(ch / 13));
                 (lay.annotations || []).forEach(a => { if (a.text && !a.xref?.includes('x') ) a.text = wrap(a.text, Math.floor(cw / 9)); });
-                (figureData || []).forEach(tr => { if (tr.type === 'bar' && tr.orientation === 'h' && Array.isArray(tr.y) && tr.y.some(v => typeof v === 'string' && v.length > 26)) {
-                    lay.yaxis = lay.yaxis || {}; lay.yaxis.tickmode = 'array'; lay.yaxis.tickvals = tr.y; lay.yaxis.ticktext = tr.y.map(v => wrap(String(v), 26)); } });
+                (figureData || []).forEach(tr => { if (tr.type === 'bar' && tr.orientation === 'h' && Array.isArray(tr.y) && tr.y.some(v => typeof v === 'string' && v.length > (cw < 520 ? 18 : 26))) {
+                    lay.yaxis = lay.yaxis || {}; lay.yaxis.tickmode = 'array'; lay.yaxis.tickvals = tr.y; lay.yaxis.ticktext = tr.y.map(v => wrap(String(v), cw < 520 ? 18 : 26)); } });
                 (figureData || []).forEach(tr => { if (tr.type === 'bar') tr.cliponaxis = false; });
                 if (cw < 520) (figureData || []).forEach(tr => { if (tr.type === 'bar' && Array.isArray(tr.text)) tr.text = tr.text.map(t => typeof t === 'string' ? t.replace(' (', '<br>(') : t); });
-                (lay.annotations || []).forEach(a => { if (a.yref === 'paper' && a.y < 0) { const n = (a.text || '').split('<br>').length; lay.margin = Object.assign({}, lay.margin, {b: Math.max((lay.margin || {}).b || 0, 36 + 15 * n)}); } });
+                (lay.annotations || []).forEach(a => { if (a.yref === 'paper' && a.y < 0) { const n = (a.text || '').split('<br>').length;
+                    const shift = (lay.xaxis && lay.xaxis.title && lay.xaxis.title.text) ? 56 : 36;
+                    a.y = 0; a.yanchor = 'top'; a.yshift = -shift; a.xanchor = 'center'; a.x = 0.5;
+                    lay.margin = Object.assign({}, lay.margin, {b: Math.max((lay.margin || {}).b || 0, shift + 15 * n + 10)}); } });
+                // On narrow screens a side legend squeezes the plot: move multi-series legends underneath
+                if (cw < 520 && lay.showlegend !== false && (figureData || []).length > 1 && !(figureData || []).some(tr => tr.type === 'pie')) {
+                    lay.legend = Object.assign({}, lay.legend, {orientation: 'h', x: 0.5, xanchor: 'center', yref: 'container', y: 0, yanchor: 'bottom', title: {text: ''}, entrywidth: 76, entrywidthmode: 'pixels'});
+                    lay.margin = Object.assign({}, lay.margin, {b: Math.max((lay.margin || {}).b || 0, 118)}); }
+                // Charts with many horizontal bars get height in proportion to the number of categories
+                (figureData || []).forEach(tr => { if (tr.type === 'bar' && tr.orientation === 'h' && Array.isArray(tr.y) && tr.y.length > 3) {
+                    const need = tr.y.length * 42 + 180; if (el.clientHeight < need) el.style.height = need + 'px'; } });
                 if (cw < 520) (figureData || []).forEach(tr => { if (tr.type === 'bar' && tr.orientation === 'h' && /outside/.test(String(tr.textposition)) && Array.isArray(tr.x)) {
                     const mx = Math.max.apply(null, tr.x.filter(v => typeof v === 'number')); if (isFinite(mx)) { lay.xaxis = lay.xaxis || {}; lay.xaxis.range = [0, mx * 2.0]; } } });
                 await plotLib.newPlot(elementId, figureData, lay, config);
