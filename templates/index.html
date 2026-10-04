@@ -154,6 +154,27 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
 .rd-hero p{-webkit-line-clamp:unset!important;display:block!important;overflow:visible!important}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== App shell: header + sidebar fixed, only the content pane scrolls (md and up) ===== */
+@media (min-width:768px){
+  html,body{height:100%!important;overflow:hidden!important}
+  body{display:flex!important;flex-direction:column!important;min-height:0!important}
+  header{position:relative!important;flex:none!important}
+  body>div.flex-1{flex:1 1 0!important;min-height:0!important;height:auto!important;overflow:hidden!important}
+  aside{position:static!important;align-self:stretch!important;min-height:0!important;height:100%!important;overflow-y:auto!important}
+  main,aside{scrollbar-width:thin!important;scrollbar-color:#9AA6B8 #EEF0F4!important}
+  main{height:100%!important;overflow-y:auto!important;overflow-x:hidden!important}
+  aside{overflow-x:hidden!important;overscroll-behavior:contain}
+  main{overscroll-behavior:contain}
+  aside::-webkit-scrollbar{display:block!important;width:10px!important;height:10px!important;background:#EEF0F4!important}
+  aside::-webkit-scrollbar-track{display:block!important;background:#EEF0F4!important}
+  aside::-webkit-scrollbar-thumb{display:block!important;background:#9AA6B8!important;border-radius:6px!important;border:2px solid #EEF0F4!important}
+  aside::-webkit-scrollbar-thumb:hover{background:#6B7A90!important}
+  main::-webkit-scrollbar{display:block!important;width:10px!important;height:10px!important;background:#EEF0F4!important}
+  main::-webkit-scrollbar-track{display:block!important;background:#EEF0F4!important}
+  main::-webkit-scrollbar-thumb{display:block!important;background:#9AA6B8!important;border-radius:6px!important;border:2px solid #EEF0F4!important}
+  main::-webkit-scrollbar-thumb:hover{background:#6B7A90!important}
+}
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
@@ -979,16 +1000,17 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
             </div>
         </section>
 
-    </main>
-    </div>
-
-    <!-- Footer -->
+    
     <footer class="bg-white border-t border-slate-200 py-2 text-center text-[10px] text-slate-500 mt-2.5 w-full">
         <div class="w-full px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-1">
             <span>© 2026 Student Financial Habits & Spending Behavior Survey • BSc Data Science Project</span>
             <span class="text-slate-400">Pure Python • Zero Fake Data • Anonymized</span>
         </div>
     </footer>
+        </main>
+    </div>
+
+    <!-- Footer -->
 
     <!-- Frontend Interactive Script -->
     <script>
@@ -1006,6 +1028,7 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
         // Tab Navigation
         function switchTab(tabId) {
             currentTab = tabId;
+            const pane = document.querySelector('main'); if (pane) pane.scrollTop = 0;
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
             document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
 
