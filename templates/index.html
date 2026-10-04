@@ -6,8 +6,8 @@
     <title>Behavioral Insights into Financial Planning Among College Students</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Plotly.js CDN with failover -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.2/plotly.min.js" onerror="this.onerror=null;this.src='https://cdn.plot.ly/plotly-2.35.2.min.js';"></script>
+    <!-- Plotly.js CDN (Fast jsDelivr primary with official Plotly failover) -->
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js" onerror="this.onerror=null;this.src='https://cdn.plot.ly/plotly-2.35.2.min.js';"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Google Font: Plus Jakarta Sans -->
@@ -895,30 +895,53 @@
             window.dispatchEvent(new Event('resize'));
         }
 
+        // Promise-based Plotly loader that waits until Plotly is fully ready
+        let plotlyReadyPromise = null;
+        function waitForPlotly() {
+            if (typeof Plotly !== 'undefined') return Promise.resolve(Plotly);
+            if (!plotlyReadyPromise) {
+                plotlyReadyPromise = new Promise((resolve) => {
+                    let attempts = 0;
+                    const check = () => {
+                        if (typeof Plotly !== 'undefined') {
+                            resolve(Plotly);
+                        } else if (attempts < 200) { // Poll for up to 20 seconds
+                            attempts++;
+                            setTimeout(check, 100);
+                        } else {
+                            console.error('Plotly failed to load from CDNs within 20 seconds.');
+                            resolve(null);
+                        }
+                    };
+                    check();
+                });
+            }
+            return plotlyReadyPromise;
+        }
+
         // Resilient Plotly Renderer with auto-retry and responsive resize
-        function safePlotlyRender(elementId, figureData, figureLayout, config = {responsive: true, displayModeBar: false}) {
+        async function safePlotlyRender(elementId, figureData, figureLayout, config = {responsive: true, displayModeBar: false}) {
             if (!figureData) return;
             const el = document.getElementById(elementId);
-            if (el) {
-                if (el.classList.contains('flex')) {
-                    el.classList.remove('flex', 'items-center', 'justify-center', 'text-slate-400', 'text-xs');
-                }
-                el.innerHTML = '';
+            if (!el) return;
+
+            const plotLib = await waitForPlotly();
+            if (!plotLib) {
+                el.innerHTML = '<div class="text-center text-red-500 py-4 text-xs">Failed to load chart library. Please refresh.</div>';
+                return;
             }
-            let attempts = 0;
-            const render = () => {
-                if (typeof Plotly !== 'undefined') {
-                    Plotly.newPlot(elementId, figureData, figureLayout, config).then(() => {
-                        Plotly.Plots.resize(elementId);
-                    }).catch(err => {
-                        console.error('Error plotting ' + elementId, err);
-                    });
-                } else if (attempts < 30) {
-                    attempts++;
-                    setTimeout(render, 100);
-                }
-            };
-            render();
+
+            if (el.classList.contains('flex')) {
+                el.classList.remove('flex', 'items-center', 'justify-center', 'text-slate-400', 'text-xs');
+            }
+            el.innerHTML = '';
+
+            try {
+                await plotLib.newPlot(elementId, figureData, figureLayout, config);
+                plotLib.Plots.resize(elementId);
+            } catch (err) {
+                console.error('Error plotting ' + elementId, err);
+            }
         }
 
         // Fetch Dropdown Filter Options
