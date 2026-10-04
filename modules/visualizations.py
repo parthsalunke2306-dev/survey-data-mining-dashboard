@@ -260,26 +260,35 @@ def plot_confidence_planning_matrix(df: pd.DataFrame) -> go.Figure:
     return fig
 
 def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
-    """Financial Discipline Index (FDI) distribution histogram with mean indicator."""
+    """Financial Discipline Index (FDI) distribution manually binned to avoid rendering issues."""
     fdi = [float(round(v, 1)) for v in df["FDI_Score"].dropna().tolist()] if (len(df) > 0 and "FDI_Score" in df.columns) else []
     mean_val = float(round(sum(fdi) / len(fdi), 1)) if fdi else 0.0
 
     fig = go.Figure()
-    fig.add_trace(go.Histogram(
-        x=fdi,
-        nbinsx=12,
-        marker=dict(color="#10B981", line=dict(color="white", width=1.5)),
-        name="FDI Score"
-    ))
+    
+    if fdi:
+        import numpy as np
+        counts, bins = np.histogram(fdi, bins=10, range=(0, 100))
+        bin_centers = [(bins[i] + bins[i+1])/2 for i in range(len(bins)-1)]
+        
+        fig.add_trace(go.Bar(
+            x=[float(x) for x in bin_centers],
+            y=[int(c) for c in counts],
+            width=9.5,
+            marker=dict(color="#10B981", line=dict(color="white", width=1.5)),
+            name="FDI Score"
+        ))
+    
     fig.add_vline(
         x=mean_val, line_dash="dash", line_color="#1E293B", line_width=2,
         annotation_text=f"Cohort Mean: {mean_val:.1f} / 100", annotation_position="top right"
     )
+    
     layout = get_base_layout("Financial Discipline Index (FDI) Distribution (0-100 Scale)")
     layout["xaxis"] = dict(
         gridcolor="#F1F5F9",
         zeroline=False,
-        range=[-2, 102],
+        range=[-5, 105],
         dtick=10,
         title=dict(text="Financial Discipline Score (0 = Minimal, 100 = Exemplary)")
     )
