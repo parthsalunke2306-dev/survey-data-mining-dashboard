@@ -1,18 +1,10 @@
 """
-Interactive Visualization Module (Plotly)
-==========================================
-VIVA EXPLANATION GUIDE FOR PROFESSOR:
-1. What this code does:
-   Renders responsive, interactive charts (Donut, Bar, Stacked, Bubble, Heatmap, FDI distribution)
-   and exports them directly into JSON for client-side rendering via Plotly.js.
-2. Python Libraries used:
-   - plotly (plotly.graph_objects as go, plotly.express as px): Industry-standard interactive plotting library.
-   - pandas: For aggregating chart values (e.g., value_counts(), crosstab()).
-3. Why Plotly is used:
-   Enables student interactivity (hover tooltips, dynamic filtering, responsive resizing) without hardcoded static images.
+Visualization Module using Plotly for Field Survey Analytics & Data Mining
+Styled with a clean slate/white/soft-neutral palette with restrained emerald/green accents (#27478C).
 """
 import plotly.express as px
 import plotly.graph_objects as go
+import textwrap
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Any
@@ -37,21 +29,32 @@ def get_base_layout(title: str = "") -> dict:
     )
 
 def plot_donut_chart(df: pd.DataFrame, column: str, title: str = None) -> go.Figure:
-    """Generates an elegant Donut chart for categorical dimensions."""
+    """Donut chart: legend carries label + share, so small slices never collide with leader-line labels."""
     counts = df[column].value_counts().reset_index()
     counts.columns = [column, "Count"]
+    total = float(counts["Count"].sum()) or 1.0
+    labels = ["<br>".join(textwrap.wrap(f"{l} ({c / total * 100:.1f}%)", 28)) for l, c in zip(counts[column], counts["Count"])]
+    big = [("inside" if c / total >= 0.08 else "none") for c in counts["Count"]]
     fig = go.Figure(data=[
         go.Pie(
-            labels=counts[column].tolist(),
+            labels=labels,
             values=counts["Count"].tolist(),
             hole=0.55,
-            marker=dict(colors=THEME_COLORS),
-            textinfo="label+percent",
-            hoverinfo="label+value+percent"
+            sort=False,
+            domain=dict(x=[0.0, 0.52], y=[0.04, 0.96]),
+            marker=dict(colors=THEME_COLORS, line=dict(color="white", width=2)),
+            textinfo="percent",
+            textposition=big,
+            textfont=dict(color="white", size=12),
+            insidetextorientation="horizontal",
+            hovertemplate="%{label}<br>%{value} respondents<extra></extra>",
         )
     ])
     layout = get_base_layout(title or f"Distribution of {column.replace('_', ' ')}")
-    layout["showlegend"] = False
+    layout["showlegend"] = True
+    layout["legend"] = dict(orientation="v", x=0.56, xanchor="left", y=0.5, yanchor="middle",
+                            font=dict(size=11), tracegroupgap=2)
+    layout["margin"] = dict(t=16, b=10, l=10, r=10)
     fig.update_layout(**layout)
     return fig
 
@@ -95,7 +98,7 @@ def plot_stacked_academic_budget(df: pd.DataFrame) -> go.Figure:
     ct = ct[cols]
 
     fig = go.Figure()
-    palette = ["#94A3B8", "#38BDF8", "#27478C", "#059669"]
+    palette = ["#C3CDE3", "#8FA6D3", "#4C6BAA", "#1D3570"]
     for i, col in enumerate(cols):
         fig.add_trace(go.Bar(
             name=col,
@@ -146,7 +149,7 @@ def plot_comparative_rate(df: pd.DataFrame, group_col: str, target_col: str, tit
     fig = go.Figure(go.Bar(
         x=rate_df[group_col].tolist(),
         y=[float(round(r, 1)) for r in rate_df["Emergency_Fund_Rate"]],
-        marker_color="#3B82F6",
+        marker_color="#4C6BAA",
         text=[f"{r:.1f}%" for r in rate_df["Emergency_Fund_Rate"]],
         textposition="outside"
     ))
@@ -228,7 +231,7 @@ def plot_likert_diverging(df: pd.DataFrame, likert_columns: List[str]) -> go.Fig
     plot_df = pd.DataFrame(data)
     fig = px.bar(
         plot_df, y="Question", x="Percentage", color="Rating", orientation="h",
-        color_discrete_sequence=["#EF4444", "#F97316", "#CBD5E1", "#34D399", "#27478C"],
+        color_discrete_sequence=["#A34A3A", "#D49A8E", "#D3D9E3", "#8FA6D3", "#27478C"],
         title="Mindset & Behavioral Likert Distribution (1 = Strongly Disagree to 5 = Strongly Agree)"
     )
     layout = get_base_layout("Mindset & Behavioral Likert Distribution")
@@ -248,9 +251,9 @@ def plot_confidence_planning_matrix(df: pd.DataFrame) -> go.Figure:
 
     colors = {
         "Prudent Strategists (High Conf + Action Plan)": "#27478C",
-        "Overconfident Optimists (High Conf + No Action Plan)": "#F59E0B",
-        "Cautious Planners (Low Conf + Action Plan)": "#3B82F6",
-        "Unprepared / At-Risk (Low Conf + No Action Plan)": "#EF4444"
+        "Overconfident Optimists (High Conf + No Action Plan)": "#B7791F",
+        "Cautious Planners (Low Conf + Action Plan)": "#4C6BAA",
+        "Unprepared / At-Risk (Low Conf + No Action Plan)": "#A34A3A"
     }
 
     fig = go.Figure(go.Bar(
@@ -366,7 +369,7 @@ def plot_feature_gain_comparison(gain_df: pd.DataFrame) -> go.Figure:
     fig = go.Figure()
     fig.add_trace(go.Bar(
         x=gain_df["Feature"], y=gain_df["Info Gain (ID3)"],
-        name="ID3 (Information Gain)", marker_color="#3B82F6"
+        name="ID3 (Information Gain)", marker_color="#4C6BAA"
     ))
     fig.add_trace(go.Bar(
         x=gain_df["Feature"], y=gain_df["Gain Ratio (J48/C4.5)"],
@@ -394,7 +397,7 @@ def plot_interactive_tree_structure(tree_dict: Dict) -> go.Figure:
             color_nodes.append(EMERALD)
         else:
             text_nodes.append(f"<b>{node.get('feature')}</b><br>H={node.get('entropy', 0):.2f}<br>n={node.get('samples')}")
-            color_nodes.append("#3B82F6")
+            color_nodes.append("#4C6BAA")
 
         children = node.get("children", [])
         n_children = len(children)

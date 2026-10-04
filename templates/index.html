@@ -175,6 +175,14 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
   main::-webkit-scrollbar-thumb{display:block!important;background:#9AA6B8!important;border-radius:6px!important;border:2px solid #EEF0F4!important}
   main::-webkit-scrollbar-thumb:hover{background:#6B7A90!important}
 }
+
+/* ===== UX fixes: readable minimum type size ===== */
+[class*="text-[8px]"],[class*="text-[9px]"],[class*="text-[10px]"]{font-size:11px!important;line-height:1.35!important}
+[class*="text-[11px]"]{font-size:12px!important}
+button,select,a{min-height:30px}
+.nav-tab{min-height:38px}
+
+@media (max-width:639px){header h1,header .truncate{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:.95rem!important;line-height:1.25!important}}
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
@@ -520,7 +528,7 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
 
                         <!-- FDI Histogram Chart Container -->
                         <div class="border border-slate-200 rounded-lg overflow-hidden bg-white p-0.5 shadow-xs">
-                            <div id="chart-fdi-dist" class="w-full h-44 sm:h-48"></div>
+                            <div id="chart-fdi-dist" class="w-full h-60 sm:h-64"></div>
                         </div>
                     </div>
                     <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-200 space-y-1.5 text-[11px]">
@@ -567,25 +575,25 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
                 <!-- Academic Year Donut -->
                 <div class="glass-panel p-3 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Academic Standing Distribution</h3>
-                    <div id="chart-academic-year" class="w-full h-48 sm:h-52"></div>
+                    <div id="chart-academic-year" class="w-full h-64 sm:h-72"></div>
                 </div>
 
                 <!-- Academic Stream Bar -->
                 <div class="glass-panel p-3 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Academic Stream / Major Breakdown</h3>
-                    <div id="chart-stream" class="w-full h-48 sm:h-52"></div>
+                    <div id="chart-stream" class="w-full h-64 sm:h-72"></div>
                 </div>
 
                 <!-- Living Situation Donut -->
                 <div class="glass-panel p-3 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Primary Living Situation</h3>
-                    <div id="chart-living" class="w-full h-48 sm:h-52"></div>
+                    <div id="chart-living" class="w-full h-64 sm:h-72"></div>
                 </div>
 
                 <!-- Commuting Mode Bar -->
                 <div class="glass-panel p-3 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Campus Commuting Mode</h3>
-                    <div id="chart-commute" class="w-full h-48 sm:h-52"></div>
+                    <div id="chart-commute" class="w-full h-64 sm:h-72"></div>
                 </div>
             </div>
 
@@ -609,15 +617,15 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Primary Funding Source</h3>
-                    <div id="chart-funding" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-funding" class="w-full h-60 sm:h-64"></div>
                 </div>
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Monthly Funds Managed</h3>
-                    <div id="chart-budget" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-budget" class="w-full h-60 sm:h-64"></div>
                 </div>
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Expense Tracking Methods</h3>
-                    <div id="chart-tracking" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-tracking" class="w-full h-60 sm:h-64"></div>
                 </div>
             </div>
 
@@ -625,15 +633,15 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Emergency Fund (1-Month Cushion)</h3>
-                    <div id="chart-emergency" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-emergency" class="w-full h-60 sm:h-64"></div>
                 </div>
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Demat / Brokerage Ownership</h3>
-                    <div id="chart-demat" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-demat" class="w-full h-60 sm:h-64"></div>
                 </div>
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Financial Research Frequency</h3>
-                    <div id="chart-research" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-research" class="w-full h-60 sm:h-64"></div>
                 </div>
             </div>
 
@@ -644,9 +652,9 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
                     <span>Comparative Empirical Rate Analysis</span>
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                    <div id="chart-comp-budget" class="w-full h-44 sm:h-48"></div>
-                    <div id="chart-comp-tracking" class="w-full h-44 sm:h-48"></div>
-                    <div id="chart-comp-research" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-comp-budget" class="w-full h-60 sm:h-64"></div>
+                    <div id="chart-comp-tracking" class="w-full h-60 sm:h-64"></div>
+                    <div id="chart-comp-research" class="w-full h-60 sm:h-64"></div>
                 </div>
             </div>
         </section>
@@ -676,7 +684,7 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
                 <div class="glass-panel p-3 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-0.5">Peer Influence vs Stress-Induced Spending</h3>
                     <p class="text-[10px] text-slate-500 mb-2">Bubble size indicates respondent density at each coordinate.</p>
-                    <div id="chart-peer-stress-bubble" class="w-full h-48 sm:h-52"></div>
+                    <div id="chart-peer-stress-bubble" class="w-full h-64 sm:h-72"></div>
                 </div>
                 <div class="glass-panel p-3 rounded-xl flex flex-col justify-between">
                     <div>
@@ -723,7 +731,7 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
                         Cohort Counts
                     </span>
                 </div>
-                <div id="chart-conf-plan-matrix" class="w-full h-48 sm:h-52"></div>
+                <div id="chart-conf-plan-matrix" class="w-full h-64 sm:h-72"></div>
             </div>
         </section>
 
@@ -740,37 +748,37 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
                 <!-- Salary sufficiency -->
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Is Traditional Salary Enough for Long-Term Goals?</h3>
-                    <div id="chart-salary-alone" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-salary-alone" class="w-full h-60 sm:h-64"></div>
                 </div>
 
                 <!-- SIP Intention -->
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Intention to Automate SIP Investments Once Employed</h3>
-                    <div id="chart-sip-intent" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-sip-intent" class="w-full h-60 sm:h-64"></div>
                 </div>
 
                 <!-- Asset Classes Horizontal Bar -->
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Preferred Asset Classes Over Next 5 Years</h3>
-                    <div id="chart-asset-bar" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-asset-bar" class="w-full h-60 sm:h-64"></div>
                 </div>
 
                 <!-- Review Frequency -->
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Envisioned Portfolio Review Frequency</h3>
-                    <div id="chart-review-freq" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-review-freq" class="w-full h-60 sm:h-64"></div>
                 </div>
 
                 <!-- Investment Obstacle -->
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Reported Obstacles to Starting Investment Journey</h3>
-                    <div id="chart-obstacle-bar" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-obstacle-bar" class="w-full h-60 sm:h-64"></div>
                 </div>
 
                 <!-- Financial Independence Approach -->
                 <div class="glass-panel p-2.5 rounded-xl">
                     <h3 class="font-bold text-xs text-slate-900 mb-1">Strategic Philosophy for Financial Independence</h3>
-                    <div id="chart-philosophy-bar" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-philosophy-bar" class="w-full h-60 sm:h-64"></div>
                 </div>
             </div>
         </section>
@@ -882,7 +890,7 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
                             Mine Decision Tree
                         </button>
                     </div>
-                    <div id="chart-tree-gains" class="w-full h-48 sm:h-52"></div>
+                    <div id="chart-tree-gains" class="w-full h-64 sm:h-72"></div>
                     <div id="chart-tree-viz" class="w-full h-56 sm:h-64"></div>
                 </div>
             </div>
@@ -1114,7 +1122,33 @@ i[data-lucide],svg.lucide{color:var(--muted)!important}
             el.innerHTML = '';
 
             try {
-                await plotLib.newPlot(elementId, figureData, figureLayout, config);
+                const lay = JSON.parse(JSON.stringify(figureLayout || {}));
+                // The card header already names a single-chart card, so drop the duplicate in-chart title
+                const card = el.closest('.glass-panel, section, div[class*="rounded"]');
+                if (card && card.querySelectorAll('.js-plotly-plot, [id^="chart-"]').length === 1 && card.querySelector('h2, h3, h4')) {
+                    lay.title = {text: ''};
+                    lay.margin = Object.assign({}, lay.margin, {t: 28});
+                }
+                // Let Plotly grow margins so axis titles and tick labels are never clipped
+                ['xaxis','yaxis'].forEach(a => { if (lay[a]) lay[a].automargin = true; });
+                // Wrap long text so nothing is clipped: titles, axis titles, long category ticks, annotations
+                const cw = el.clientWidth || 360, ch = el.clientHeight || 220;
+                const wrap = (txt, n) => { if (typeof txt !== 'string' || txt.includes('<br>') || txt.length <= n) return txt;
+                    const out = []; let line = '';
+                    txt.split(' ').forEach(w => { if ((line + ' ' + w).trim().length > n) { out.push(line.trim()); line = w; } else line += ' ' + w; });
+                    out.push(line.trim()); return out.join('<br>'); };
+                if (lay.title && lay.title.text) { lay.title.text = wrap(lay.title.text, Math.floor(cw / 10)); lay.title.x = 0.02; lay.title.xanchor = 'left'; lay.margin = Object.assign({}, lay.margin, {t: Math.max((lay.margin || {}).t || 0, 60)}); }
+                if (lay.xaxis && lay.xaxis.title && lay.xaxis.title.text) lay.xaxis.title.text = wrap(lay.xaxis.title.text, Math.floor(cw / 10));
+                if (lay.yaxis && lay.yaxis.title && lay.yaxis.title.text) lay.yaxis.title.text = wrap(lay.yaxis.title.text, Math.floor(ch / 13));
+                (lay.annotations || []).forEach(a => { if (a.text && !a.xref?.includes('x') ) a.text = wrap(a.text, Math.floor(cw / 9)); });
+                (figureData || []).forEach(tr => { if (tr.type === 'bar' && tr.orientation === 'h' && Array.isArray(tr.y) && tr.y.some(v => typeof v === 'string' && v.length > 26)) {
+                    lay.yaxis = lay.yaxis || {}; lay.yaxis.tickmode = 'array'; lay.yaxis.tickvals = tr.y; lay.yaxis.ticktext = tr.y.map(v => wrap(String(v), 26)); } });
+                (figureData || []).forEach(tr => { if (tr.type === 'bar') tr.cliponaxis = false; });
+                if (cw < 520) (figureData || []).forEach(tr => { if (tr.type === 'bar' && Array.isArray(tr.text)) tr.text = tr.text.map(t => typeof t === 'string' ? t.replace(' (', '<br>(') : t); });
+                (lay.annotations || []).forEach(a => { if (a.yref === 'paper' && a.y < 0) { const n = (a.text || '').split('<br>').length; lay.margin = Object.assign({}, lay.margin, {b: Math.max((lay.margin || {}).b || 0, 36 + 15 * n)}); } });
+                if (cw < 520) (figureData || []).forEach(tr => { if (tr.type === 'bar' && tr.orientation === 'h' && /outside/.test(String(tr.textposition)) && Array.isArray(tr.x)) {
+                    const mx = Math.max.apply(null, tr.x.filter(v => typeof v === 'number')); if (isFinite(mx)) { lay.xaxis = lay.xaxis || {}; lay.xaxis.range = [0, mx * 2.0]; } } });
+                await plotLib.newPlot(elementId, figureData, lay, config);
                 plotLib.Plots.resize(elementId);
             } catch (err) {
                 console.error('Error plotting ' + elementId, err);
