@@ -7,8 +7,8 @@ import pandas as pd
 import numpy as np
 from typing import Dict, List, Any
 
-# Professional Theme Color Palette
-COLORS = ["#2563EB", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4", "#EC4899", "#84CC16"]
+# Professional Theme Color Palette (restrained slate and forest emerald, zero rainbow)
+COLORS = ["#047857", "#334155", "#059669", "#64748B", "#0D9488", "#475569", "#10B981", "#94A3B8"]
 
 def plot_distribution(df: pd.DataFrame, column: str, title: str = None) -> go.Figure:
     """Creates a clean, styled bar chart for categorical distributions."""
@@ -22,7 +22,7 @@ def plot_distribution(df: pd.DataFrame, column: str, title: str = None) -> go.Fi
         title=title or f"Distribution of {column}"
     )
     fig.update_traces(textposition="outside")
-    fig.update_layout(showlegend=False, xaxis_title=column, yaxis_title="Respondents", margin=dict(t=40, b=40, l=40, r=40))
+    fig.update_layout(showlegend=False, xaxis_title=column, yaxis_title="Respondents", margin=dict(t=40, b=40, l=40, r=40), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     return fig
 
 def plot_likert_summary(df: pd.DataFrame, likert_columns: List[str]) -> go.Figure:
@@ -38,10 +38,10 @@ def plot_likert_summary(df: pd.DataFrame, likert_columns: List[str]) -> go.Figur
     plot_df = pd.DataFrame(data)
     fig = px.bar(
         plot_df, y="Question", x="Percentage", color="Rating", orientation="h",
-        color_discrete_sequence=["#EF4444", "#F97316", "#FBBF24", "#34D399", "#10B981"],
+        color_discrete_sequence=["#475569", "#64748B", "#94A3B8", "#34D399", "#047857"],
         title="Psychographic & Spending Attitude Ratings (1 = Strongly Disagree, 5 = Strongly Agree)"
     )
-    fig.update_layout(barmode="stack", xaxis_title="Percentage of Respondents (%)", yaxis_title="", margin=dict(l=150))
+    fig.update_layout(barmode="stack", xaxis_title="Percentage of Respondents (%)", yaxis_title="", margin=dict(l=150), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     return fig
 
 def plot_crosstab_heatmap(df: pd.DataFrame, col_x: str, col_y: str) -> go.Figure:
@@ -49,10 +49,10 @@ def plot_crosstab_heatmap(df: pd.DataFrame, col_x: str, col_y: str) -> go.Figure
     ct = pd.crosstab(df[col_y], df[col_x])
     fig = px.imshow(
         ct, text_auto=True, aspect="auto",
-        color_continuous_scale="Blues",
+        color_continuous_scale=[[0, "#F8FAFC"], [1, "#047857"]],
         title=f"Cross-Tabulation: {col_y} vs {col_x}"
     )
-    fig.update_layout(xaxis_title=col_x, yaxis_title=col_y)
+    fig.update_layout(xaxis_title=col_x, yaxis_title=col_y, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     return fig
 
 def plot_sunburst_hierarchy(df: pd.DataFrame, path_cols: List[str], target_metric: str = None) -> go.Figure:
@@ -63,6 +63,7 @@ def plot_sunburst_hierarchy(df: pd.DataFrame, path_cols: List[str], target_metri
         color_discrete_sequence=COLORS
     )
     fig.update_traces(textinfo="label+percent entry")
+    fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     return fig
 
 def plot_feature_gain_comparison(gain_df: pd.DataFrame) -> go.Figure:
@@ -70,17 +71,19 @@ def plot_feature_gain_comparison(gain_df: pd.DataFrame) -> go.Figure:
     fig = go.Figure()
     fig.add_trace(go.Bar(
         x=gain_df["Feature"], y=gain_df["Info Gain (ID3)"],
-        name="ID3 (Information Gain)", marker_color="#3B82F6"
+        name="ID3 (Information Gain)", marker_color="#334155"
     ))
     fig.add_trace(go.Bar(
         x=gain_df["Feature"], y=gain_df["Gain Ratio (J48/C4.5)"],
-        name="J48 / C4.5 (Gain Ratio)", marker_color="#10B981"
+        name="J48 / C4.5 (Gain Ratio)", marker_color="#047857"
     ))
     fig.update_layout(
         barmode="group",
         title="Feature Splitting Power: ID3 Information Gain vs. J48 Gain Ratio",
         xaxis_title="Survey Feature",
         yaxis_title="Score",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
     return fig
@@ -92,9 +95,10 @@ def plot_confusion_matrix_interactive(cm: np.ndarray, labels: List[str]) -> go.F
         labels=dict(x="Predicted Class", y="Actual Class", color="Count"),
         x=labels, y=labels,
         text_auto=True,
-        color_continuous_scale="Greens",
+        color_continuous_scale=[[0, "#F8FAFC"], [1, "#047857"]],
         title="Decision Tree Confusion Matrix"
     )
+    fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     return fig
 
 def plot_interactive_tree_structure(tree_dict: Dict) -> go.Figure:
@@ -117,10 +121,10 @@ def plot_interactive_tree_structure(tree_dict: Dict) -> go.Figure:
         is_leaf = node.get("is_leaf", False)
         if is_leaf:
             text_nodes.append(f"<b>LEAF</b><br>{node.get('prediction')}<br>n={node.get('samples')}")
-            color_nodes.append("#10B981")
+            color_nodes.append("#047857")
         else:
             text_nodes.append(f"<b>{node.get('feature')}</b><br>H={node.get('entropy', 0):.2f}<br>n={node.get('samples')}")
-            color_nodes.append("#3B82F6")
+            color_nodes.append("#334155")
 
         children = node.get("children", [])
         n_children = len(children)
