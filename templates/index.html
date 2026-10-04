@@ -6,13 +6,8 @@
     <title>Behavioral Insights into Financial Planning Among College Students</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Plotly.js CDN with CDNJS fallback -->
-    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-    <script>
-        if (typeof Plotly === 'undefined') {
-            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.2/plotly.min.js"><\/script>');
-        }
-    </script>
+    <!-- Plotly.js CDN with failover -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.2/plotly.min.js" onerror="this.onerror=null;this.src='https://cdn.plot.ly/plotly-2.35.2.min.js';"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Google Font: Plus Jakarta Sans -->
@@ -349,9 +344,7 @@
 
                         <!-- FDI Histogram Chart Container -->
                         <div class="border border-slate-200 rounded-xl overflow-hidden bg-white p-1 shadow-sm">
-                            <div id="chart-fdi-dist" class="w-full h-72 min-h-[18rem] flex items-center justify-center text-slate-400 text-xs">
-                                <i data-lucide="loader-2" class="w-4 h-4 animate-spin mr-1.5 text-emerald-600"></i> Loading FDI Distribution Histogram...
-                            </div>
+                            <div id="chart-fdi-dist" class="w-full h-72"></div>
                         </div>
                     </div>
                     <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3 text-xs">
@@ -905,6 +898,13 @@
         // Resilient Plotly Renderer with auto-retry and responsive resize
         function safePlotlyRender(elementId, figureData, figureLayout, config = {responsive: true, displayModeBar: false}) {
             if (!figureData) return;
+            const el = document.getElementById(elementId);
+            if (el) {
+                if (el.classList.contains('flex')) {
+                    el.classList.remove('flex', 'items-center', 'justify-center', 'text-slate-400', 'text-xs');
+                }
+                el.innerHTML = '';
+            }
             let attempts = 0;
             const render = () => {
                 if (typeof Plotly !== 'undefined') {
