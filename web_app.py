@@ -1,7 +1,22 @@
 """
-Pure Python Full-Stack Web Application for Survey Data Mining & Analytics
+Full-Stack Web Application for Survey Data Mining & Analytics
+==============================================================
 Project: "Behavioral Insights into Financial Planning Among College Students"
-FastAPI backend with Plotly, Pandas, NumPy, and Scikit-Learn.
+BSc Data Science Viva Guide:
+1. What this backend does:
+   A lightweight FastAPI web server that loads the cleaned student survey data,
+   executes data mining models (K-Means, PCA, Apriori, Decision Trees, KNN, Naive Bayes),
+   and delivers structured JSON responses to the interactive frontend dashboard.
+2. Libraries used:
+   - FastAPI: High-performance modern web framework for Python APIs.
+   - pandas: Loads and filters the survey dataset on demand.
+   - scikit-learn & mlxtend: Runs machine learning and data mining algorithms.
+   - plotly: Generates JSON figures for charts.
+3. Architecture:
+   Separation of Concerns:
+   - /api/filter-options: Dropdown choices for Academic Year, Stream, Living Situation.
+   - /api/dashboard-data: Primary dashboard metrics, KPIs, and charts.
+   - /api/mining/*: Dedicated data mining endpoints for K-Means, Apriori, Correlation, Trees.
 """
 import os
 import glob
@@ -294,8 +309,8 @@ async def get_correlation_matrix():
         "Peer_Pressure_Spend", "Stress_Spend", "Financial_Confidence",
         "Lifestyle_Upgrade_Spend", "Wealth_Plan_Readiness", "Research_Freq_Num"
     ]
-    # Pure Pandas/NumPy Spearman correlation (rank Pearson correlation) without scipy dependency
-    corr_matrix = df_calc[corr_cols].rank().corr().round(3)
+    # Built-in Pandas Spearman rank correlation
+    corr_matrix = df_calc[corr_cols].corr(method="spearman").round(3)
     fig = viz.plot_spearman_heatmap(corr_matrix)
 
     _correlation_cache = {

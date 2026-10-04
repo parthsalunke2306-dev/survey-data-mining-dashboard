@@ -1,6 +1,21 @@
 """
-Core Data Mining Module: Custom ID3, C4.5 / J48, and Scikit-Learn Decision Trees
-Includes step-by-step Entropy, Information Gain, Split Information, and Gain Ratio calculations.
+Decision Tree Mining Module (ID3 & J48 / C4.5)
+==============================================
+VIVA EXPLANATION GUIDE FOR PROFESSOR:
+1. What this code does:
+   Demonstrates decision tree induction and mathematical splitting metrics:
+   - ID3 (Iterative Dichotomiser 3): Uses Shannon Entropy and Information Gain.
+   - J48 / C4.5: Uses Gain Ratio (Information Gain / Split Info) to prevent bias towards attributes with many distinct values.
+2. Formulas implemented:
+   - Shannon Entropy: H(S) = - Σ (p_i * log2(p_i))
+   - Information Gain: IG(S, A) = H(S) - Σ (|S_v| / |S|) * H(S_v)
+   - Split Information: SplitInfo(S, A) = - Σ (|S_v| / |S|) * log2(|S_v| / |S|)
+   - Gain Ratio: GR(S, A) = IG(S, A) / SplitInfo(S, A)
+3. Python Libraries used:
+   - math: For log2 calculations.
+   - pandas: For group-by subsetting and value counts.
+4. Output produced:
+   A comparative feature gain table and recursive tree nodes for Plotly tree hierarchy visualization.
 """
 import math
 import numpy as np

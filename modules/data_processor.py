@@ -1,11 +1,30 @@
 """
-Data Preprocessing, Cleaning, & Analytics Module for Student Financial Habits Survey
-Empirical Research Study: "Behavioral Insights into Financial Planning Among College Students"
+Data Preprocessing, Cleaning, & Analytics Module
+=================================================
+VIVA EXPLANATION GUIDE FOR PROFESSOR:
+1. What this code does:
+   Loads, cleans, and standardizes raw survey responses from Google Forms.
+   Anonymizes student identities, converts text ratings into numbers, computes the
+   Financial Discipline Index (FDI), and calculates core summary KPIs.
+2. Python Libraries used:
+   - pandas: Primary data manipulation and analysis library.
+   - numpy: Fast vectorized conditional logic (`np.select`).
+3. Built-in functions used:
+   - `df.rename(columns=...)`: Standardizes long survey question text into concise column names.
+   - `df.drop(columns=...)`: Drops PII (Name, Email, Timestamp) for privacy compliance.
+   - `pd.to_numeric()`, `astype(int)`: Converts text Likert ratings (1-5) into integers.
+   - `pd.cut()`: Bins continuous FDI scores into 3 discipline tiers (Low, Moderate, High).
+   - `df.mean()`, `df.value_counts(normalize=True)`: Calculates summary statistics and percentage rates.
+4. Why these built-ins are used:
+   Standard Pandas functions are vectorized, fast, and easy for students to explain without writing complex custom loops.
+5. Output produced:
+   Cleaned Pandas DataFrame ready for visualization, statistical testing, and data mining.
 """
+
 import re
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any
 
 # Standardized short column names mapping for survey questions
 SHORT_NAME_MAP = {
@@ -37,6 +56,7 @@ SHORT_NAME_MAP = {
     "What specific topics regarding personal finance, market analysis, or investing would you like to see covered in future workshops or campus events?": "Workshop_Interests"
 }
 
+
 def parse_multiselect(val: Any) -> List[str]:
     """
     Parses comma-separated multi-select responses safely,
@@ -49,19 +69,14 @@ def parse_multiselect(val: Any) -> List[str]:
     items = [x.strip().replace(';', ',') for x in s.split(',') if x.strip()]
     return items
 
+
 def clean_survey_data(df: pd.DataFrame, drop_pii: bool = True) -> pd.DataFrame:
     """
-    Cleans raw Google Forms survey responses:
-    - Renames questions to clean standard identifiers.
-    - Anonymizes PII (strips Name, Email, Timestamp).
-    - Standardizes categorical variables (Stream, Budget, Commute).
-    - Encodes 1-5 Likert scales to numeric integers.
-    - Standardizes binary Yes/No responses.
-    - Computes the Financial Discipline Index (FDI).
+    Cleans raw Google Forms survey responses into an analysis-ready DataFrame.
     """
     df_clean = df.copy()
-    
-    # 1. Rename columns
+
+    # Step 1: Standardize Column Names using Pandas rename()
     rename_dict = {}
     for col in df_clean.columns:
         clean_col_key = col.strip()
@@ -78,23 +93,22 @@ def clean_survey_data(df: pd.DataFrame, drop_pii: bool = True) -> pd.DataFrame:
             if not matched:
                 sanitized = re.sub(r'[^\w\s]', '', col)[:30].strip().replace(' ', '_')
                 rename_dict[col] = sanitized
-                
+
     df_clean.rename(columns=rename_dict, inplace=True)
-    
-    # 2. Anonymize PII
+
+    # Step 2: Anonymize Personally Identifiable Information (PII)
     if drop_pii:
         pii_cols = ["Timestamp", "Email", "Name"]
         df_clean.drop(columns=[c for c in pii_cols if c in df_clean.columns], inplace=True)
-        # Add anonymous respondent identifier
+        # Assign anonymous respondent identifier (RESP_001 to RESP_131)
         df_clean.insert(0, "Respondent_ID", [f"RESP_{i+1:03d}" for i in range(len(df_clean))])
 
-    # 3. Standardize Academic Standing
+    # Step 3: Standardize Academic Standing category names
     if "Academic_Year" in df_clean.columns:
         df_clean["Academic_Year"] = df_clean["Academic_Year"].astype(str).str.strip()
-        year_order = ["1st Year", "2nd Year", "3rd Year", "4th Year", "Post-Grad", "12th"]
         df_clean["Academic_Year"] = df_clean["Academic_Year"].replace({"12th": "High School / 12th"})
 
-    # 4. Standardize Stream/Major
+    # Step 4: Standardize Stream / Major labels
     if "Stream_Major" in df_clean.columns:
         df_clean["Stream_Major"] = df_clean["Stream_Major"].astype(str).str.strip().str.title()
         stream_map = {
@@ -109,7 +123,7 @@ def clean_survey_data(df: pd.DataFrame, drop_pii: bool = True) -> pd.DataFrame:
         }
         df_clean["Stream_Major"] = df_clean["Stream_Major"].replace(stream_map)
 
-    # 5. Clean and order Monthly Budget
+    # Step 5: Clean and order Monthly Budget tiers
     if "Monthly_Budget" in df_clean.columns:
         df_clean["Monthly_Budget"] = df_clean["Monthly_Budget"].astype(str).str.strip()
         budget_map = {
@@ -120,16 +134,15 @@ def clean_survey_data(df: pd.DataFrame, drop_pii: bool = True) -> pd.DataFrame:
         }
         df_clean["Monthly_Budget"] = df_clean["Monthly_Budget"].replace(budget_map)
 
-    # 6. Standardize Tracking Method
+    # Step 6: Standardize Tracking Method categories
     if "Tracking_Method" in df_clean.columns:
         df_clean["Tracking_Method"] = df_clean["Tracking_Method"].astype(str).str.strip()
-        # Clean rare write-ins like 'Eating'
         standard_tracking = ["Mental Math", "Mobile App", "Spreadsheet", "Pen and Paper", "I don't track it"]
         df_clean["Tracking_Method"] = df_clean["Tracking_Method"].apply(
             lambda x: x if x in standard_tracking else "I don't track it"
         )
 
-    # 7. Clean Likert columns to numeric integers (1 to 5)
+    # Step 7: Convert Likert columns to numeric integers (1 to 5)
     likert_cols = [
         "Peer_Pressure_Spend", "Stress_Spend", "Financial_Confidence",
         "Lifestyle_Upgrade_Spend", "Wealth_Plan_Readiness"
@@ -138,22 +151,24 @@ def clean_survey_data(df: pd.DataFrame, drop_pii: bool = True) -> pd.DataFrame:
         if col in df_clean.columns:
             df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce').fillna(3).astype(int)
 
-    # 8. Clean Binary flags
+    # Step 8: Standardize Binary Yes/No responses
     binary_cols = ["Has_Emergency_Fund", "Has_Investment_Account", "Salary_Alone_Enough", "Plan_Automated_Invest"]
     for col in binary_cols:
         if col in df_clean.columns:
             df_clean[col] = df_clean[col].astype(str).str.strip().str.capitalize()
             df_clean[col] = df_clean[col].apply(lambda x: "Yes" if "yes" in str(x).lower() else ("No" if "no" in str(x).lower() else x))
 
-    # 9. Compute Financial Discipline Index (FDI) (0-100 scale)
+    # Step 9: Compute Financial Discipline Index (FDI: 0 to 100)
     df_clean["FDI_Score"] = calculate_fdi(df_clean)
+
+    # Bin FDI into 3 tiers using pd.cut()
     df_clean["FDI_Tier"] = pd.cut(
         df_clean["FDI_Score"],
         bins=[-1, 35, 65, 100],
         labels=["Low Discipline (0-35)", "Moderate Discipline (36-65)", "High Discipline (66-100)"]
     )
 
-    # 10. Compute 2x2 Confidence-Planning Segment
+    # Step 10: Compute 2x2 Confidence vs Planning Segment using numpy select()
     conf_high = df_clean["Financial_Confidence"] >= 4
     plan_high = df_clean["Wealth_Plan_Readiness"] >= 4
     conditions = [
@@ -173,22 +188,23 @@ def clean_survey_data(df: pd.DataFrame, drop_pii: bool = True) -> pd.DataFrame:
     df_clean = df_clean.fillna("")
     return df_clean
 
+
 def calculate_fdi(df: pd.DataFrame) -> pd.Series:
     """
-    Computes the Financial Discipline Index (FDI) on a 0 to 100 scale:
+    Computes the Financial Discipline Index (FDI) on a 0 to 100 composite scale:
     
     1. Expense Tracking Rigor (25 points):
        - Mobile App / Spreadsheet: 25 pts (Structured digital tracking)
        - Pen and Paper: 18 pts (Manual ledger tracking)
-       - Mental Math: 8 pts (Informal mental accounting)
-       - I don't track it / Other: 0 pts
+       - Mental Math: 8 pts (Informal mental calculation)
+       - I don't track it: 0 pts
        
     2. Emergency Liquidity Reserve (25 points):
        - Maintains 1-month liquid emergency cushion: 25 pts
        - No emergency reserve: 0 pts
        
     3. Actionable Wealth Planning (25 points):
-       - Likert scale (1-5) normalized linearly: (Rating - 1) / 4 * 25 pts
+       - Likert scale (1-5) normalized: (Rating - 1) / 4 * 25 pts
        
     4. Financial Research & Market Engagement (25 points):
        - Daily: 25 pts
@@ -196,7 +212,7 @@ def calculate_fdi(df: pd.DataFrame) -> pd.Series:
        - Monthly: 12 pts
        - Rarely / Never: 0 pts
        
-    Total FDI = Tracking + Emergency + Planning + Research (Max 100)
+    Total FDI = Tracking + Emergency + Planning + Research (Max 100 pts)
     """
     track_map = {
         "Mobile App": 25.0,
@@ -207,11 +223,13 @@ def calculate_fdi(df: pd.DataFrame) -> pd.Series:
     }
     s_track = df["Tracking_Method"].map(lambda x: track_map.get(str(x).strip(), 0.0))
 
+    # Emergency cushion: 25 pts for Yes, 0 for No
     s_em = df["Has_Emergency_Fund"].apply(lambda x: 25.0 if str(x).strip().lower() == "yes" else 0.0)
 
-    # Likert 1-5 scaled to 0-25
+    # Likert scale 1-5 scaled linearly to 0-25 pts
     s_plan = (pd.to_numeric(df["Wealth_Plan_Readiness"], errors="coerce").fillna(3).clip(1, 5) - 1.0) / 4.0 * 25.0
 
+    # Research frequency mapping
     res_map = {
         "Daily": 25.0,
         "Weekly": 20.0,
@@ -223,8 +241,11 @@ def calculate_fdi(df: pd.DataFrame) -> pd.Series:
     fdi = (s_track + s_em + s_plan + s_res).round(1)
     return fdi
 
+
 def get_executive_kpis(df: pd.DataFrame) -> Dict[str, Any]:
-    """Computes dynamic KPI metrics and auto-generated summary narrative."""
+    """
+    Computes summary Key Performance Indicators using built-in Pandas aggregations.
+    """
     n = len(df)
     if n == 0:
         return {
@@ -238,6 +259,7 @@ def get_executive_kpis(df: pd.DataFrame) -> Dict[str, Any]:
             "narrative_summary": "No responses match the active filter criteria."
         }
 
+    # Built-in Pandas mean operations
     avg_conf = float(df["Financial_Confidence"].mean())
     em_fund_pct = float((df["Has_Emergency_Fund"] == "Yes").mean() * 100)
     tracking_rate_pct = float(df["Tracking_Method"].isin(["Mobile App", "Spreadsheet", "Pen and Paper"]).mean() * 100)
@@ -245,7 +267,7 @@ def get_executive_kpis(df: pd.DataFrame) -> Dict[str, Any]:
     actionable_plan_pct = float((df["Wealth_Plan_Readiness"] >= 4).mean() * 100)
     avg_fdi = float(df["FDI_Score"].mean())
 
-    # Build dynamically grounded narrative summary
+    # Dynamically generated narrative summary
     narrative = (
         f"Across the {n} surveyed university students, respondents expressed an average subjective "
         f"financial confidence of {avg_conf:.1f} out of 5.0. However, empirical financial preparedness lags behind: "
@@ -267,8 +289,11 @@ def get_executive_kpis(df: pd.DataFrame) -> Dict[str, Any]:
         "narrative_summary": narrative
     }
 
+
 def get_key_findings(df: pd.DataFrame) -> Dict[str, Any]:
-    """Generates structured data-driven findings and academic research conclusions."""
+    """
+    Computes key empirical findings and research conclusions using built-in Pandas aggregations.
+    """
     n = len(df)
     if n == 0:
         return {"findings": [], "conclusions": {}}
@@ -279,12 +304,12 @@ def get_key_findings(df: pd.DataFrame) -> Dict[str, Any]:
     plan_high_pct = (df["Wealth_Plan_Readiness"] >= 4).mean() * 100
     sip_pct = (df["Plan_Automated_Invest"] == "Yes").mean() * 100
 
-    # Top obstacle
-    top_barrier = df["Investment_Obstacle"].value_counts().index[0] if len(df["Investment_Obstacle"].value_counts()) > 0 else "N/A"
-    top_barrier_count = int(df["Investment_Obstacle"].value_counts().iloc[0]) if len(df["Investment_Obstacle"].value_counts()) > 0 else 0
+    # Top investment obstacle using value_counts()
+    obstacles = df["Investment_Obstacle"].value_counts()
+    top_barrier = obstacles.index[0] if len(obstacles) > 0 else "N/A"
+    top_barrier_count = int(obstacles.iloc[0]) if len(obstacles) > 0 else 0
     top_barrier_pct = top_barrier_count / n * 100
 
-    # Findings bullet points
     findings = [
         {
             "title": "Pronounced Confidence–Preparedness Gap",
@@ -313,7 +338,6 @@ def get_key_findings(df: pd.DataFrame) -> Dict[str, Any]:
         }
     ]
 
-    # Academic conclusions
     conclusions = {
         "management_practices": (
             "The survey indicates that student financial management remains predominantly informal. Over two-thirds of respondents "

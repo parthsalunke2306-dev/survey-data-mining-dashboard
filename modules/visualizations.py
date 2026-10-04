@@ -1,6 +1,15 @@
 """
-Visualization Module using Plotly for Field Survey Analytics & Data Mining
-Styled with a clean slate/white/soft-neutral palette with restrained emerald/green accents (#27478C).
+Interactive Visualization Module (Plotly)
+==========================================
+VIVA EXPLANATION GUIDE FOR PROFESSOR:
+1. What this code does:
+   Renders responsive, interactive charts (Donut, Bar, Stacked, Bubble, Heatmap, FDI distribution)
+   and exports them directly into JSON for client-side rendering via Plotly.js.
+2. Python Libraries used:
+   - plotly (plotly.graph_objects as go, plotly.express as px): Industry-standard interactive plotting library.
+   - pandas: For aggregating chart values (e.g., value_counts(), crosstab()).
+3. Why Plotly is used:
+   Enables student interactivity (hover tooltips, dynamic filtering, responsive resizing) without hardcoded static images.
 """
 import plotly.express as px
 import plotly.graph_objects as go
