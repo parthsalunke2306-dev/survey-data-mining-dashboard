@@ -67,39 +67,43 @@
             border-color: #10B981;
             box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.1);
         }
-        /* Completely eliminate all horizontal scrollbars across all elements & browsers */
-        * {
-            scrollbar-width: thin;
+        /* Completely eliminate ALL scrollbars (vertical & horizontal) across all elements & browsers */
+        html, body, *, ::-webkit-scrollbar {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
         }
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 0px !important;
-        }
-        ::-webkit-scrollbar:horizontal {
+        ::-webkit-scrollbar, *::-webkit-scrollbar {
             display: none !important;
-            height: 0px !important;
             width: 0px !important;
-        }
-        *::-webkit-scrollbar:horizontal {
-            display: none !important;
             height: 0px !important;
+            background: transparent !important;
         }
-        ::-webkit-scrollbar-track {
-            background: #F1F5F9;
+        ::-webkit-scrollbar-vertical, *::-webkit-scrollbar-vertical {
+            display: none !important;
+            width: 0px !important;
+            height: 0px !important;
+            background: transparent !important;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
-            border-radius: 4px;
+        ::-webkit-scrollbar-horizontal, *::-webkit-scrollbar-horizontal {
+            display: none !important;
+            width: 0px !important;
+            height: 0px !important;
+            background: transparent !important;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94A3B8;
+        ::-webkit-scrollbar-track, *::-webkit-scrollbar-track {
+            display: none !important;
+            background: transparent !important;
+        }
+        ::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb {
+            display: none !important;
+            background: transparent !important;
         }
         .no-scrollbar::-webkit-scrollbar {
             display: none !important;
         }
         .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
         }
         /* Keep Plotly containers within their parent's width.
            NOTE: do NOT set overflow:hidden here - Plotly's inner .svg-container
@@ -113,79 +117,79 @@
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- Top Navigation Header -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
-        <div class="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+        <div class="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6">
+            <div class="flex justify-between items-center h-12 sm:h-13">
                 <!-- Branding & Title -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
-                        <i data-lucide="wallet" class="w-5 h-5"></i>
+                <div class="flex items-center space-x-2.5 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-xs flex-shrink-0">
+                        <i data-lucide="wallet" class="w-4 h-4"></i>
                     </div>
-                    <div>
-                        <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 leading-tight">
+                    <div class="min-w-0">
+                        <h1 class="font-extrabold text-xs sm:text-sm md:text-base tracking-tight text-slate-900 leading-tight truncate">
                             Behavioral Insights into Financial Planning Among College Students
                         </h1>
-                        <p class="text-xs text-slate-500 font-medium">Student Financial Behaviour Analytics Dashboard • Field Research</p>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium truncate">Student Financial Behaviour Analytics • Field Research</p>
                     </div>
                 </div>
 
                 <!-- Export & Dataset Status Badges -->
-                <div class="flex items-center space-x-2">
-                    <span id="badge-sample-size" class="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        <span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                <div class="flex items-center space-x-1.5 flex-shrink-0">
+                    <span id="badge-sample-size" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        <span class="w-1.5 h-1.5 mr-1 bg-emerald-500 rounded-full animate-pulse"></span>
                         n = <span id="header-sample-count">131</span> Students
                     </span>
-                    <a href="/api/download/cleaned-data" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition border border-slate-300">
-                        <i data-lucide="download" class="w-3.5 h-3.5 mr-1.5 text-slate-500"></i> Cleaned CSV
+                    <a href="/api/download/cleaned-data" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition border border-slate-200">
+                        <i data-lucide="download" class="w-3 h-3 mr-1 text-slate-500"></i> Cleaned CSV
                     </a>
-                    <a href="/api/download/summary" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm">
-                        <i data-lucide="file-text" class="w-3.5 h-3.5 mr-1.5"></i> Report
+                    <a href="/api/download/summary" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-xs">
+                        <i data-lucide="file-text" class="w-3 h-3 mr-1"></i> Report
                     </a>
                 </div>
             </div>
         </div>
 
         <!-- Global Interactive Filter Bar -->
-        <div class="bg-slate-100/90 border-t border-slate-200 px-4 py-2">
-            <div class="max-w-7xl 2xl:max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
-                <div class="flex flex-wrap items-center gap-3">
-                    <div class="flex items-center space-x-1.5">
-                        <i data-lucide="filter" class="w-3.5 h-3.5 text-slate-500"></i>
-                        <span class="font-bold text-slate-700">Filters:</span>
+        <div class="bg-slate-50 border-t border-slate-200/80 px-4 sm:px-6 py-1">
+            <div class="max-w-7xl 2xl:max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div class="flex items-center space-x-1">
+                        <i data-lucide="filter" class="w-3 h-3 text-slate-500"></i>
+                        <span class="font-bold text-slate-700 text-[11px]">Filters:</span>
                     </div>
 
                     <!-- Academic Year Filter -->
                     <div class="flex items-center space-x-1">
-                        <label for="filter-year" class="text-slate-500 font-medium">Year:</label>
-                        <select id="filter-year" onchange="applyFilters()" class="bg-white border border-slate-300 rounded-md px-2 py-1 text-slate-800 font-semibold focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        <label for="filter-year" class="text-slate-500 font-medium text-[11px]">Year:</label>
+                        <select id="filter-year" onchange="applyFilters()" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500">
                             <option value="All">All Years</option>
                         </select>
                     </div>
 
                     <!-- Stream / Major Filter -->
                     <div class="flex items-center space-x-1">
-                        <label for="filter-stream" class="text-slate-500 font-medium">Stream:</label>
-                        <select id="filter-stream" onchange="applyFilters()" class="bg-white border border-slate-300 rounded-md px-2 py-1 text-slate-800 font-semibold focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        <label for="filter-stream" class="text-slate-500 font-medium text-[11px]">Stream:</label>
+                        <select id="filter-stream" onchange="applyFilters()" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500 max-w-[140px] truncate">
                             <option value="All">All Streams</option>
                         </select>
                     </div>
 
                     <!-- Living Situation Filter -->
                     <div class="flex items-center space-x-1">
-                        <label for="filter-living" class="text-slate-500 font-medium">Living:</label>
-                        <select id="filter-living" onchange="applyFilters()" class="bg-white border border-slate-300 rounded-md px-2 py-1 text-slate-800 font-semibold focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        <label for="filter-living" class="text-slate-500 font-medium text-[11px]">Living:</label>
+                        <select id="filter-living" onchange="applyFilters()" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500">
                             <option value="All">All Situations</option>
                         </select>
                     </div>
 
                     <!-- Reset Filters Button -->
-                    <button onclick="resetFilters()" class="inline-flex items-center px-2.5 py-1 rounded bg-white hover:bg-slate-50 border border-slate-300 text-slate-600 font-medium transition">
-                        <i data-lucide="rotate-ccw" class="w-3 h-3 mr-1"></i> Reset
+                    <button onclick="resetFilters()" class="inline-flex items-center px-2 py-0.5 rounded bg-white hover:bg-slate-50 border border-slate-300 text-slate-600 text-[11px] font-medium transition">
+                        <i data-lucide="rotate-ccw" class="w-2.5 h-2.5 mr-1"></i> Reset
                     </button>
                 </div>
 
                 <!-- Active Filter Indicator -->
-                <div class="text-slate-500 font-medium">
+                <div class="text-slate-500 text-[11px] font-medium">
                     Showing <span id="filter-active-count" class="font-bold text-emerald-700">131</span> of 131 responses
                 </div>
             </div>
@@ -197,248 +201,248 @@
     <div class="flex-1 flex flex-col md:flex-row w-full max-w-7xl 2xl:max-w-[1600px] mx-auto">
 
         <!-- Left Vertical Navigation Sidebar -->
-        <aside class="w-full md:w-64 lg:w-72 bg-white border-b md:border-b-0 md:border-r border-slate-200 flex-shrink-0 p-4 md:sticky md:top-[106px] md:self-start md:max-h-[calc(100vh-106px)] md:overflow-y-auto">
-            <div class="mb-3 px-2 hidden md:flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Navigation Modules</span>
-                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">8 Modules</span>
+        <aside class="w-full md:w-56 lg:w-60 bg-white border-b md:border-b-0 md:border-r border-slate-200 flex-shrink-0 p-2.5 md:sticky md:top-[74px] md:self-start">
+            <div class="mb-2 px-2 hidden md:flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Navigation</span>
+                <span class="text-[9px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded-full border border-emerald-200">8 Modules</span>
             </div>
 
             <!-- Navigation Buttons: Stacked Vertically on Desktop -->
-            <nav class="space-y-1 grid grid-cols-2 gap-1.5 sm:grid-cols-4 md:flex md:flex-col md:space-y-1">
-                <button onclick="switchTab('overview')" class="nav-tab active w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-overview" title="Executive Overview">
-                    <div class="flex items-center space-x-2.5 min-w-0">
-                        <i data-lucide="layout-dashboard" class="w-4 h-4 flex-shrink-0"></i>
-                        <span class="truncate">Executive Overview</span>
+            <nav class="space-y-0.5 grid grid-cols-2 gap-1 sm:grid-cols-4 md:flex md:flex-col md:space-y-0.5">
+                <button onclick="switchTab('overview')" class="nav-tab active w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-overview" title="Executive Overview">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                        <span class="truncate">Overview</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M1</span>
+                    <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M1</span>
                 </button>
 
-                <button onclick="switchTab('demographics')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-demographics" title="Student Demographics">
-                    <div class="flex items-center space-x-2.5 min-w-0">
-                        <i data-lucide="users" class="w-4 h-4 flex-shrink-0"></i>
+                <button onclick="switchTab('demographics')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-demographics" title="Student Demographics">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <i data-lucide="users" class="w-3.5 h-3.5 flex-shrink-0"></i>
                         <span class="truncate">Demographics</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M2</span>
+                    <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M2</span>
                 </button>
 
-                <button onclick="switchTab('income')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-income" title="Income & Financial Discipline">
-                    <div class="flex items-center space-x-2.5 min-w-0">
-                        <i data-lucide="landmark" class="w-4 h-4 flex-shrink-0"></i>
+                <button onclick="switchTab('income')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-income" title="Income & Financial Discipline">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <i data-lucide="landmark" class="w-3.5 h-3.5 flex-shrink-0"></i>
                         <span class="truncate">Income & Discipline</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M3</span>
+                    <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M3</span>
                 </button>
 
-                <button onclick="switchTab('spending')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-spending" title="Spending Behaviour & Psychology">
-                    <div class="flex items-center space-x-2.5 min-w-0">
-                        <i data-lucide="shopping-cart" class="w-4 h-4 flex-shrink-0"></i>
+                <button onclick="switchTab('spending')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-spending" title="Spending Behaviour & Psychology">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <i data-lucide="shopping-cart" class="w-3.5 h-3.5 flex-shrink-0"></i>
                         <span class="truncate">Spending Psychology</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M4</span>
+                    <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M4</span>
                 </button>
 
-                <button onclick="switchTab('mindset')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-mindset" title="Financial Mindset & Planning">
-                    <div class="flex items-center space-x-2.5 min-w-0">
-                        <i data-lucide="brain" class="w-4 h-4 flex-shrink-0"></i>
+                <button onclick="switchTab('mindset')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-mindset" title="Financial Mindset & Planning">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <i data-lucide="brain" class="w-3.5 h-3.5 flex-shrink-0"></i>
                         <span class="truncate">Mindset & Planning</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M5</span>
+                    <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M5</span>
                 </button>
 
-                <button onclick="switchTab('invest')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-invest" title="Investment Readiness">
-                    <div class="flex items-center space-x-2.5 min-w-0">
-                        <i data-lucide="trending-up" class="w-4 h-4 flex-shrink-0"></i>
+                <button onclick="switchTab('invest')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-invest" title="Investment Readiness">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <i data-lucide="trending-up" class="w-3.5 h-3.5 flex-shrink-0"></i>
                         <span class="truncate">Investment Readiness</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M6</span>
+                    <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M6</span>
                 </button>
 
-                <button onclick="switchTab('datamining')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-datamining" title="Data Mining Suite">
-                    <div class="flex items-center space-x-2.5 min-w-0">
-                        <i data-lucide="cpu" class="w-4 h-4 flex-shrink-0"></i>
+                <button onclick="switchTab('datamining')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-datamining" title="Data Mining Suite">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <i data-lucide="cpu" class="w-3.5 h-3.5 flex-shrink-0"></i>
                         <span class="truncate">Data Mining Suite</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M7</span>
+                    <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M7</span>
                 </button>
 
-                <button onclick="switchTab('findings')" class="nav-tab w-full py-2.5 px-3 transition flex items-center justify-between text-left text-xs font-semibold" id="tab-btn-findings" title="Key Findings & Academic Conclusions">
-                    <div class="flex items-center space-x-2.5 min-w-0">
-                        <i data-lucide="lightbulb" class="w-4 h-4 flex-shrink-0"></i>
-                        <span class="truncate">Findings & Conclusion</span>
+                <button onclick="switchTab('findings')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-findings" title="Key Findings & Academic Conclusions">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <i data-lucide="lightbulb" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                        <span class="truncate">Findings & Insights</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium hidden md:inline ml-1">M8</span>
+                    <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M8</span>
                 </button>
             </nav>
 
             <!-- Sidebar Project Meta Badge -->
-            <div class="mt-6 pt-4 border-t border-slate-200/70 hidden md:block">
-                <div class="p-3 rounded-xl bg-slate-100/70 border border-slate-200/80 text-[11px] text-slate-500 space-y-1">
-                    <div class="font-bold text-slate-700 flex items-center space-x-1.5">
-                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <div class="mt-3 pt-2.5 border-t border-slate-200/70 hidden md:block">
+                <div class="p-2 rounded-lg bg-slate-50 border border-slate-200/80 text-[10px] text-slate-500 space-y-0.5">
+                    <div class="font-bold text-slate-700 flex items-center space-x-1">
+                        <i data-lucide="graduation-cap" class="w-3 h-3 text-emerald-600"></i>
                         <span>BSc Data Science</span>
                     </div>
-                    <p class="text-[10px] leading-relaxed text-slate-500">Field Survey Analytics • 131 Respondents</p>
+                    <p class="text-[9px] text-slate-400">131 Responses • Pure Python</p>
                 </div>
             </div>
         </aside>
 
         <!-- Main Content Body -->
-        <main class="flex-1 px-4 sm:px-6 lg:px-8 py-6 min-w-0 w-full space-y-8">
+        <main class="flex-1 px-3 sm:px-5 py-2.5 min-w-0 w-full space-y-3">
 
         <!-- ================= MODULE 1: EXECUTIVE OVERVIEW ================= -->
-        <section id="tab-overview" class="space-y-6">
+        <section id="tab-overview" class="space-y-2.5">
             <!-- Executive Narrative Banner -->
-            <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 rounded-2xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-                <div class="relative z-10 max-w-4xl space-y-3">
+            <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 rounded-xl p-3 sm:p-3.5 text-white shadow-xs relative overflow-hidden">
+                <div class="relative z-10 max-w-4xl space-y-1.5">
                     <div class="flex items-center space-x-2">
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            Empirical Field Study Analysis
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            Empirical Study
                         </span>
-                        <span class="text-xs text-slate-400">• BSc Data Science Field Project</span>
+                        <span class="text-[11px] text-slate-400">• BSc Data Science Field Project</span>
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Executive Summary & Analytical Narrative</h2>
-                    <p id="executive-narrative-text" class="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+                    <h2 class="text-sm sm:text-base font-extrabold tracking-tight">Executive Summary & Analytical Narrative</h2>
+                    <p id="executive-narrative-text" class="text-xs text-slate-300 leading-snug line-clamp-2 hover:line-clamp-none transition-all cursor-pointer" title="Hover or click to view full narrative">
                         Loading dynamically computed narrative summary...
                     </p>
                 </div>
             </div>
 
             <!-- 6 Dynamically Computed KPI Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
                 <!-- KPI 1: Respondents -->
-                <div class="kpi-card p-4 rounded-xl">
-                    <div class="text-[11px] font-bold uppercase text-slate-400 flex items-center justify-between">
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                    <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
                         <span>Respondents</span>
-                        <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i>
+                        <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-600"></i>
                     </div>
-                    <div id="kpi-respondents" class="text-2xl font-extrabold text-slate-900 mt-2">131</div>
-                    <div class="text-[11px] text-slate-500 mt-1">100% verified complete</div>
+                    <div id="kpi-respondents" class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">131</div>
+                    <div class="text-[10px] text-slate-500 mt-0.5 leading-tight">100% complete</div>
                 </div>
 
                 <!-- KPI 2: Confidence -->
-                <div class="kpi-card p-4 rounded-xl">
-                    <div class="text-[11px] font-bold uppercase text-slate-400 flex items-center justify-between">
-                        <span>Mean Confidence</span>
-                        <i data-lucide="smile" class="w-4 h-4 text-emerald-600"></i>
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                    <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
+                        <span>Confidence</span>
+                        <i data-lucide="smile" class="w-3.5 h-3.5 text-emerald-600"></i>
                     </div>
-                    <div id="kpi-confidence" class="text-2xl font-extrabold text-slate-900 mt-2">3.96 <span class="text-xs text-slate-400 font-normal">/ 5.0</span></div>
-                    <div class="text-[11px] text-emerald-700 font-semibold mt-1">High future optimism</div>
+                    <div id="kpi-confidence" class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">3.96 <span class="text-[10px] text-slate-400 font-normal">/ 5</span></div>
+                    <div class="text-[10px] text-emerald-700 font-semibold mt-0.5 leading-tight">High optimism</div>
                 </div>
 
                 <!-- KPI 3: Emergency Fund -->
-                <div class="kpi-card p-4 rounded-xl">
-                    <div class="text-[11px] font-bold uppercase text-slate-400 flex items-center justify-between">
-                        <span>Emergency Fund</span>
-                        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                    <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
+                        <span>Emergency</span>
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
                     </div>
-                    <div id="kpi-emergency" class="text-2xl font-extrabold text-emerald-700 mt-2">53.4%</div>
-                    <div class="text-[11px] text-slate-500 mt-1">Have 1-month cushion</div>
+                    <div id="kpi-emergency" class="text-lg sm:text-xl font-extrabold text-emerald-700 mt-0.5">53.4%</div>
+                    <div class="text-[10px] text-slate-500 mt-0.5 leading-tight">1-mo cushion</div>
                 </div>
 
                 <!-- KPI 4: Tracking Rate -->
-                <div class="kpi-card p-4 rounded-xl">
-                    <div class="text-[11px] font-bold uppercase text-slate-400 flex items-center justify-between">
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                    <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
                         <span>Tracking Rate</span>
-                        <i data-lucide="activity" class="w-4 h-4 text-emerald-600"></i>
+                        <i data-lucide="activity" class="w-3.5 h-3.5 text-emerald-600"></i>
                     </div>
-                    <div id="kpi-tracking" class="text-2xl font-extrabold text-slate-900 mt-2">30.5%</div>
-                    <div class="text-[11px] text-amber-600 font-medium mt-1">Structured digital/ledger</div>
+                    <div id="kpi-tracking" class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">30.5%</div>
+                    <div class="text-[10px] text-amber-600 font-medium mt-0.5 leading-tight">Structured tracking</div>
                 </div>
 
                 <!-- KPI 5: SIP Intention -->
-                <div class="kpi-card p-4 rounded-xl">
-                    <div class="text-[11px] font-bold uppercase text-slate-400 flex items-center justify-between">
-                        <span>SIP Automation</span>
-                        <i data-lucide="repeat" class="w-4 h-4 text-emerald-600"></i>
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                    <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
+                        <span>SIP Auto</span>
+                        <i data-lucide="repeat" class="w-3.5 h-3.5 text-emerald-600"></i>
                     </div>
-                    <div id="kpi-sip" class="text-2xl font-extrabold text-slate-900 mt-2">79.4%</div>
-                    <div class="text-[11px] text-emerald-700 font-medium mt-1">Plan automated investing</div>
+                    <div id="kpi-sip" class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">79.4%</div>
+                    <div class="text-[10px] text-emerald-700 font-medium mt-0.5 leading-tight">Plan auto-invest</div>
                 </div>
 
                 <!-- KPI 6: Actionable Plan -->
-                <div class="kpi-card p-4 rounded-xl">
-                    <div class="text-[11px] font-bold uppercase text-slate-400 flex items-center justify-between">
-                        <span>Actionable Plan</span>
-                        <i data-lucide="target" class="w-4 h-4 text-emerald-600"></i>
+                <div class="kpi-card p-2 sm:p-2.5 rounded-lg">
+                    <div class="text-[10px] font-bold uppercase text-slate-400 flex items-center justify-between">
+                        <span>3-Yr Plan</span>
+                        <i data-lucide="target" class="w-3.5 h-3.5 text-emerald-600"></i>
                     </div>
-                    <div id="kpi-plan" class="text-2xl font-extrabold text-slate-900 mt-2">40.5%</div>
-                    <div class="text-[11px] text-slate-500 mt-1">Score 4 or 5 on 3-yr plan</div>
+                    <div id="kpi-plan" class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">40.5%</div>
+                    <div class="text-[10px] text-slate-500 mt-0.5 leading-tight">Score 4-5 on plan</div>
                 </div>
             </div>
 
             <!-- Financial Discipline Index (FDI) Section -->
-            <div class="glass-panel p-6 rounded-2xl space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+            <div class="glass-panel p-2.5 sm:p-3 rounded-xl space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-slate-100 gap-1.5">
                     <div>
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-1.5">
                             <span class="p-1 rounded bg-emerald-100 text-emerald-800">
-                                <i data-lucide="gauge" class="w-4 h-4"></i>
+                                <i data-lucide="gauge" class="w-3.5 h-3.5"></i>
                             </span>
-                            <h3 class="font-bold text-slate-900 text-base">Financial Discipline Index (FDI)</h3>
-                            <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold border border-slate-200">Scale: 0 – 100</span>
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Financial Discipline Index (FDI)</h3>
+                            <span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-semibold border border-slate-200">Scale: 0 – 100</span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">
-                            Exploratory composite index synthesizing tracking rigor, emergency liquidity cushion, forward-looking wealth planning, and research frequency.
+                        <p class="text-[10px] text-slate-500 mt-0.5">
+                            Exploratory composite index synthesizing tracking rigor, emergency cushion, wealth planning, and research frequency.
                         </p>
                     </div>
-                    <div class="text-right">
-                        <span class="text-xs text-slate-400 uppercase font-semibold">Cohort Mean FDI</span>
-                        <div id="fdi-mean-score" class="text-2xl font-extrabold text-emerald-700">46.0 <span class="text-xs text-slate-500 font-normal">/ 100</span></div>
+                    <div class="text-right sm:self-center">
+                        <span class="text-[10px] text-slate-400 uppercase font-semibold">Cohort Mean FDI</span>
+                        <div id="fdi-mean-score" class="text-lg sm:text-xl font-extrabold text-emerald-700 leading-tight">46.0 <span class="text-[10px] text-slate-500 font-normal">/ 100</span></div>
                     </div>
                 </div>
 
                 <!-- FDI Histogram Chart & Formula Explanation -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 space-y-3">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-2.5">
+                    <div class="lg:col-span-2 space-y-1.5">
                         <!-- Cohort Discipline Tier Indicators -->
-                        <div class="grid grid-cols-3 gap-2.5 text-center text-xs">
-                            <div class="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/80">
-                                <span class="text-[10px] uppercase font-bold text-amber-700 block tracking-wider">Low Discipline (0–35)</span>
-                                <span id="fdi-low-stat" class="font-extrabold text-amber-900 text-sm sm:text-base">33.6%</span>
-                                <span id="fdi-low-sub" class="text-[10px] text-amber-700 block">44 students</span>
+                        <div class="grid grid-cols-3 gap-1.5 text-center text-xs">
+                            <div class="p-1.5 rounded-lg bg-amber-50/80 border border-amber-200/80">
+                                <span class="text-[9px] uppercase font-bold text-amber-700 block tracking-wider">Low (0–35)</span>
+                                <span id="fdi-low-stat" class="font-extrabold text-amber-900 text-xs sm:text-sm">33.6%</span>
+                                <span id="fdi-low-sub" class="text-[9px] text-amber-700 block">44 students</span>
                             </div>
-                            <div class="p-2.5 rounded-xl bg-blue-50/80 border border-blue-200/80">
-                                <span class="text-[10px] uppercase font-bold text-blue-700 block tracking-wider">Moderate (36–65)</span>
-                                <span id="fdi-mod-stat" class="font-extrabold text-blue-900 text-sm sm:text-base">42.7%</span>
-                                <span id="fdi-mod-sub" class="text-[10px] text-blue-700 block">56 students</span>
+                            <div class="p-1.5 rounded-lg bg-blue-50/80 border border-blue-200/80">
+                                <span class="text-[9px] uppercase font-bold text-blue-700 block tracking-wider">Moderate (36–65)</span>
+                                <span id="fdi-mod-stat" class="font-extrabold text-blue-900 text-xs sm:text-sm">42.7%</span>
+                                <span id="fdi-mod-sub" class="text-[9px] text-blue-700 block">56 students</span>
                             </div>
-                            <div class="p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-200/80">
-                                <span class="text-[10px] uppercase font-bold text-emerald-700 block tracking-wider">High Discipline (66–100)</span>
-                                <span id="fdi-high-stat" class="font-extrabold text-emerald-900 text-sm sm:text-base">23.7%</span>
-                                <span id="fdi-high-sub" class="text-[10px] text-emerald-700 block">31 students</span>
+                            <div class="p-1.5 rounded-lg bg-emerald-50/80 border border-emerald-200/80">
+                                <span class="text-[9px] uppercase font-bold text-emerald-700 block tracking-wider">High (66–100)</span>
+                                <span id="fdi-high-stat" class="font-extrabold text-emerald-900 text-xs sm:text-sm">23.7%</span>
+                                <span id="fdi-high-sub" class="text-[9px] text-emerald-700 block">31 students</span>
                             </div>
                         </div>
 
                         <!-- FDI Histogram Chart Container -->
-                        <div class="border border-slate-200 rounded-xl overflow-hidden bg-white p-1 shadow-sm">
-                            <div id="chart-fdi-dist" class="w-full h-72"></div>
+                        <div class="border border-slate-200 rounded-lg overflow-hidden bg-white p-0.5 shadow-xs">
+                            <div id="chart-fdi-dist" class="w-full h-44 sm:h-48"></div>
                         </div>
                     </div>
-                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3 text-xs">
-                        <h4 class="font-bold text-slate-800 flex items-center space-x-1.5">
-                            <i data-lucide="binary" class="w-4 h-4 text-emerald-600"></i>
+                    <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-200 space-y-1.5 text-[11px]">
+                        <h4 class="font-bold text-slate-800 flex items-center space-x-1 text-xs">
+                            <i data-lucide="binary" class="w-3.5 h-3.5 text-emerald-600"></i>
                             <span>FDI Weighting Formula</span>
                         </h4>
-                        <ul class="space-y-2 text-slate-600">
-                            <li class="flex justify-between pb-1.5 border-b border-slate-200">
+                        <ul class="space-y-1 text-slate-600 text-[10px]">
+                            <li class="flex justify-between pb-0.5 border-b border-slate-200">
                                 <span>1. Expense Tracking Rigor</span>
                                 <span class="font-bold text-slate-800">25 pts</span>
                             </li>
-                            <li class="flex justify-between pb-1.5 border-b border-slate-200">
+                            <li class="flex justify-between pb-0.5 border-b border-slate-200">
                                 <span>2. 1-Month Emergency Cushion</span>
                                 <span class="font-bold text-slate-800">25 pts</span>
                             </li>
-                            <li class="flex justify-between pb-1.5 border-b border-slate-200">
+                            <li class="flex justify-between pb-0.5 border-b border-slate-200">
                                 <span>3. 3-Year Wealth Plan Readiness</span>
                                 <span class="font-bold text-slate-800">25 pts</span>
                             </li>
-                            <li class="flex justify-between pb-1.5 border-b border-slate-200">
+                            <li class="flex justify-between pb-0.5 border-b border-slate-200">
                                 <span>4. Financial Research Frequency</span>
                                 <span class="font-bold text-slate-800">25 pts</span>
                             </li>
                         </ul>
-                        <div class="p-2.5 rounded bg-emerald-50 border border-emerald-100 text-emerald-800 text-[11px] leading-relaxed">
-                            <strong>Academic Note:</strong> The FDI is a project-defined exploratory research metric designed to evaluate student preparedness. It is not an accredited psychometric or commercial credit score.
+                        <div class="p-1.5 rounded bg-emerald-50 border border-emerald-100 text-emerald-800 text-[9px] leading-tight">
+                            <strong>Academic Note:</strong> The FDI is a project-defined exploratory research metric evaluating student preparedness. Not an accredited credit score.
                         </div>
                     </div>
                 </div>
@@ -446,141 +450,141 @@
         </section>
 
         <!-- ================= MODULE 2: DEMOGRAPHICS ================= -->
-        <section id="tab-demographics" class="space-y-6 hidden">
+        <section id="tab-demographics" class="space-y-3 hidden">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900">Academic & Demographic Profile</h2>
-                    <p class="text-xs text-slate-500">Distribution of surveyed student cohorts across study years, majors, living situations, and commuting modes.</p>
+                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900">Academic & Demographic Profile</h2>
+                    <p class="text-[11px] text-slate-500">Distribution of surveyed student cohorts across study years, majors, living situations, and commuting modes.</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <!-- Academic Year Donut -->
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Academic Standing Distribution</h3>
-                    <div id="chart-academic-year" class="w-full h-64"></div>
+                <div class="glass-panel p-3 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Academic Standing Distribution</h3>
+                    <div id="chart-academic-year" class="w-full h-48 sm:h-52"></div>
                 </div>
 
                 <!-- Academic Stream Bar -->
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Academic Stream / Major Breakdown</h3>
-                    <div id="chart-stream" class="w-full h-64"></div>
+                <div class="glass-panel p-3 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Academic Stream / Major Breakdown</h3>
+                    <div id="chart-stream" class="w-full h-48 sm:h-52"></div>
                 </div>
 
                 <!-- Living Situation Donut -->
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Primary Living Situation</h3>
-                    <div id="chart-living" class="w-full h-64"></div>
+                <div class="glass-panel p-3 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Primary Living Situation</h3>
+                    <div id="chart-living" class="w-full h-48 sm:h-52"></div>
                 </div>
 
                 <!-- Commuting Mode Bar -->
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Campus Commuting Mode</h3>
-                    <div id="chart-commute" class="w-full h-64"></div>
+                <div class="glass-panel p-3 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Campus Commuting Mode</h3>
+                    <div id="chart-commute" class="w-full h-48 sm:h-52"></div>
                 </div>
             </div>
 
             <!-- Academic Year vs Monthly Budget Stacked -->
-            <div class="glass-panel p-5 rounded-2xl">
-                <h3 class="font-bold text-sm text-slate-900 mb-2">Cross-Analysis: Academic Standing vs Monthly Money Managed</h3>
-                <div id="chart-academic-budget" class="w-full h-72"></div>
+            <div class="glass-panel p-3 rounded-xl">
+                <h3 class="font-bold text-xs text-slate-900 mb-1">Cross-Analysis: Academic Standing vs Monthly Money Managed</h3>
+                <div id="chart-academic-budget" class="w-full h-52 sm:h-56"></div>
             </div>
         </section>
 
         <!-- ================= MODULE 3: INCOME & DISCIPLINE ================= -->
-        <section id="tab-income" class="space-y-6 hidden">
+        <section id="tab-income" class="space-y-3 hidden">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900">Income & Financial Discipline Analysis</h2>
-                    <p class="text-xs text-slate-500">Funding sources, monthly budgeting tiers, tracking methods, and emergency liquidity cushions.</p>
+                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900">Income & Financial Discipline Analysis</h2>
+                    <p class="text-[11px] text-slate-500">Funding sources, monthly budgeting tiers, tracking methods, and emergency liquidity cushions.</p>
                 </div>
             </div>
 
             <!-- Funding & Budget Row -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Primary Funding Source</h3>
-                    <div id="chart-funding" class="w-full h-64"></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Primary Funding Source</h3>
+                    <div id="chart-funding" class="w-full h-44 sm:h-48"></div>
                 </div>
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Monthly Funds Managed</h3>
-                    <div id="chart-budget" class="w-full h-64"></div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Monthly Funds Managed</h3>
+                    <div id="chart-budget" class="w-full h-44 sm:h-48"></div>
                 </div>
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Expense Tracking Methods</h3>
-                    <div id="chart-tracking" class="w-full h-64"></div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Expense Tracking Methods</h3>
+                    <div id="chart-tracking" class="w-full h-44 sm:h-48"></div>
                 </div>
             </div>
 
             <!-- Emergency Fund & Investment Account Row -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Emergency Fund (1-Month Cushion)</h3>
-                    <div id="chart-emergency" class="w-full h-64"></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Emergency Fund (1-Month Cushion)</h3>
+                    <div id="chart-emergency" class="w-full h-44 sm:h-48"></div>
                 </div>
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Demat / Brokerage Ownership</h3>
-                    <div id="chart-demat" class="w-full h-64"></div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Demat / Brokerage Ownership</h3>
+                    <div id="chart-demat" class="w-full h-44 sm:h-48"></div>
                 </div>
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Financial Research Frequency</h3>
-                    <div id="chart-research" class="w-full h-64"></div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Financial Research Frequency</h3>
+                    <div id="chart-research" class="w-full h-44 sm:h-48"></div>
                 </div>
             </div>
 
             <!-- Comparative Analysis Row -->
-            <div class="glass-panel p-6 rounded-2xl space-y-4">
-                <h3 class="font-bold text-base text-slate-900 flex items-center space-x-2">
-                    <i data-lucide="git-compare" class="w-4 h-4 text-emerald-600"></i>
+            <div class="glass-panel p-2.5 rounded-xl space-y-2">
+                <h3 class="font-bold text-xs sm:text-sm text-slate-900 flex items-center space-x-1.5">
+                    <i data-lucide="git-compare" class="w-3.5 h-3.5 text-emerald-600"></i>
                     <span>Comparative Empirical Rate Analysis</span>
                 </h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div id="chart-comp-budget" class="w-full h-64"></div>
-                    <div id="chart-comp-tracking" class="w-full h-64"></div>
-                    <div id="chart-comp-research" class="w-full h-64"></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                    <div id="chart-comp-budget" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-comp-tracking" class="w-full h-44 sm:h-48"></div>
+                    <div id="chart-comp-research" class="w-full h-44 sm:h-48"></div>
                 </div>
             </div>
         </section>
 
         <!-- ================= MODULE 4: SPENDING PSYCHOLOGY ================= -->
-        <section id="tab-spending" class="space-y-6 hidden">
+        <section id="tab-spending" class="space-y-3 hidden">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900">Spending Behaviour & Behavioral Psychology</h2>
-                    <p class="text-xs text-slate-500">Analysis of recent multi-select spending categories and behavioral peer/stress outlays.</p>
+                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900">Spending Behaviour & Behavioral Psychology</h2>
+                    <p class="text-[11px] text-slate-500">Analysis of recent multi-select spending categories and behavioral peer/stress outlays.</p>
                 </div>
             </div>
 
             <!-- Recent Spending Categories Multi-Select -->
-            <div class="glass-panel p-6 rounded-2xl">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-bold text-base text-slate-900">Weekly Discretionary Spending Categories (Prior 7 Days)</h3>
-                    <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded font-medium border border-slate-200">
-                        Multi-Select Item Frequencies
+            <div class="glass-panel p-3 rounded-xl">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-bold text-xs sm:text-sm text-slate-900">Weekly Discretionary Spending Categories (Prior 7 Days)</h3>
+                    <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium border border-slate-200">
+                        Multi-Select Frequencies
                     </span>
                 </div>
-                <div id="chart-recent-spending" class="w-full h-80"></div>
+                <div id="chart-recent-spending" class="w-full h-52 sm:h-56"></div>
             </div>
 
             <!-- Peer vs Stress Spending Correlation -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="glass-panel p-6 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-1">Peer Influence vs Stress-Induced Spending</h3>
-                    <p class="text-xs text-slate-500 mb-3">Bubble size indicates respondent density at each coordinate.</p>
-                    <div id="chart-peer-stress-bubble" class="w-full h-72"></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
+                <div class="glass-panel p-3 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-0.5">Peer Influence vs Stress-Induced Spending</h3>
+                    <p class="text-[10px] text-slate-500 mb-2">Bubble size indicates respondent density at each coordinate.</p>
+                    <div id="chart-peer-stress-bubble" class="w-full h-48 sm:h-52"></div>
                 </div>
-                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                <div class="glass-panel p-3 rounded-xl flex flex-col justify-between">
                     <div>
-                        <h3 class="font-bold text-sm text-slate-900 mb-2">Psychological Spending Takeaways</h3>
-                        <div class="space-y-3 text-xs text-slate-600 mt-4 leading-relaxed">
-                            <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-900">
-                                <strong>Positive Association (ρ = +0.318):</strong> Students susceptible to spending because "friends are doing it" display a statistically significant likelihood of also spending on food and entertainment when stressed about academics.
+                        <h3 class="font-bold text-xs text-slate-900 mb-1.5">Psychological Spending Takeaways</h3>
+                        <div class="space-y-2 text-[11px] text-slate-600 mt-2 leading-relaxed">
+                            <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-900">
+                                <strong>Positive Association (ρ = +0.318):</strong> Students spending because "friends are doing it" display a statistically significant correlation with academic stress spending.
                             </div>
-                            <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-700">
-                                <strong>Discretionary Core Drivers:</strong> Eating Out / Cafes (66.4%) and Public Transit (61.8%) represent the two dominant weekly cash outflows, followed by Academic Supplies (34.4%).
+                            <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-700">
+                                <strong>Discretionary Core Drivers:</strong> Eating Out / Cafes (66.4%) and Public Transit (61.8%) represent the two dominant weekly cash outflows.
                             </div>
-                            <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-700">
-                                <strong>Digital Subscriptions:</strong> Nearly 1 in 5 students maintains recurring entertainment subscriptions (Spotify, Netflix, Prime), often representing unnoticed passive outlays.
+                            <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-700">
+                                <strong>Digital Subscriptions:</strong> Nearly 1 in 5 students maintains recurring entertainment subscriptions (Spotify, Netflix, Prime).
                             </div>
                         </div>
                     </div>
@@ -589,121 +593,121 @@
         </section>
 
         <!-- ================= MODULE 5: MINDSET & PLANNING ================= -->
-        <section id="tab-mindset" class="space-y-6 hidden">
+        <section id="tab-mindset" class="space-y-3 hidden">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900">Financial Mindset & Planning Readiness</h2>
-                    <p class="text-xs text-slate-500">Likert scale distributions across psychographic attributes and 2x2 Confidence-Planning matrix segmentation.</p>
+                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900">Financial Mindset & Planning Readiness</h2>
+                    <p class="text-[11px] text-slate-500">Likert scale distributions across psychographic attributes and 2x2 Confidence-Planning matrix segmentation.</p>
                 </div>
             </div>
 
             <!-- Likert Summary Chart -->
-            <div class="glass-panel p-6 rounded-2xl">
-                <h3 class="font-bold text-base text-slate-900 mb-1">Attitudinal Likert Scale Distributions (1 = Strongly Disagree, 5 = Strongly Agree)</h3>
-                <div id="chart-likert-summary" class="w-full h-80"></div>
+            <div class="glass-panel p-3 rounded-xl">
+                <h3 class="font-bold text-xs sm:text-sm text-slate-900 mb-1">Attitudinal Likert Scale Distributions (1 = Strongly Disagree, 5 = Strongly Agree)</h3>
+                <div id="chart-likert-summary" class="w-full h-52 sm:h-56"></div>
             </div>
 
             <!-- Confidence - Planning 2x2 Segmentation -->
-            <div class="glass-panel p-6 rounded-2xl space-y-4">
+            <div class="glass-panel p-3 rounded-xl space-y-2">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="font-bold text-base text-slate-900">Confidence–Planning 2x2 Matrix Segmentation</h3>
-                        <p class="text-xs text-slate-500">Cross-segmenting subjective future confidence (Ratings 4-5) against actionable 3-year debt & wealth plans (Ratings 4-5).</p>
+                        <h3 class="font-bold text-xs sm:text-sm text-slate-900">Confidence–Planning 2x2 Matrix Segmentation</h3>
+                        <p class="text-[10px] text-slate-500">Cross-segmenting future confidence against actionable 3-year debt & wealth plans.</p>
                     </div>
-                    <span class="text-xs px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200">
-                        Exact Empirical Cohort Counts
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200">
+                        Cohort Counts
                     </span>
                 </div>
-                <div id="chart-conf-plan-matrix" class="w-full h-72"></div>
+                <div id="chart-conf-plan-matrix" class="w-full h-48 sm:h-52"></div>
             </div>
         </section>
 
         <!-- ================= MODULE 6: INVESTMENT READINESS ================= -->
-        <section id="tab-invest" class="space-y-6 hidden">
+        <section id="tab-invest" class="space-y-3 hidden">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900">Investment Readiness & Forward-Looking Intentions</h2>
-                    <p class="text-xs text-slate-500">Salary sufficiency views, SIP automation, 5-year asset class preferences, and reported investment obstacles.</p>
+                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900">Investment Readiness & Forward-Looking Intentions</h2>
+                    <p class="text-[11px] text-slate-500">Salary sufficiency views, SIP automation, 5-year asset class preferences, and reported investment obstacles.</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                 <!-- Salary sufficiency -->
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Is Traditional Salary Enough for Long-Term Goals?</h3>
-                    <div id="chart-salary-alone" class="w-full h-64"></div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Is Traditional Salary Enough for Long-Term Goals?</h3>
+                    <div id="chart-salary-alone" class="w-full h-44 sm:h-48"></div>
                 </div>
 
                 <!-- SIP Intention -->
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Intention to Automate SIP Investments Once Employed</h3>
-                    <div id="chart-sip-intent" class="w-full h-64"></div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Intention to Automate SIP Investments Once Employed</h3>
+                    <div id="chart-sip-intent" class="w-full h-44 sm:h-48"></div>
                 </div>
 
                 <!-- Asset Classes Horizontal Bar -->
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Preferred Asset Classes Over Next 5 Years</h3>
-                    <div id="chart-asset-bar" class="w-full h-64"></div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Preferred Asset Classes Over Next 5 Years</h3>
+                    <div id="chart-asset-bar" class="w-full h-44 sm:h-48"></div>
                 </div>
 
                 <!-- Review Frequency -->
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Envisioned Portfolio Review Frequency</h3>
-                    <div id="chart-review-freq" class="w-full h-64"></div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Envisioned Portfolio Review Frequency</h3>
+                    <div id="chart-review-freq" class="w-full h-44 sm:h-48"></div>
                 </div>
 
                 <!-- Investment Obstacle -->
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Reported Obstacles to Starting Investment Journey</h3>
-                    <div id="chart-obstacle-bar" class="w-full h-64"></div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Reported Obstacles to Starting Investment Journey</h3>
+                    <div id="chart-obstacle-bar" class="w-full h-44 sm:h-48"></div>
                 </div>
 
                 <!-- Financial Independence Approach -->
-                <div class="glass-panel p-5 rounded-2xl">
-                    <h3 class="font-bold text-sm text-slate-900 mb-2">Strategic Philosophy for Financial Independence</h3>
-                    <div id="chart-philosophy-bar" class="w-full h-64"></div>
+                <div class="glass-panel p-2.5 rounded-xl">
+                    <h3 class="font-bold text-xs text-slate-900 mb-1">Strategic Philosophy for Financial Independence</h3>
+                    <div id="chart-philosophy-bar" class="w-full h-44 sm:h-48"></div>
                 </div>
             </div>
         </section>
 
         <!-- ================= MODULE 7: DATA MINING SUITE ================= -->
-        <section id="tab-datamining" class="space-y-6 hidden">
+        <section id="tab-datamining" class="space-y-3 hidden">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900">Advanced Data Mining & Machine Learning Suite</h2>
-                    <p class="text-xs text-slate-500">Pure Python algorithms: Spearman Correlation, K-Means Clustering, Apriori Association Rules, Decision Trees, Classifiers.</p>
+                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900">Advanced Data Mining & Machine Learning Suite</h2>
+                    <p class="text-[11px] text-slate-500">Pure Python algorithms: Spearman Correlation, K-Means Clustering, Apriori Association Rules, Decision Trees, Classifiers.</p>
                 </div>
             </div>
 
             <!-- Sub-tabs for Data Mining -->
-            <div class="flex flex-wrap border-b border-slate-200 gap-2 pb-1 text-xs font-bold">
-                <button onclick="switchMiningSubtab('correlation')" class="mining-btn px-4 py-2 border-b-2 border-emerald-600 text-emerald-700" id="mbtn-correlation">📊 Spearman Heatmap</button>
-                <button onclick="switchMiningSubtab('kmeans')" class="mining-btn px-4 py-2 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-kmeans">🎯 K-Means Archetypes</button>
-                <button onclick="switchMiningSubtab('apriori')" class="mining-btn px-4 py-2 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-apriori">🛒 Apriori (Rules)</button>
-                <button onclick="switchMiningSubtab('trees')" class="mining-btn px-4 py-2 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-trees">🌳 ID3 & J48 Trees</button>
-                <button onclick="switchMiningSubtab('simulator')" class="mining-btn px-4 py-2 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-simulator">🔮 What-If Simulator</button>
+            <div class="flex flex-wrap border-b border-slate-200 gap-1.5 pb-1 text-xs font-bold">
+                <button onclick="switchMiningSubtab('correlation')" class="mining-btn px-2.5 py-1.5 border-b-2 border-emerald-600 text-emerald-700" id="mbtn-correlation">📊 Spearman Heatmap</button>
+                <button onclick="switchMiningSubtab('kmeans')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-kmeans">🎯 K-Means Archetypes</button>
+                <button onclick="switchMiningSubtab('apriori')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-apriori">🛒 Apriori (Rules)</button>
+                <button onclick="switchMiningSubtab('trees')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-trees">🌳 ID3 & J48 Trees</button>
+                <button onclick="switchMiningSubtab('simulator')" class="mining-btn px-2.5 py-1.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900" id="mbtn-simulator">🔮 What-If Simulator</button>
             </div>
 
             <!-- Subtab 1: Spearman Correlation -->
-            <div id="msub-correlation" class="space-y-4">
-                <div class="glass-panel p-6 rounded-2xl">
-                    <h3 class="font-bold text-base text-slate-900 mb-1">Spearman Rank Correlation Heatmap</h3>
-                    <p class="text-xs text-slate-500 mb-4">Evaluates monotonic relationships across ordinal Likert responses and numerical research habits.</p>
-                    <div id="chart-spearman-heatmap" class="w-full h-80"></div>
+            <div id="msub-correlation" class="space-y-2.5">
+                <div class="glass-panel p-3 rounded-xl">
+                    <h3 class="font-bold text-xs sm:text-sm text-slate-900 mb-0.5">Spearman Rank Correlation Heatmap</h3>
+                    <p class="text-[10px] text-slate-500 mb-2">Evaluates monotonic relationships across ordinal Likert responses and numerical research habits.</p>
+                    <div id="chart-spearman-heatmap" class="w-full h-56 sm:h-64"></div>
                 </div>
             </div>
 
             <!-- Subtab 2: K-Means Segmentation -->
-            <div id="msub-kmeans" class="space-y-4 hidden">
-                <div class="glass-panel p-6 rounded-2xl space-y-4">
+            <div id="msub-kmeans" class="space-y-2.5 hidden">
+                <div class="glass-panel p-3 rounded-xl space-y-2.5">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="font-bold text-base text-slate-900">Student Behaviour Segmentation (K-Means Clustering)</h3>
-                            <p class="text-xs text-slate-500">Mined using 6 standardized indicators: Tracking, Emergency Fund, Confidence, Planning, Research, SIP Intention.</p>
+                            <h3 class="font-bold text-xs sm:text-sm text-slate-900">Student Behaviour Segmentation (K-Means Clustering)</h3>
+                            <p class="text-[10px] text-slate-500">Mined using 6 standardized indicators: Tracking, Emergency Fund, Confidence, Planning, Research, SIP Intention.</p>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xs text-slate-500 font-medium">Clusters (k):</span>
-                            <select id="kmeans-k-select" onchange="fetchKMeans()" class="border border-slate-300 rounded px-2 py-1 text-xs font-bold bg-white">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="text-[11px] text-slate-500 font-medium">Clusters:</span>
+                            <select id="kmeans-k-select" onchange="fetchKMeans()" class="border border-slate-300 rounded px-1.5 py-0.5 text-xs font-bold bg-white">
                                 <option value="3" selected>k = 3 (Optimal)</option>
                                 <option value="2">k = 2</option>
                                 <option value="4">k = 4</option>
@@ -712,50 +716,48 @@
                     </div>
 
                     <!-- Cluster Archetype Cards -->
-                    <div id="kmeans-cards-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div id="kmeans-cards-container" class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
                         <!-- Populated dynamically -->
                     </div>
 
                     <!-- PCA 2D Scatter Plot -->
-                    <div class="pt-4 border-t border-slate-100">
-                        <h4 class="font-bold text-xs uppercase text-slate-400 mb-2">PCA 2D Dimensionality Projection</h4>
-                        <div id="chart-kmeans-pca" class="w-full h-80"></div>
+                    <div class="pt-2 border-t border-slate-100">
+                        <h4 class="font-bold text-[10px] uppercase text-slate-400 mb-1">PCA 2D Dimensionality Projection</h4>
+                        <div id="chart-kmeans-pca" class="w-full h-52 sm:h-56"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Subtab 3: Apriori Association Rules -->
-            <div id="msub-apriori" class="space-y-4 hidden">
-                <div class="glass-panel p-6 rounded-2xl space-y-4">
-                    <div class="flex flex-wrap items-center justify-between gap-3">
+            <div id="msub-apriori" class="space-y-2.5 hidden">
+                <div class="glass-panel p-3 rounded-xl space-y-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
                         <div>
-                            <h3 class="font-bold text-base text-slate-900">Apriori Association Rule Mining</h3>
-                            <p class="text-xs text-slate-500">Discovers frequent itemsets and high-lift behavioral implications across student choices.</p>
+                            <h3 class="font-bold text-xs sm:text-sm text-slate-900">Apriori Association Rule Mining</h3>
+                            <p class="text-[10px] text-slate-500">Discovers frequent itemsets and high-lift behavioral implications across student choices.</p>
                         </div>
-                        <div class="flex items-center space-x-3 text-xs">
-                            <div class="flex items-center space-x-1">
-                                <label class="text-slate-500 font-medium">Basket:</label>
-                                <select id="apriori-basket-select" onchange="fetchApriori()" class="border border-slate-300 rounded px-2 py-1 font-semibold bg-white">
-                                    <option value="behavior" selected>Behavioral Attributes</option>
-                                    <option value="spending">Recent Spending Categories</option>
-                                    <option value="assets">5-Year Asset Classes</option>
-                                </select>
-                            </div>
+                        <div class="flex items-center space-x-1.5 text-xs">
+                            <label class="text-slate-500 font-medium text-[11px]">Basket:</label>
+                            <select id="apriori-basket-select" onchange="fetchApriori()" class="border border-slate-300 rounded px-1.5 py-0.5 text-xs font-semibold bg-white">
+                                <option value="behavior" selected>Behavioral Attributes</option>
+                                <option value="spending">Recent Spending Categories</option>
+                                <option value="assets">5-Year Asset Classes</option>
+                            </select>
                         </div>
                     </div>
 
                     <!-- Mined Rules Table -->
-                    <div class="border border-slate-200 rounded-xl overflow-x-hidden">
+                    <div class="border border-slate-200 rounded-lg overflow-x-hidden">
                         <table class="w-full text-xs text-left table-auto">
-                            <thead class="bg-slate-100 text-slate-700 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                            <thead class="bg-slate-100 text-slate-700 font-bold uppercase text-[9px] tracking-wider border-b border-slate-200">
                                 <tr>
-                                    <th class="px-4 py-3">Mined Association Rule (IF → THEN)</th>
-                                    <th class="px-3 py-3 text-center">Support</th>
-                                    <th class="px-3 py-3 text-center">Confidence</th>
-                                    <th class="px-3 py-3 text-center">Lift Ratio</th>
+                                    <th class="px-3 py-2">Mined Association Rule (IF → THEN)</th>
+                                    <th class="px-2 py-2 text-center">Support</th>
+                                    <th class="px-2 py-2 text-center">Confidence</th>
+                                    <th class="px-2 py-2 text-center">Lift Ratio</th>
                                 </tr>
                             </thead>
-                            <tbody id="apriori-rules-tbody" class="divide-y divide-slate-100 text-slate-700">
+                            <tbody id="apriori-rules-tbody" class="divide-y divide-slate-100 text-slate-700 text-[11px]">
                                 <!-- Populated dynamically -->
                             </tbody>
                         </table>
@@ -764,32 +766,32 @@
             </div>
 
             <!-- Subtab 4: Decision Trees -->
-            <div id="msub-trees" class="space-y-4 hidden">
-                <div class="glass-panel p-6 rounded-2xl space-y-4">
-                    <div class="flex flex-wrap items-center justify-between gap-3">
+            <div id="msub-trees" class="space-y-2.5 hidden">
+                <div class="glass-panel p-3 rounded-xl space-y-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
                         <div>
-                            <h3 class="font-bold text-base text-slate-900">Decision Tree Induction (ID3 vs J48/C4.5)</h3>
-                            <p class="text-xs text-slate-500">Information Gain vs Gain Ratio calculation and recursive tree induction.</p>
+                            <h3 class="font-bold text-xs sm:text-sm text-slate-900">Decision Tree Induction (ID3 vs J48/C4.5)</h3>
+                            <p class="text-[10px] text-slate-500">Information Gain vs Gain Ratio calculation and recursive tree induction.</p>
                         </div>
-                        <button onclick="fetchDecisionTree()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition">
+                        <button onclick="fetchDecisionTree()" class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition">
                             Mine Decision Tree
                         </button>
                     </div>
-                    <div id="chart-tree-gains" class="w-full h-64"></div>
-                    <div id="chart-tree-viz" class="w-full h-80"></div>
+                    <div id="chart-tree-gains" class="w-full h-48 sm:h-52"></div>
+                    <div id="chart-tree-viz" class="w-full h-56 sm:h-64"></div>
                 </div>
             </div>
 
             <!-- Subtab 5: What-If Simulator -->
-            <div id="msub-simulator" class="space-y-4 hidden">
-                <div class="glass-panel p-6 rounded-2xl space-y-4">
-                    <h3 class="font-bold text-base text-slate-900">Student Persona 'What-If' Financial Simulator</h3>
-                    <p class="text-xs text-slate-500">Simulate a student profile and predict their emergency preparedness using mined decision tree rules.</p>
+            <div id="msub-simulator" class="space-y-2.5 hidden">
+                <div class="glass-panel p-3 rounded-xl space-y-2">
+                    <h3 class="font-bold text-xs sm:text-sm text-slate-900">Student Persona 'What-If' Financial Simulator</h3>
+                    <p class="text-[10px] text-slate-500">Simulate a student profile and predict their emergency preparedness using mined decision tree rules.</p>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
                         <div>
-                            <label class="font-bold text-slate-700 block mb-1">Tracking Method:</label>
-                            <select id="sim-tracking" class="w-full border border-slate-300 rounded p-2 bg-white">
+                            <label class="font-bold text-slate-700 block mb-0.5 text-[11px]">Tracking Method:</label>
+                            <select id="sim-tracking" class="w-full border border-slate-300 rounded p-1.5 bg-white text-xs">
                                 <option value="Mobile App">Mobile App</option>
                                 <option value="Spreadsheet">Spreadsheet</option>
                                 <option value="Mental Math" selected>Mental Math</option>
@@ -797,97 +799,97 @@
                             </select>
                         </div>
                         <div>
-                            <label class="font-bold text-slate-700 block mb-1">Financial Confidence (1-5):</label>
+                            <label class="font-bold text-slate-700 block mb-0.5 text-[11px]">Financial Confidence (1-5):</label>
                             <input type="range" id="sim-conf" min="1" max="5" value="4" class="w-full" oninput="document.getElementById('sim-conf-val').innerText = this.value">
                             <span id="sim-conf-val" class="font-bold text-emerald-700">4</span> / 5
                         </div>
                         <div>
-                            <label class="font-bold text-slate-700 block mb-1">Stress Spending Likelihood (1-5):</label>
+                            <label class="font-bold text-slate-700 block mb-0.5 text-[11px]">Stress Spending Likelihood (1-5):</label>
                             <input type="range" id="sim-stress" min="1" max="5" value="3" class="w-full" oninput="document.getElementById('sim-stress-val').innerText = this.value">
                             <span id="sim-stress-val" class="font-bold text-emerald-700">3</span> / 5
                         </div>
                     </div>
 
-                    <button onclick="runSimulation()" class="px-4 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition">
+                    <button onclick="runSimulation()" class="px-3 py-1.5 rounded-md text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition">
                         Run Persona Inference
                     </button>
 
-                    <div id="sim-result-box" class="hidden p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-xs text-emerald-900 space-y-2">
-                        <div class="font-bold text-sm">Predicted Emergency Fund Status: <span id="sim-pred-val" class="underline">Yes</span></div>
-                        <div id="sim-advice-val" class="text-slate-700 leading-relaxed">Advice text</div>
+                    <div id="sim-result-box" class="hidden p-2.5 rounded-lg border border-emerald-200 bg-emerald-50 text-xs text-emerald-900 space-y-1">
+                        <div class="font-bold text-xs">Predicted Emergency Fund Status: <span id="sim-pred-val" class="underline">Yes</span></div>
+                        <div id="sim-advice-val" class="text-slate-700 leading-snug text-[11px]">Advice text</div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ================= MODULE 8: FINDINGS & CONCLUSION ================= -->
-        <section id="tab-findings" class="space-y-6 hidden">
+        <section id="tab-findings" class="space-y-3 hidden">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-extrabold text-slate-900">Key Findings & Actionable Insights</h2>
-                    <p class="text-xs text-slate-500">Ground-truth observations calculated from the empirical dataset and formal academic research conclusions.</p>
+                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900">Key Findings & Actionable Insights</h2>
+                    <p class="text-[11px] text-slate-500">Ground-truth observations calculated from the empirical dataset and formal academic research conclusions.</p>
                 </div>
             </div>
 
             <!-- Dynamic Observations Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="findings-container">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5" id="findings-container">
                 <!-- Dynamically populated from get_key_findings -->
             </div>
 
             <!-- Formal Academic Research Conclusions -->
-            <div class="glass-panel p-6 sm:p-8 rounded-2xl space-y-6">
-                <div class="border-b border-slate-200 pb-4">
-                    <h3 class="font-bold text-lg text-slate-900">Academic Research Conclusion</h3>
-                    <p class="text-xs text-slate-500">Synthesized report across the 6 field study dimensions using cautious academic phrasing.</p>
+            <div class="glass-panel p-3 sm:p-4 rounded-xl space-y-3">
+                <div class="border-b border-slate-200 pb-2">
+                    <h3 class="font-bold text-sm text-slate-900">Academic Research Conclusion</h3>
+                    <p class="text-[10px] text-slate-500">Synthesized report across the 6 field study dimensions using cautious academic phrasing.</p>
                 </div>
 
-                <div class="space-y-5 text-xs text-slate-700 leading-relaxed">
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                        <h4 class="font-bold text-slate-900 text-sm mb-1.5 flex items-center space-x-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <div class="space-y-2 text-xs text-slate-700 leading-relaxed">
+                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                        <h4 class="font-bold text-slate-900 text-xs mb-1 flex items-center space-x-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             <span>1. Financial Management Practices</span>
                         </h4>
-                        <p id="conc-management">Loading...</p>
+                        <p id="conc-management" class="text-[11px] text-slate-600">Loading...</p>
                     </div>
 
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                        <h4 class="font-bold text-slate-900 text-sm mb-1.5 flex items-center space-x-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                        <h4 class="font-bold text-slate-900 text-xs mb-1 flex items-center space-x-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             <span>2. Spending Behaviour & Behavioral Correlations</span>
                         </h4>
-                        <p id="conc-spending">Loading...</p>
+                        <p id="conc-spending" class="text-[11px] text-slate-600">Loading...</p>
                     </div>
 
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                        <h4 class="font-bold text-slate-900 text-sm mb-1.5 flex items-center space-x-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                        <h4 class="font-bold text-slate-900 text-xs mb-1 flex items-center space-x-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             <span>3. Financial Confidence & Preparedness Divergence</span>
                         </h4>
-                        <p id="conc-confidence">Loading...</p>
+                        <p id="conc-confidence" class="text-[11px] text-slate-600">Loading...</p>
                     </div>
 
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                        <h4 class="font-bold text-slate-900 text-sm mb-1.5 flex items-center space-x-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                        <h4 class="font-bold text-slate-900 text-xs mb-1 flex items-center space-x-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             <span>4. Investment Preferences & Structural Obstacles</span>
                         </h4>
-                        <p id="conc-investment">Loading...</p>
+                        <p id="conc-investment" class="text-[11px] text-slate-600">Loading...</p>
                     </div>
 
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                        <h4 class="font-bold text-slate-900 text-sm mb-1.5 flex items-center space-x-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                        <h4 class="font-bold text-slate-900 text-xs mb-1 flex items-center space-x-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             <span>5. Identified Student Behaviour Segments</span>
                         </h4>
-                        <p id="conc-segments">Loading...</p>
+                        <p id="conc-segments" class="text-[11px] text-slate-600">Loading...</p>
                     </div>
 
-                    <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950">
-                        <h4 class="font-bold text-emerald-900 text-sm mb-1.5 flex items-center space-x-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                    <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-950">
+                        <h4 class="font-bold text-emerald-900 text-xs mb-1 flex items-center space-x-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
                             <span>6. Recommendations for Campus Financial Literacy Initiatives</span>
                         </h4>
-                        <p id="conc-recommendations">Loading...</p>
+                        <p id="conc-recommendations" class="text-[11px] text-emerald-900">Loading...</p>
                     </div>
                 </div>
             </div>
@@ -897,10 +899,10 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-12">
-        <div class="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <span>© 2026 Student Financial Habits & Spending Behavior Survey Analytics • BSc Data Science Field Project</span>
-            <span class="text-slate-400">Pure Python Implementation • Zero Fake Data • Fully Anonymized</span>
+    <footer class="bg-white border-t border-slate-200 py-2 text-center text-[10px] text-slate-500 mt-2.5">
+        <div class="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-1">
+            <span>© 2026 Student Financial Habits & Spending Behavior Survey • BSc Data Science Project</span>
+            <span class="text-slate-400">Pure Python • Zero Fake Data • Anonymized</span>
         </div>
     </footer>
 
