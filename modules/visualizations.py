@@ -33,8 +33,8 @@ def plot_donut_chart(df: pd.DataFrame, column: str, title: str = None) -> go.Fig
     counts.columns = [column, "Count"]
     fig = go.Figure(data=[
         go.Pie(
-            labels=counts[column],
-            values=counts["Count"],
+            labels=counts[column].tolist(),
+            values=counts["Count"].tolist(),
             hole=0.55,
             marker=dict(colors=THEME_COLORS),
             textinfo="label+percent",
@@ -56,19 +56,19 @@ def plot_bar_chart(df: pd.DataFrame, column: str, title: str = None, horizontal:
 
     if horizontal:
         fig = go.Figure(go.Bar(
-            y=counts[column], x=counts["Count"],
+            y=counts[column].tolist(), x=counts["Count"].tolist(),
             orientation="h",
             marker=dict(color=EMERALD),
-            text=counts["Count"],
+            text=counts["Count"].tolist(),
             textposition="outside"
         ))
         layout = get_base_layout(title or f"{column.replace('_', ' ')} Breakdown")
         layout["xaxis"]["title"] = "Respondents"
     else:
         fig = go.Figure(go.Bar(
-            x=counts[column], y=counts["Count"],
+            x=counts[column].tolist(), y=counts["Count"].tolist(),
             marker=dict(color=THEME_COLORS[1]),
-            text=counts["Count"],
+            text=counts["Count"].tolist(),
             textposition="outside"
         ))
         layout = get_base_layout(title or f"{column.replace('_', ' ')} Breakdown")
@@ -90,8 +90,8 @@ def plot_stacked_academic_budget(df: pd.DataFrame) -> go.Figure:
     for i, col in enumerate(cols):
         fig.add_trace(go.Bar(
             name=col,
-            x=ct.index,
-            y=ct[col],
+            x=ct.index.tolist(),
+            y=ct[col].tolist(),
             marker_color=palette[i % len(palette)]
         ))
     layout = get_base_layout("Academic Year vs Monthly Budget Managed")
@@ -104,8 +104,8 @@ def plot_stacked_academic_budget(df: pd.DataFrame) -> go.Figure:
 def plot_multiselect_breakdown(counts_dict: Dict[str, int], total_n: int, title: str, xlabel: str = "Respondents") -> go.Figure:
     """Horizontal bar chart for multi-select questions with percentage annotation."""
     sorted_items = sorted(counts_dict.items(), key=lambda x: x[1])
-    labels = [k for k, v in sorted_items]
-    vals = [v for k, v in sorted_items]
+    labels = [str(k) for k, v in sorted_items]
+    vals = [int(v) for k, v in sorted_items]
     pcts = [f"{v/total_n*100:.1f}% ({v})" for v in vals]
 
     fig = go.Figure(go.Bar(
@@ -135,10 +135,10 @@ def plot_comparative_rate(df: pd.DataFrame, group_col: str, target_col: str, tit
     rate_df.columns = [group_col, "Emergency_Fund_Rate"]
 
     fig = go.Figure(go.Bar(
-        x=rate_df[group_col],
-        y=rate_df["Emergency_Fund_Rate"].round(1),
+        x=rate_df[group_col].tolist(),
+        y=[float(round(r, 1)) for r in rate_df["Emergency_Fund_Rate"]],
         marker_color="#3B82F6",
-        text=rate_df["Emergency_Fund_Rate"].apply(lambda x: f"{x:.1f}%"),
+        text=[f"{r:.1f}%" for r in rate_df["Emergency_Fund_Rate"]],
         textposition="outside"
     ))
     layout = get_base_layout(title)
@@ -155,10 +155,10 @@ def plot_research_vs_confidence(df: pd.DataFrame) -> go.Figure:
     agg = agg.sort_values("Research_Frequency").dropna()
 
     fig = go.Figure(go.Bar(
-        x=agg["Research_Frequency"],
-        y=agg["mean"].round(2),
+        x=agg["Research_Frequency"].tolist(),
+        y=[float(round(m, 2)) for m in agg["mean"]],
         marker_color=EMERALD,
-        text=agg.apply(lambda r: f"{r['mean']:.2f} / 5 (n={int(r['count'])})", axis=1),
+        text=[f"{m:.2f} / 5 (n={int(c)})" for m, c in zip(agg["mean"], agg["count"])],
         textposition="outside"
     ))
     layout = get_base_layout("Financial Research Frequency vs Average Confidence")
@@ -177,17 +177,17 @@ def plot_peer_vs_stress_correlation(df: pd.DataFrame) -> go.Figure:
     rho = float(df["Peer_Pressure_Spend"].rank().corr(df["Stress_Spend"].rank()))
 
     fig = go.Figure(go.Scatter(
-        x=melted["Stress_Spend"],
-        y=melted["Peer_Pressure_Spend"],
+        x=melted["Stress_Spend"].tolist(),
+        y=melted["Peer_Pressure_Spend"].tolist(),
         mode="markers+text",
         marker=dict(
-            size=melted["Count"] * 5 + 10,
-            color=melted["Count"],
+            size=[int(c * 5 + 10) for c in melted["Count"]],
+            color=melted["Count"].tolist(),
             colorscale="Viridis",
             showscale=True,
             colorbar=dict(title="Respondents")
         ),
-        text=melted["Count"],
+        text=melted["Count"].tolist(),
         textposition="middle center",
         textfont=dict(color="white", size=10, weight="bold")
     ))
@@ -213,7 +213,7 @@ def plot_likert_diverging(df: pd.DataFrame, likert_columns: List[str]) -> go.Fig
         if col in df.columns:
             counts = df[col].value_counts(normalize=True).sort_index() * 100
             for rating in range(1, 6):
-                pct = counts.get(rating, 0.0)
+                pct = float(round(counts.get(rating, 0.0), 1))
                 data.append({"Question": labels_map.get(col, col), "Rating": f"Score {rating}", "Percentage": pct})
     
     plot_df = pd.DataFrame(data)
@@ -245,8 +245,8 @@ def plot_confidence_planning_matrix(df: pd.DataFrame) -> go.Figure:
     }
 
     fig = go.Figure(go.Bar(
-        y=counts["Segment"],
-        x=counts["Count"],
+        y=counts["Segment"].tolist(),
+        x=counts["Count"].tolist(),
         orientation="h",
         marker=dict(color=[colors.get(s, "#64748B") for s in counts["Segment"]]),
         text=[f"{c} students ({p}%)" for c, p in zip(counts["Count"], counts["Pct"])],
@@ -261,8 +261,8 @@ def plot_confidence_planning_matrix(df: pd.DataFrame) -> go.Figure:
 
 def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
     """Financial Discipline Index (FDI) distribution histogram with mean indicator."""
-    fdi = df["FDI_Score"]
-    mean_val = float(fdi.mean())
+    fdi = [float(round(v, 1)) for v in df["FDI_Score"].dropna().tolist()] if (len(df) > 0 and "FDI_Score" in df.columns) else []
+    mean_val = float(round(sum(fdi) / len(fdi), 1)) if fdi else 0.0
 
     fig = go.Figure()
     fig.add_trace(go.Histogram(
@@ -273,11 +273,22 @@ def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
     ))
     fig.add_vline(
         x=mean_val, line_dash="dash", line_color="#1E293B", line_width=2,
-        annotation_text=f"Mean: {mean_val:.1f}", annotation_position="top right"
+        annotation_text=f"Cohort Mean: {mean_val:.1f} / 100", annotation_position="top right"
     )
     layout = get_base_layout("Financial Discipline Index (FDI) Distribution (0-100 Scale)")
-    layout["xaxis"]["title"] = "Financial Discipline Score (0 = Minimal, 100 = Exemplary)"
-    layout["yaxis"]["title"] = "Number of Students"
+    layout["xaxis"] = dict(
+        gridcolor="#F1F5F9",
+        zeroline=False,
+        range=[-2, 102],
+        dtick=10,
+        title=dict(text="Financial Discipline Score (0 = Minimal, 100 = Exemplary)")
+    )
+    layout["yaxis"] = dict(
+        gridcolor="#F1F5F9",
+        zeroline=False,
+        title=dict(text="Number of Students")
+    )
+    layout["margin"] = dict(t=40, b=40, l=45, r=25)
     fig.update_layout(**layout)
     return fig
 

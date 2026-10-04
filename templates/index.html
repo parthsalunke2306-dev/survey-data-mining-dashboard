@@ -6,8 +6,13 @@
     <title>Behavioral Insights into Financial Planning Among College Students</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Plotly.js CDN -->
+    <!-- Plotly.js CDN with CDNJS fallback -->
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <script>
+        if (typeof Plotly === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.2/plotly.min.js"><\/script>');
+        }
+    </script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Google Font: Plus Jakarta Sans -->
@@ -322,8 +327,32 @@
 
                 <!-- FDI Histogram Chart & Formula Explanation -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2">
-                        <div id="chart-fdi-dist" class="w-full h-72"></div>
+                    <div class="lg:col-span-2 space-y-3">
+                        <!-- Cohort Discipline Tier Indicators -->
+                        <div class="grid grid-cols-3 gap-2.5 text-center text-xs">
+                            <div class="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/80">
+                                <span class="text-[10px] uppercase font-bold text-amber-700 block tracking-wider">Low Discipline (0–35)</span>
+                                <span id="fdi-low-stat" class="font-extrabold text-amber-900 text-sm sm:text-base">33.6%</span>
+                                <span id="fdi-low-sub" class="text-[10px] text-amber-700 block">44 students</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-blue-50/80 border border-blue-200/80">
+                                <span class="text-[10px] uppercase font-bold text-blue-700 block tracking-wider">Moderate (36–65)</span>
+                                <span id="fdi-mod-stat" class="font-extrabold text-blue-900 text-sm sm:text-base">42.7%</span>
+                                <span id="fdi-mod-sub" class="text-[10px] text-blue-700 block">56 students</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-200/80">
+                                <span class="text-[10px] uppercase font-bold text-emerald-700 block tracking-wider">High Discipline (66–100)</span>
+                                <span id="fdi-high-stat" class="font-extrabold text-emerald-900 text-sm sm:text-base">23.7%</span>
+                                <span id="fdi-high-sub" class="text-[10px] text-emerald-700 block">31 students</span>
+                            </div>
+                        </div>
+
+                        <!-- FDI Histogram Chart Container -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden bg-white p-1 shadow-sm">
+                            <div id="chart-fdi-dist" class="w-full h-72 min-h-[18rem] flex items-center justify-center text-slate-400 text-xs">
+                                <i data-lucide="loader-2" class="w-4 h-4 animate-spin mr-1.5 text-emerald-600"></i> Loading FDI Distribution Histogram...
+                            </div>
+                        </div>
                     </div>
                     <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3 text-xs">
                         <h4 class="font-bold text-slate-800 flex items-center space-x-1.5">
@@ -873,6 +902,25 @@
             window.dispatchEvent(new Event('resize'));
         }
 
+        // Resilient Plotly Renderer with auto-retry and responsive resize
+        function safePlotlyRender(elementId, figureData, figureLayout, config = {responsive: true, displayModeBar: false}) {
+            if (!figureData) return;
+            let attempts = 0;
+            const render = () => {
+                if (typeof Plotly !== 'undefined') {
+                    Plotly.newPlot(elementId, figureData, figureLayout, config).then(() => {
+                        Plotly.Plots.resize(elementId);
+                    }).catch(err => {
+                        console.error('Error plotting ' + elementId, err);
+                    });
+                } else if (attempts < 30) {
+                    attempts++;
+                    setTimeout(render, 100);
+                }
+            };
+            render();
+        }
+
         // Fetch Dropdown Filter Options
         async function populateFilterDropdowns() {
             try {
@@ -945,49 +993,68 @@
                 document.getElementById('executive-narrative-text').innerText = k.narrative_summary;
                 document.getElementById('fdi-mean-score').innerHTML = `${k.avg_fdi_score} <span class="text-xs text-slate-500 font-normal">/ 100</span>`;
 
+                // Update FDI Tier stats
+                if (dashboardData.fdi_stats) {
+                    const fs = dashboardData.fdi_stats;
+                    const lowEl = document.getElementById('fdi-low-stat');
+                    if (lowEl) lowEl.innerText = `${fs.low_pct}%`;
+                    const lowSub = document.getElementById('fdi-low-sub');
+                    if (lowSub) lowSub.innerText = `${fs.low_count} students`;
+
+                    const modEl = document.getElementById('fdi-mod-stat');
+                    if (modEl) modEl.innerText = `${fs.mod_pct}%`;
+                    const modSub = document.getElementById('fdi-mod-sub');
+                    if (modSub) modSub.innerText = `${fs.mod_count} students`;
+
+                    const highEl = document.getElementById('fdi-high-stat');
+                    if (highEl) highEl.innerText = `${fs.high_pct}%`;
+                    const highSub = document.getElementById('fdi-high-sub');
+                    if (highSub) highSub.innerText = `${fs.high_count} students`;
+                }
+
                 // 2. Render FDI Chart
                 if (dashboardData.fdi_chart && dashboardData.fdi_chart.data) {
-                    Plotly.newPlot('chart-fdi-dist', dashboardData.fdi_chart.data, dashboardData.fdi_chart.layout, {responsive: true, displayModeBar: false});
+                    safePlotlyRender('chart-fdi-dist', dashboardData.fdi_chart.data, dashboardData.fdi_chart.layout);
                 }
 
                 // 3. Render Module 2: Demographics Charts
                 const d = dashboardData.demographics_charts;
-                if (d.academic_year_donut) Plotly.newPlot('chart-academic-year', d.academic_year_donut.data, d.academic_year_donut.layout, {responsive: true, displayModeBar: false});
-                if (d.stream_bar) Plotly.newPlot('chart-stream', d.stream_bar.data, d.stream_bar.layout, {responsive: true, displayModeBar: false});
-                if (d.living_donut) Plotly.newPlot('chart-living', d.living_donut.data, d.living_donut.layout, {responsive: true, displayModeBar: false});
-                if (d.commute_bar) Plotly.newPlot('chart-commute', d.commute_bar.data, d.commute_bar.layout, {responsive: true, displayModeBar: false});
-                if (d.academic_budget_stacked) Plotly.newPlot('chart-academic-budget', d.academic_budget_stacked.data, d.academic_budget_stacked.layout, {responsive: true, displayModeBar: false});
+                if (d.academic_year_donut) safePlotlyRender('chart-academic-year', d.academic_year_donut.data, d.academic_year_donut.layout);
+                if (d.stream_bar) safePlotlyRender('chart-stream', d.stream_bar.data, d.stream_bar.layout);
+                if (d.living_donut) safePlotlyRender('chart-living', d.living_donut.data, d.living_donut.layout);
+                if (d.commute_bar) safePlotlyRender('chart-commute', d.commute_bar.data, d.commute_bar.layout);
+                if (d.academic_budget_stacked) safePlotlyRender('chart-academic-budget', d.academic_budget_stacked.data, d.academic_budget_stacked.layout);
 
                 // 4. Render Module 3: Income Charts
                 const inc = dashboardData.income_charts;
-                if (inc.funding_donut) Plotly.newPlot('chart-funding', inc.funding_donut.data, inc.funding_donut.layout, {responsive: true, displayModeBar: false});
-                if (inc.budget_col) Plotly.newPlot('chart-budget', inc.budget_col.data, inc.budget_col.layout, {responsive: true, displayModeBar: false});
-                if (inc.tracking_bar) Plotly.newPlot('chart-tracking', inc.tracking_bar.data, inc.tracking_bar.layout, {responsive: true, displayModeBar: false});
-                if (inc.emergency_donut) Plotly.newPlot('chart-emergency', inc.emergency_donut.data, inc.emergency_donut.layout, {responsive: true, displayModeBar: false});
-                if (inc.demat_donut) Plotly.newPlot('chart-demat', inc.demat_donut.data, inc.demat_donut.layout, {responsive: true, displayModeBar: false});
-                if (inc.research_bar) Plotly.newPlot('chart-research', inc.research_bar.data, inc.research_bar.layout, {responsive: true, displayModeBar: false});
-                if (inc.comp_budget_emergency) Plotly.newPlot('chart-comp-budget', inc.comp_budget_emergency.data, inc.comp_budget_emergency.layout, {responsive: true, displayModeBar: false});
-                if (inc.comp_tracking_emergency) Plotly.newPlot('chart-comp-tracking', inc.comp_tracking_emergency.data, inc.comp_tracking_emergency.layout, {responsive: true, displayModeBar: false});
-                if (inc.comp_research_confidence) Plotly.newPlot('chart-comp-research', inc.comp_research_confidence.data, inc.comp_research_confidence.layout, {responsive: true, displayModeBar: false});
+                if (inc.funding_donut) safePlotlyRender('chart-funding', inc.funding_donut.data, inc.funding_donut.layout);
+                if (inc.budget_col) safePlotlyRender('chart-budget', inc.budget_col.data, inc.budget_col.layout);
+                if (inc.tracking_bar) safePlotlyRender('chart-tracking', inc.tracking_bar.data, inc.tracking_bar.layout);
+                if (inc.emergency_donut) safePlotlyRender('chart-emergency', inc.emergency_donut.data, inc.emergency_donut.layout);
+                if (inc.demat_donut) safePlotlyRender('chart-demat', inc.demat_donut.data, inc.demat_donut.layout);
+                if (inc.research_bar) safePlotlyRender('chart-research', inc.research_bar.data, inc.research_bar.layout);
+                if (inc.comp_budget_emergency) safePlotlyRender('chart-comp-budget', inc.comp_budget_emergency.data, inc.comp_budget_emergency.layout);
+                if (inc.comp_tracking_emergency) safePlotlyRender('chart-comp-tracking', inc.comp_tracking_emergency.data, inc.comp_tracking_emergency.layout);
+                if (inc.comp_research_confidence) safePlotlyRender('chart-comp-research', inc.comp_research_confidence.data, inc.comp_research_confidence.layout);
 
                 // 5. Render Module 4: Spending Charts
                 const sp = dashboardData.spending_charts;
-                if (sp.recent_spending_bar) Plotly.newPlot('chart-recent-spending', sp.recent_spending_bar.data, sp.recent_spending_bar.layout, {responsive: true, displayModeBar: false});
-                if (sp.peer_vs_stress_bubble) Plotly.newPlot('chart-peer-stress-bubble', sp.peer_vs_stress_bubble.data, sp.peer_vs_stress_bubble.layout, {responsive: true, displayModeBar: false});
+                if (sp.recent_spending_bar) safePlotlyRender('chart-recent-spending', sp.recent_spending_bar.data, sp.recent_spending_bar.layout);
+                if (sp.peer_vs_stress_bubble) safePlotlyRender('chart-peer-stress-bubble', sp.peer_vs_stress_bubble.data, sp.peer_vs_stress_bubble.layout);
 
                 // 6. Render Module 5: Mindset Charts
                 const m = dashboardData.mindset_charts;
-                if (m.likert_summary) Plotly.newPlot('chart-likert-summary', m.likert_summary.data, m.likert_summary.layout, {responsive: true, displayModeBar: false});
-                if (m.conf_plan_matrix) Plotly.newPlot('chart-conf-plan-matrix', m.conf_plan_matrix.data, m.conf_plan_matrix.layout, {responsive: true, displayModeBar: false});
+                if (m.likert_summary) safePlotlyRender('chart-likert-summary', m.likert_summary.data, m.likert_summary.layout);
+                if (m.conf_plan_matrix) safePlotlyRender('chart-conf-plan-matrix', m.conf_plan_matrix.data, m.conf_plan_matrix.layout);
 
                 // 7. Render Module 6: Investment Charts
                 const inv = dashboardData.invest_charts;
-                if (inv.salary_alone_donut) Plotly.newPlot('chart-salary-alone', inv.salary_alone_donut.data, inv.salary_alone_donut.layout, {responsive: true, displayModeBar: false});
-                if (inv.sip_donut) Plotly.newPlot('chart-sip-intent', inv.sip_donut.data, inv.sip_donut.layout, {responsive: true, displayModeBar: false});
-                if (inv.asset_bar) Plotly.newPlot('chart-asset-bar', inv.asset_bar.data, inv.asset_bar.layout, {responsive: true, displayModeBar: false});
-                if (inv.portfolio_review_bar) Plotly.newPlot('chart-review-freq', inv.portfolio_review_bar.data, inv.portfolio_review_bar.layout, {responsive: true, displayModeBar: false});
-                if (inv.obstacle_bar) Plotly.newPlot('chart-obstacle-bar', inv.obstacle_bar.data, inv.obstacle_bar.layout, {responsive: true, displayModeBar: false});
-                if (inv.philosophy_bar) Plotly.newPlot('chart-philosophy-bar', inv.philosophy_bar.data, inv.philosophy_bar.layout, {responsive: true, displayModeBar: false});
+                if (inv.salary_alone_donut) safePlotlyRender('chart-salary-alone', inv.salary_alone_donut.data, inv.salary_alone_donut.layout);
+                if (inv.sip_donut) safePlotlyRender('chart-sip-intent', inv.sip_donut.data, inv.sip_donut.layout);
+                if (inv.asset_bar) safePlotlyRender('chart-asset-bar', inv.asset_bar.data, inv.asset_bar.layout);
+                if (inv.portfolio_review_bar) safePlotlyRender('chart-review-freq', inv.portfolio_review_bar.data, inv.portfolio_review_bar.layout);
+                if (inv.obstacle_bar) safePlotlyRender('chart-obstacle-bar', inv.obstacle_bar.data, inv.obstacle_bar.layout);
+                if (inv.philosophy_bar) safePlotlyRender('chart-philosophy-bar', inv.philosophy_bar.data, inv.philosophy_bar.layout);
 
                 // 8. Render Findings
                 const findingsBox = document.getElementById('findings-container');
@@ -1029,7 +1096,7 @@
                 const res = await fetch('/api/mining/correlation');
                 const data = await res.json();
                 if (data.heatmap) {
-                    Plotly.newPlot('chart-spearman-heatmap', data.heatmap.data, data.heatmap.layout, {responsive: true, displayModeBar: false});
+                    safePlotlyRender('chart-spearman-heatmap', data.heatmap.data, data.heatmap.layout);
                 }
             } catch (err) {
                 console.error("Error loading correlation:", err);
@@ -1094,7 +1161,7 @@
                     yaxis: {title: 'Principal Component 2', gridcolor: '#F1F5F9'},
                     legend: {orientation: 'h', y: 1.05, x: 1, xanchor: 'right'}
                 };
-                Plotly.newPlot('chart-kmeans-pca', traces, pcaLayout, {responsive: true, displayModeBar: false});
+                safePlotlyRender('chart-kmeans-pca', traces, pcaLayout, {responsive: true, displayModeBar: false});
             } catch (err) {
                 console.error("Error loading K-Means:", err);
             }
@@ -1148,8 +1215,8 @@
                     body: JSON.stringify({target: 'Has_Emergency_Fund', algorithm: 'J48', max_depth: 3})
                 });
                 const data = await res.json();
-                if (data.gain_fig) Plotly.newPlot('chart-tree-gains', data.gain_fig.data, data.gain_fig.layout, {responsive: true, displayModeBar: false});
-                if (data.tree_fig) Plotly.newPlot('chart-tree-viz', data.tree_fig.data, data.tree_fig.layout, {responsive: true, displayModeBar: false});
+                if (data.gain_fig) safePlotlyRender('chart-tree-gains', data.gain_fig.data, data.gain_fig.layout, {responsive: true, displayModeBar: false});
+                if (data.tree_fig) safePlotlyRender('chart-tree-viz', data.tree_fig.data, data.tree_fig.layout, {responsive: true, displayModeBar: false});
             } catch (err) {
                 console.error("Error loading Decision Tree:", err);
             }
