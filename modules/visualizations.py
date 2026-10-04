@@ -1,6 +1,6 @@
 """
 Visualization Module using Plotly for Field Survey Analytics & Data Mining
-Styled with a clean slate/white/soft-neutral palette with restrained emerald/green accents (#10B981).
+Styled with a clean slate/white/soft-neutral palette with restrained emerald/green accents (#27478C).
 """
 import plotly.express as px
 import plotly.graph_objects as go
@@ -9,8 +9,8 @@ import numpy as np
 from typing import Dict, List, Any
 
 # Restrained, elegant professional palette: slate, emerald/green, subtle blues and grays
-THEME_COLORS = ["#10B981", "#3B82F6", "#64748B", "#F59E0B", "#8B5CF6", "#06B6D4", "#EF4444", "#94A3B8"]
-EMERALD = "#10B981"
+THEME_COLORS = ["#27478C","#7C97CC","#B7791F","#5A6678","#2F7D6D","#A9B4C6","#A34A3A","#D3D9E3"]
+EMERALD = "#27478C"
 SLATE_DARK = "#1E293B"
 SLATE_LIGHT = "#F8FAFC"
 BORDER_GRAY = "#E2E8F0"
@@ -18,8 +18,8 @@ BORDER_GRAY = "#E2E8F0"
 def get_base_layout(title: str = "") -> dict:
     """Standardized clean styling dictionary for Plotly charts."""
     return dict(
-        title=dict(text=title, font=dict(family="Plus Jakarta Sans, sans-serif", size=14, color=SLATE_DARK, weight=600)),
-        font=dict(family="Plus Jakarta Sans, sans-serif", color="#334155", size=12),
+        title=dict(text=title, font=dict(family="IBM Plex Sans, sans-serif", size=14, color=SLATE_DARK, weight=600)),
+        font=dict(family="IBM Plex Sans, sans-serif", color="#334155", size=12),
         paper_bgcolor="white",
         plot_bgcolor="white",
         margin=dict(t=45, b=35, l=45, r=30),
@@ -86,7 +86,7 @@ def plot_stacked_academic_budget(df: pd.DataFrame) -> go.Figure:
     ct = ct[cols]
 
     fig = go.Figure()
-    palette = ["#94A3B8", "#38BDF8", "#10B981", "#059669"]
+    palette = ["#94A3B8", "#38BDF8", "#27478C", "#059669"]
     for i, col in enumerate(cols):
         fig.add_trace(go.Bar(
             name=col,
@@ -219,7 +219,7 @@ def plot_likert_diverging(df: pd.DataFrame, likert_columns: List[str]) -> go.Fig
     plot_df = pd.DataFrame(data)
     fig = px.bar(
         plot_df, y="Question", x="Percentage", color="Rating", orientation="h",
-        color_discrete_sequence=["#EF4444", "#F97316", "#CBD5E1", "#34D399", "#10B981"],
+        color_discrete_sequence=["#EF4444", "#F97316", "#CBD5E1", "#34D399", "#27478C"],
         title="Mindset & Behavioral Likert Distribution (1 = Strongly Disagree to 5 = Strongly Agree)"
     )
     layout = get_base_layout("Mindset & Behavioral Likert Distribution")
@@ -238,7 +238,7 @@ def plot_confidence_planning_matrix(df: pd.DataFrame) -> go.Figure:
     counts["Pct"] = (counts["Count"] / n * 100).round(1)
 
     colors = {
-        "Prudent Strategists (High Conf + Action Plan)": "#10B981",
+        "Prudent Strategists (High Conf + Action Plan)": "#27478C",
         "Overconfident Optimists (High Conf + No Action Plan)": "#F59E0B",
         "Cautious Planners (Low Conf + Action Plan)": "#3B82F6",
         "Unprepared / At-Risk (Low Conf + No Action Plan)": "#EF4444"
@@ -275,7 +275,7 @@ def plot_fdi_distribution(df: pd.DataFrame) -> go.Figure:
             x=[float(x) for x in bin_centers],
             y=[int(c) for c in counts],
             width=9.5,
-            marker=dict(color="#10B981", line=dict(color="white", width=1.5)),
+            marker=dict(color="#27478C", line=dict(color="white", width=1.5)),
             name="FDI Score"
         ))
     

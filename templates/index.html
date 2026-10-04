@@ -13,7 +13,7 @@
     <!-- Google Font: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
 
     <style>
         html, body {
@@ -22,7 +22,7 @@
             width: 100%;
         }
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
             overflow-x: hidden !important;
         }
         .glass-panel {
@@ -112,7 +112,49 @@
             max-width: 100% !important;
             overflow: visible !important;
         }
-    </style>
+    
+/* ===== Redesign: research-report design system ===== */
+:root{--ink:#16202E;--muted:#5A6678;--canvas:#F4F5F7;--rule:#D8DDE5;--accent:#27478C;--accent-tint:#EDF1F9;--ochre:#B7791F}
+body{background:var(--canvas)!important;color:var(--ink)!important;font-family:'IBM Plex Sans',system-ui,sans-serif!important;font-feature-settings:'tnum'}
+h1,h2,h3,h4{font-family:'Source Serif 4',Georgia,serif!important;font-weight:600!important;letter-spacing:-.005em!important;color:var(--ink)!important}
+h2{font-size:1.35rem!important}h3{font-size:1.05rem!important}
+.uppercase{text-transform:none!important;letter-spacing:0!important}
+[class*="font-extrabold"],[class*="font-bold"]{font-weight:600!important}
+[class*="rounded-"]:not(.rounded-full){border-radius:6px!important}
+.rounded-full{border-radius:4px!important}
+.glass-panel,[class*="shadow"]{box-shadow:none!important}
+.glass-panel,[class*="bg-white"]{border-color:var(--rule)!important}
+[class*="border-slate-"]{border-color:var(--rule)!important}
+/* one accent instead of emerald/amber/blue rainbow */
+[class*="text-emerald"],[class*="text-blue-"]{color:var(--accent)!important}
+[class*="text-amber-"]{color:var(--ochre)!important}
+[class*="bg-emerald-"],[class*="bg-blue-50"],[class*="bg-amber-50"]{background:#fff!important}
+[class*="border-emerald"],[class*="border-blue-"],[class*="border-amber-"]{border-color:var(--rule)!important}
+[class*="text-slate-"]{color:var(--muted)!important}
+[class*="text-slate-800"],[class*="text-slate-900"]{color:var(--ink)!important}
+/* chrome */
+header{background:#fff!important;border-bottom:1px solid var(--rule)!important;backdrop-filter:none!important}
+aside{background:#fff!important;border-color:var(--rule)!important}
+.rd-hide{display:none!important}
+select,button,a{border-radius:4px!important}
+select{border:1px solid var(--rule)!important;background:#fff!important;color:var(--ink)!important}
+.nav-tab{border-radius:4px!important;border:0!important;border-left:3px solid transparent!important;padding:.5rem .75rem!important;font-weight:500!important;color:var(--muted)!important}
+.nav-tab:hover{background:var(--canvas)!important}
+body .nav-tab.active{background:var(--accent-tint)!important;color:var(--accent)!important;border-left-color:var(--accent)!important;box-shadow:none!important;font-weight:600!important}
+.nav-tab i,.nav-tab svg{display:none!important}
+.rd-hero{background:#fff;border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:6px;padding:1rem 1.25rem}
+.rd-hero h2{font-size:1.2rem!important;margin-bottom:.35rem}
+.rd-hero p{color:var(--ink)!important;font-size:.9rem!important;line-height:1.6!important;max-width:75ch}
+/* key figures: serif numerals, quiet labels */
+[id^="kpi-"],[id^="fdi-"][id$="-stat"],#fdi-mean-score{font-family:'Source Serif 4',Georgia,serif!important;font-weight:600!important;color:var(--ink)!important}
+#fdi-mean-score{color:var(--ochre)!important}
+i[data-lucide],svg.lucide{color:var(--muted)!important}
+[class*="bg-emerald-6"],[class*="bg-emerald-7"]{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
+[class*="bg-emerald-6"] *,[class*="bg-emerald-7"] *{color:#fff!important}
+.rd-hero p{-webkit-line-clamp:unset!important;display:block!important;overflow:visible!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
@@ -137,7 +179,7 @@
                 <div class="flex items-center space-x-1.5 flex-shrink-0">
                     <span id="badge-sample-size" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                         <span class="w-1.5 h-1.5 mr-1 bg-emerald-500 rounded-full animate-pulse"></span>
-                        n = <span id="header-sample-count">131</span> Students
+                        <span>n = <span id="header-sample-count">131</span> students</span>
                     </span>
                     <a href="/api/download/cleaned-data" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition border border-slate-200">
                         <i data-lucide="download" class="w-3 h-3 mr-1 text-slate-500"></i> Cleaned CSV
@@ -205,8 +247,7 @@
             <!-- Top Section: Navigation Modules -->
             <div class="space-y-1.5">
                 <div class="mb-1.5 px-2 hidden md:flex items-center justify-between">
-                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Navigation</span>
-                    <span class="text-[9px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded-full border border-emerald-200">8 Modules</span>
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Sections</span>
                 </div>
 
                 <!-- Navigation Buttons: Stacked Vertically on Desktop -->
@@ -216,7 +257,6 @@
                             <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 flex-shrink-0"></i>
                             <span class="truncate">Overview</span>
                         </div>
-                        <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M1</span>
                     </button>
 
                     <button onclick="switchTab('demographics')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-demographics" title="Student Demographics">
@@ -224,7 +264,6 @@
                             <i data-lucide="users" class="w-3.5 h-3.5 flex-shrink-0"></i>
                             <span class="truncate">Demographics</span>
                         </div>
-                        <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M2</span>
                     </button>
 
                     <button onclick="switchTab('income')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-income" title="Income & Financial Discipline">
@@ -232,7 +271,6 @@
                             <i data-lucide="landmark" class="w-3.5 h-3.5 flex-shrink-0"></i>
                             <span class="truncate">Income & Discipline</span>
                         </div>
-                        <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M3</span>
                     </button>
 
                     <button onclick="switchTab('spending')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-spending" title="Spending Behaviour & Psychology">
@@ -240,7 +278,6 @@
                             <i data-lucide="shopping-cart" class="w-3.5 h-3.5 flex-shrink-0"></i>
                             <span class="truncate">Spending Psychology</span>
                         </div>
-                        <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M4</span>
                     </button>
 
                     <button onclick="switchTab('mindset')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-mindset" title="Financial Mindset & Planning">
@@ -248,7 +285,6 @@
                             <i data-lucide="brain" class="w-3.5 h-3.5 flex-shrink-0"></i>
                             <span class="truncate">Mindset & Planning</span>
                         </div>
-                        <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M5</span>
                     </button>
 
                     <button onclick="switchTab('invest')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-invest" title="Investment Readiness">
@@ -256,7 +292,6 @@
                             <i data-lucide="trending-up" class="w-3.5 h-3.5 flex-shrink-0"></i>
                             <span class="truncate">Investment Readiness</span>
                         </div>
-                        <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M6</span>
                     </button>
 
                     <button onclick="switchTab('datamining')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-datamining" title="Data Mining Suite">
@@ -264,7 +299,6 @@
                             <i data-lucide="cpu" class="w-3.5 h-3.5 flex-shrink-0"></i>
                             <span class="truncate">Data Mining Suite</span>
                         </div>
-                        <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M7</span>
                     </button>
 
                     <button onclick="switchTab('findings')" class="nav-tab w-full py-1.5 px-2.5 transition flex items-center justify-between text-left text-xs font-semibold rounded-lg" id="tab-btn-findings" title="Key Findings & Academic Conclusions">
@@ -272,7 +306,6 @@
                             <i data-lucide="lightbulb" class="w-3.5 h-3.5 flex-shrink-0"></i>
                             <span class="truncate">Findings & Insights</span>
                         </div>
-                        <span class="text-[9px] text-slate-400 font-medium hidden md:inline ml-1">M8</span>
                     </button>
                 </nav>
             </div>
@@ -280,7 +313,7 @@
             <!-- Bottom Section: Telemetry, Active Models & Research Details -->
             <div class="mt-3 pt-2.5 border-t border-slate-200/80 space-y-2 hidden md:block">
                 <!-- Live Cohort Snapshot Widget -->
-                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <div class="rd-hide p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
                     <div class="flex items-center justify-between">
                         <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Cohort Telemetry</span>
                         <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800">
@@ -309,7 +342,7 @@
                 </div>
 
                 <!-- Active Data Mining Algorithms Card -->
-                <div class="p-2 rounded-xl bg-emerald-50/50 border border-emerald-200/60 text-[10px] space-y-1">
+                <div class="rd-hide p-2 rounded-xl bg-emerald-50/50 border border-emerald-200/60 text-[10px] space-y-1">
                     <div class="flex items-center space-x-1.5 font-bold text-emerald-900">
                         <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-600"></i>
                         <span>Active Mining Models</span>
@@ -329,7 +362,6 @@
                             <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-emerald-600"></i>
                             <span>BSc Data Science</span>
                         </span>
-                        <span class="text-[9px] font-semibold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-200">Field Study</span>
                     </div>
                     <p class="text-[9px] text-slate-400 leading-tight">131 Student Responses • Pure Python Analytics</p>
                     <div class="grid grid-cols-2 gap-1 pt-0.5 text-[10px]">
@@ -350,15 +382,9 @@
         <!-- ================= MODULE 1: EXECUTIVE OVERVIEW ================= -->
         <section id="tab-overview" class="space-y-2.5">
             <!-- Executive Narrative Banner -->
-            <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 rounded-xl p-3 sm:p-3.5 text-white shadow-xs relative overflow-hidden">
+            <div class="rd-hero">
                 <div class="relative z-10 max-w-5xl space-y-1.5">
-                    <div class="flex items-center space-x-2">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            Empirical Study
-                        </span>
-                        <span class="text-[11px] text-slate-400">• BSc Data Science Field Project</span>
-                    </div>
-                    <h2 class="text-sm sm:text-base font-extrabold tracking-tight">Executive Summary & Analytical Narrative</h2>
+                    <h2 class="text-sm sm:text-base font-extrabold tracking-tight">Summary of findings</h2>
                     <p id="executive-narrative-text" class="text-xs text-slate-300 leading-snug line-clamp-2 hover:line-clamp-none transition-all cursor-pointer" title="Hover or click to view full narrative">
                         Loading dynamically computed narrative summary...
                     </p>
