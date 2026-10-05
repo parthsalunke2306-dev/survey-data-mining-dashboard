@@ -1,93 +1,108 @@
 """
-K-Nearest Neighbors (KNN) Classifier Module
-===========================================
-VIVA EXPLANATION GUIDE FOR PROFESSOR:
-1. What this code does:
-   Classifies students (e.g. predicting whether they have an Emergency Fund)
-   based on the financial habits of their k-nearest peers in feature space.
-2. Python Libraries used:
-   - scikit-learn (sklearn): Standard machine learning library.
-   - pandas & numpy: For data preprocessing.
-3. Built-in functions used:
-   - sklearn.model_selection.train_test_split(): Splits data into 75% training and 25% testing sets.
-   - sklearn.preprocessing.StandardScaler(): Normalizes features so Euclidean distances are not biased by scale.
-   - sklearn.neighbors.KNeighborsClassifier(): Fits the KNN model using majority voting of k nearest neighbors.
-   - sklearn.metrics.accuracy_score(), confusion_matrix(), classification_report(): Standard classification evaluation metrics.
-4. Why these built-ins are used:
-   Avoids manual Euclidean distance calculation loops and provides academically standard model evaluation.
-5. Output produced:
-   Dictionary containing overall accuracy, k-accuracy curve, confusion matrix, and classification report.
+Pure Python K-Nearest Neighbors (KNN) Classifier Module
+Zero external C-extension DLL dependencies (immune to Windows AppLocker).
+Implements Euclidean distance calculation, k-nearest search, majority voting,
+train/test splits, and confusion matrix evaluation.
 """
-
 import numpy as np
 import pandas as pd
-from typing import Dict, Any
-
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-
+from collections import Counter
+from typing import Dict, List, Any, Tuple
 
 def run_knn_classification(df: pd.DataFrame, target: str = "Has_Emergency_Fund", k: int = 5) -> Dict[str, Any]:
     """
-    Trains and evaluates a K-Nearest Neighbors Classifier using Scikit-Learn.
+    Pure Python & NumPy implementation of K-Nearest Neighbors.
     """
-    if len(df) == 0 or target not in df.columns:
-        return {}
-
     feature_cols = [
         "Peer_Pressure_Spend", "Stress_Spend", "Financial_Confidence",
         "Lifestyle_Upgrade_Spend", "Wealth_Plan_Readiness"
     ]
-    num_features = [c for c in feature_cols if c in df.columns]
+    feature_cols = [c for c in feature_cols if c in df.columns]
 
+    # Categorical one-hot encoding in pure pandas
     cat_cols = ["Monthly_Budget", "Tracking_Method", "Research_Frequency"]
-    cat_features = [c for c in cat_cols if c in df.columns]
+    cat_cols = [c for c in cat_cols if c in df.columns]
 
-    # One-hot encode categorical features using Pandas get_dummies
-    X_cat = pd.get_dummies(df[cat_features], drop_first=True, dtype=float)
-    X_num = df[num_features].copy().fillna(3).astype(float)
-    X = pd.concat([X_num, X_cat], axis=1)
-    y = df[target].astype(str)
+    X_cat = pd.get_dummies(df[cat_cols], drop_first=True, dtype=float)
+    X_num = df[feature_cols].copy().fillna(3).astype(float)
+    X = pd.concat([X_num, X_cat], axis=1).values
+    y = df[target].astype(str).values
 
-    # Train / Test Split using Scikit-Learn
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.25, random_state=42, stratify=y
-    )
+    # Stratified Train/Test Split (75% / 25%) in pure Python
+    np.random.seed(42)
+    classes = np.unique(y)
+    train_indices = []
+    test_indices = []
+    
+    for c in classes:
+        c_idxs = np.where(y == c)[0]
+        np.random.shuffle(c_idxs)
+        split = int(len(c_idxs) * 0.75)
+        train_indices.extend(c_idxs[:split])
+        test_indices.extend(c_idxs[split:])
 
-    # Feature Scaling using StandardScaler
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
+    X_train, y_train = X[train_indices], y[train_indices]
+    X_test, y_test = X[test_indices], y[test_indices]
 
-    # Evaluate across test k values for hyperparameter comparison
+    # Z-score normalization based on training set
+    mean = np.mean(X_train, axis=0)
+    std = np.std(X_train, axis=0)
+    std[std == 0] = 1.0
+    X_train_scaled = (X_train - mean) / std
+    X_test_scaled = (X_test - mean) / std
+
+    # Helper: predict for single query vector
+    def predict_one(x_query, curr_k):
+        dists = np.sqrt(np.sum((X_train_scaled - x_query) ** 2, axis=1))
+        k_indices = np.argsort(dists)[:curr_k]
+        k_labels = y_train[k_indices]
+        return Counter(k_labels).most_common(1)[0][0]
+
+    # Evaluate across test k values
     k_accuracies = []
     for test_k in [1, 3, 5, 7, 9]:
-        knn_eval = KNeighborsClassifier(n_neighbors=test_k)
-        knn_eval.fit(X_train_scaled, y_train)
-        preds_eval = knn_eval.predict(X_test_scaled)
-        acc_eval = accuracy_score(y_test, preds_eval)
-        k_accuracies.append({"k": test_k, "accuracy": round(float(acc_eval), 4)})
+        preds = [predict_one(x, test_k) for x in X_test_scaled]
+        acc = np.mean(np.array(preds) == y_test)
+        k_accuracies.append({"k": test_k, "accuracy": round(float(acc), 4)})
 
-    # Fit final KNN model with requested k
-    knn = KNeighborsClassifier(n_neighbors=k)
-    knn.fit(X_train_scaled, y_train)
-    final_preds = knn.predict(X_test_scaled)
+    # Final predictions for requested k
+    final_preds = [predict_one(x, k) for x in X_test_scaled]
+    overall_acc = float(np.mean(np.array(final_preds) == y_test))
 
-    # Performance Evaluation using built-in Scikit-Learn metrics
-    overall_acc = float(accuracy_score(y_test, final_preds))
-    cm = confusion_matrix(y_test, final_preds)
-    report = classification_report(y_test, final_preds, output_dict=True, zero_division=0)
+    # Confusion matrix in pure Python
+    labels = sorted(list(classes))
+    cm = []
+    for actual in labels:
+        row = []
+        for predicted in labels:
+            count = sum(1 for a, p in zip(y_test, final_preds) if a == actual and p == predicted)
+            row.append(count)
+        cm.append(row)
 
-    classes = sorted(list(np.unique(y)))
+    # Classification metrics
+    report = {}
+    for i, lbl in enumerate(labels):
+        tp = cm[i][i]
+        fp = sum(cm[r][i] for r in range(len(labels)) if r != i)
+        fn = sum(cm[i][c] for c in range(len(labels)) if c != i)
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+        support = sum(cm[i])
+        report[lbl] = {
+            "precision": round(precision, 3),
+            "recall": round(recall, 3),
+            "f1-score": round(f1, 3),
+            "support": support
+        }
 
     return {
         "k": k,
-        "overall_accuracy": round(overall_acc, 4),
-        "k_accuracies": k_accuracies,
-        "classes": classes,
-        "confusion_matrix": cm.tolist(),
+        "accuracy": round(overall_acc, 4),
+        "k_tuning": k_accuracies,
+        "confusion_matrix": cm,
+        "labels": labels,
         "classification_report": report,
-        "feature_names": list(X.columns)
+        "n_train": len(X_train),
+        "n_test": len(X_test)
     }
